@@ -1,0 +1,352 @@
+#include "json_stuff.hpp"
+#include "map.hpp"
+#include "animation.hpp"
+#include "map_info.hpp"
+#include "rpgmmz/system_mz.hpp"
+#include "system.hpp"
+#include "tileset.hpp"
+#include "weapon.hpp"
+#include "event.hpp"
+#include "command_factory.hpp"
+
+#include "glaze/json/read.hpp"
+#include "glaze/json/write.hpp"
+//#include "glaze/glaze.hpp"
+//#include "glaze/json/raw_string.hpp"
+
+#include <QFile>
+#include <QDebug>
+
+template <>
+struct glz::from<glz::JSON, Command>
+{
+	template <auto Opts>
+	static bool read_k(std::string_view sv, is_context auto&& ctx, auto&& it, auto&& end)
+	{
+		static std::string_view buffer = "XXXXXXXXXXXXXXXXXXXX";
+		skip_ws<Opts>(ctx, it, end);
+		parse<JSON>::op<Opts>(buffer, ctx, it, end);
+		if (buffer != sv)
+		{
+			ctx.error = error_code::unknown_key;
+			return true;
+		}
+
+		skip_ws<Opts>(ctx, it, end);
+		if (match<':'>(ctx, it))
+			return true;
+
+		return false;
+	}
+
+	template <auto Opts>
+	static bool read_kv(std::string_view sv, int &value, is_context auto&& ctx, auto&& it, auto&& end)
+	{
+		if (read_k<Opts>(sv, ctx, it, end))
+			return true;
+
+		skip_ws<Opts>(ctx, it, end);
+		parse<JSON>::op<Opts>(value, ctx, it, end);
+
+		skip_ws<Opts>(ctx, it, end);
+		if (match<','>(ctx, it))
+			return true;
+
+		return false;
+	}
+
+	template <auto Opts>
+	static void op(Command& value, is_context auto&& ctx, auto&& it, auto&& end)
+	{
+		skip_ws<Opts>(ctx, it, end);
+		if (match<'{'>(ctx, it))
+			return;
+
+		if (read_kv<Opts>("code", value.code, ctx, it, end))
+			return;
+
+		if (read_kv<Opts>("indent", value.indent, ctx, it, end))
+			return;
+
+		if (read_k<Opts>("parameters", ctx, it, end))
+			return;
+
+		skip_ws<Opts>(ctx, it, end);
+		const auto start = it++;
+		skip_until_closed<Opts, '[', ']'>(ctx, it, end);
+		value.parameters = CommandFactory::createCommand2(value.code);
+		value.parameters->read({ start, size_t(it - start) });
+
+		skip_ws<Opts>(ctx, it, end);
+		if (match<'}'>(ctx, it))
+		{
+			//qDebug().noquote() << value.parameters;
+			return;
+		}
+	}
+};
+
+
+template <>
+struct glz::to<glz::JSON, QSharedPointer<ICommand>>
+{
+	template <auto Opts>
+	static void op(QSharedPointer<ICommand>& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+	{
+		serialize<JSON>::op<glz::opts{.raw = true}>(value->write(), ctx, it, end);
+	}
+};
+
+namespace glz
+{
+	template<>
+	struct from<JSON, QString>
+	{
+		template <auto Opts>
+		static void op(QString& value, auto&&... args)
+		{
+			std::string buffer {};
+			parse<JSON>::op<Opts>(buffer, args...);
+			value = QString::fromStdString(buffer);
+		}
+	};
+
+	template<>
+	struct to<JSON, QString>
+	{
+		template <auto Opts>
+		static void op(QString& value, auto&&... args)
+		{
+			std::string buffer = value.toStdString();
+			serialize<JSON>::op<Opts>(buffer, args...);
+		}
+	};
+}
+
+
+/*template <>
+struct glz::meta<Command>
+{
+	using T = Command;
+	static constexpr auto value = glz::object("code", &T::code,
+											  "indent", &T::indent,
+											  //"parameters", glz::raw<&T::parameters>,
+											  "parameters", &T::parameters);
+};*/
+
+/*template <>
+struct glz::to<glz::JSON, Command>
+{
+	template <auto Opts>
+	static void op(Command& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+	{
+		serialize<JSON>::op<Opts>("{code:", ctx, it, end);
+		serialize<JSON>::op<Opts>(value.code, ctx, it, end);
+		serialize<JSON>::op<Opts>(",indent:", ctx, it, end);
+		serialize<JSON>::op<Opts>(value.indent, ctx, it, end);
+		serialize<JSON>::op<Opts>(",parameters:", ctx, it, end);
+		serialize<JSON>::op<Opts>(value.parameters, ctx, it, end);
+		serialize<JSON>::op<Opts>("}", ctx, it, end);
+	}
+};*/
+
+template <>
+struct glz::from<glz::JSON, Route>
+{
+	template <auto Opts>
+	static void op(Route& value, is_context auto&& ctx, auto&& it, auto&& end)
+	{
+		const auto start = it++;
+		skip_until_closed<Opts, '{', '}'>(ctx, it, end);
+		value.parseLater = { start, size_t(it - start) };
+	}
+};
+
+template <>
+struct glz::to<glz::JSON, Route>
+{
+	template <auto Opts>
+	static void op(Route& value, is_context auto&& ctx, auto&& it, auto&& end)
+	{
+		/*const auto start = it++;
+		skip_until_closed<Opts, '{', '}'>(ctx, it, end);
+		value.parseLater = { start, size_t(it - start) };*/
+		serialize<JSON>::op<glz::opts{.raw = true}>(value.parseLater, ctx, it, end);
+	}
+};
+
+template <>
+struct glz::from<glz::JSON>
+{
+	template <auto Opts>
+	static void op(Timing& value, is_context auto&& ctx, auto&& it, auto&& end)
+	{
+		const auto start = it++;
+		skip_until_closed<Opts, '{', '}'>(ctx, it, end);
+		//value.parseLater = { start, size_t(it - start) };
+	}
+};
+
+bool showParsingError(glz::error_ctx err, QString filename)
+{
+	if (err)
+	{
+		qDebug() << glz::format_error(err, std::string{});
+		QFile file(filename);
+		file.open(QIODevice::ReadOnly);
+		if (err.location > 10)
+		{
+			file.skip(err.location - 10);
+			qDebug().noquote() << file.read(30);
+			qDebug().noquote() << "          ^";
+		}
+		return false;
+	}
+
+	return true;
+}
+
+/*template<>
+bool loadJson<Item>(QString filename, std::vector<std::optional<Item>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}*/
+
+template<>
+bool loadJson<Weapon>(QString filename, std::vector<std::optional<Weapon>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Event>(QString filename, std::vector<std::optional<Event>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<MapInfo>(QString filename, std::vector<std::optional<MapInfo>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<TileSet>(QString filename, std::vector<std::optional<TileSet>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Map>(QString filename, Map &object)
+{
+	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<System>(QString filename, System &object)
+{
+	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<MZ::System>(QString filename, MZ::System &object)
+{
+	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool saveJson<Weapon>(QString filename, std::vector<std::optional<Weapon>> &vector)
+{
+	QFile json_file(filename);
+	if (!json_file.open(QFile::WriteOnly))
+		return false;
+
+	json_file.write("[\n");
+
+	std::string buffer;
+	glz::error_ctx err;
+	bool first = true;
+
+	for (size_t i = 0; i < vector.size(); i++)
+	{
+		json_file.write(first ? "\n" : ",\n");
+
+		err = glz::write_json(vector.at(i), buffer);
+		if (err)
+		{
+			qDebug() << err;
+			return false;
+		}
+
+		json_file.write(buffer.data(), buffer.size());
+		first = false;
+	}
+
+	json_file.write("\n]");
+	return true;
+}
+
+template<>
+bool saveJson<Event>(QString filename, std::vector<std::optional<Event>> &vector)
+{
+	QFile json_file(filename);
+	if (!json_file.open(QFile::WriteOnly))
+		return false;
+
+	json_file.write("[\n");
+
+	std::string buffer;
+	glz::error_ctx err;
+	bool first = true;
+
+	for (size_t i = 0; i < vector.size(); i++)
+	{
+		json_file.write(first ? "\n" : ",\n");
+
+		err = glz::write_json(vector.at(i), buffer);
+		if (err)
+		{
+			qDebug() << err;
+			return false;
+		}
+
+		json_file.write(buffer.data(), buffer.size());
+		first = false;
+	}
+
+	json_file.write("\n]");
+	return true;
+}
+
+void printParsingError(const std::string &message, const QString &filename, int location)
+{
+	if (!message.empty())
+	{
+		//qDebug() << glz::format_error(err, std::string{});
+		qDebug() << message;
+		QFile file(filename);
+		file.open(QIODevice::ReadOnly);
+		if (location > 10)
+		{
+			file.skip(location - 10);
+			qDebug().noquote() << file.read(30);
+			qDebug().noquote() << "          ^";
+		}
+	}
+}
+
+template<>
+bool saveJson<Map>(QString filename, Map &object)
+{
+	glz::error_ctx err = glz::write_file_json(object, filename.toLatin1().data(), std::string{});
+	return showParsingError(err, filename);
+}
+

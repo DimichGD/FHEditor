@@ -1,0 +1,67 @@
+#pragma once
+#include "tileset.hpp"
+#include <QGraphicsView>
+#include <QGraphicsScene>
+
+class TilePickerScene: public QGraphicsScene
+{
+	Q_OBJECT
+
+public:
+	TilePickerScene(QObject *parent = nullptr);
+	void setBackgroundPixmap(QPixmap *pixmap);
+	void setSelectionRect(const QRect &rect);
+	void clearSelection();
+
+protected:
+	void drawBackground(QPainter *painter, const QRectF &rect) override;
+
+private:
+	QPixmap *backgroundPixmap = nullptr;
+	QRect selectionRect {};
+	QGraphicsRectItem *cursorItem = nullptr;
+	bool is16x16 = false;
+};
+
+// ---------------------------------------------------
+
+class TilePickerView: public QGraphicsView
+{
+	Q_OBJECT
+
+public:
+	TilePickerView(QWidget *parent = nullptr);
+	void setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap *pixmap);
+	void selectRect(const QPoint &first, const QPoint &second);
+	void selectPoint(const QPoint &point);
+	void clearSelection();
+
+public slots:
+	void selectTile(int tileId);
+
+signals:
+	void tileSelected(TileSet::Set setIndex, int x, int y);
+	void multipleTilesSelected(TileSet::Set setIndex, const QRect &rect);
+
+protected:
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
+	void resizeEvent(QResizeEvent *event) override;
+
+private:
+	enum DragOp { NONE, SCROLL, SELECT };
+	DragOp currentDragOp = NONE;
+	QPoint dragStart {};
+
+	bool skipEvents = true;
+	int tileSize = 0;
+	int pixmapWidth = 0;
+
+	TileSet::Set setIndex;
+	QRect tilesSelectionRect {};
+	QRect lastTilesSelectionRect {};
+
+	TilePickerScene *scene = nullptr;
+};
+

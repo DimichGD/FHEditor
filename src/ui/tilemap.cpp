@@ -61,10 +61,7 @@ TileMap::TileMap()
 
 void TileMap::loadTileSet(int id)
 {
-	mask.reset();
-	autoTilesFlag = false;
-	for (int i = 0; i < TileSet::COUNT; i++)
-		tileSets[i] = QPixmap();
+	clear();
 
 	TileSet *tileSet = Database::Get()->tileSet(id);
 	if (tileSet->tilesetNames.size() != TileSet::COUNT)
@@ -107,7 +104,7 @@ int TileMap::tileId(int x, int y, int z)
 	return tileLayers[z][y * map->width + x];
 }
 
-TileGraphicsInfo TileMap::tileItemInfo(int tileId)
+TileItemInfo TileMap::tileItemInfo(int tileId)
 {
 	TileSet::Set index = tilesetIndexFromId(tileId);
 	tileId &= 0xFF;
@@ -121,14 +118,14 @@ TileGraphicsInfo TileMap::tileItemInfo(int tileId)
 		y -= 16;
 	}
 
-	TileGraphicsInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
+	TileItemInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
 							&tileSets[index], tileId };
 	return info;
 }
 
-TileGraphicsInfo TileMap::tileItemInfo(int x, int y, TileSet::Set setIndex)
+TileItemInfo TileMap::tileItemInfo(int x, int y, TileSet::Set setIndex)
 {
-	int id = y * 8 + x + tileIdOffset(setIndex);
+	int tileId = y * 8 + x + tileIdOffset(setIndex);
 
 	if (y >= 16)
 	{
@@ -136,8 +133,8 @@ TileGraphicsInfo TileMap::tileItemInfo(int x, int y, TileSet::Set setIndex)
 		y -= 16;
 	}
 
-	TileGraphicsInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
-							&tileSets[setIndex], id };
+	TileItemInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
+							&tileSets[setIndex], tileId };
 	return info;
 }
 
@@ -148,10 +145,11 @@ void TileMap::putTile(int x, int y, int z, int id)
 
 void TileMap::clear()
 {
+	mask.reset();
+	autoTilesFlag = false;
+
 	for (int i = 0; i < TileSet::COUNT; i++)
 		tileSets[i] = QPixmap();
-
-	//tileLayers.clear();
 }
 
 

@@ -41,7 +41,7 @@ void Command_401::read(const std::string &str)
 	std::tuple<QString> params;
 	glz::error_ctx err = glz::read_json(params, str);
 	if (err)
-		qDebug() << glz::format_error(err);
+		qDebug() << QString::fromStdString(glz::format_error(err));
 
 	line = std::get<0>(params);
 }
@@ -53,7 +53,7 @@ std::string Command_401::write()
 	glz::expected<std::string, glz::error_ctx> result = glz::write_json(params);
 	if (!result.has_value())
 	{
-		qDebug() << glz::format_error(result.error());
+		qDebug() << QString::fromStdString(glz::format_error(result.error()));
 		return "";
 	}
 

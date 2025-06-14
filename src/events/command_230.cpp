@@ -21,7 +21,7 @@ Command_230 Command_230::parse(const std::string &parameters)
 	std::tuple<int> params;
 	glz::error_ctx err = glz::read_json(params, parameters);
 	if (err)
-		qDebug() << glz::format_error(err);
+		qDebug() << QString::fromStdString(glz::format_error(err));
 
 	return std::make_from_tuple<Command_230>(params);
 }

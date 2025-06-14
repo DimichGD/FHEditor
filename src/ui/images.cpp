@@ -1,5 +1,5 @@
 #include "images.hpp"
-#include <QSettings>
+#include "settings.hpp"
 #include <QDir>
 #include <QBuffer>
 #include <QImageReader>
@@ -12,11 +12,10 @@ Images *Images::Get()
 
 bool Images::load()
 {
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
-	if (!settings.contains("path") || settings.value("path").toString().isEmpty())
+	if (Settings::Get()->lastPath.isEmpty())
 		return false;
 
-	path = settings.value("path").toString() + "/img/";
+	path = Settings::Get()->lastPath + "/img/";
 	QDir imgDir(path);
 	if (!imgDir.exists())
 		return false;

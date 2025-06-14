@@ -11,7 +11,7 @@ void Command_353::drawImpl(QPainter *painter, bool selected, QRect &rect)
 Command_353 Command_353::parse(const std::string &parameters)
 {
 	if (parameters != "[]")
-		qDebug() << "Parameters is not [], it's" << parameters;
+		qDebug() << "Parameters is not [], it's" << QString::fromStdString(parameters);
 
 	return {};
 }

@@ -1,10 +1,10 @@
 #include "database.hpp"
 #include "iconset.hpp"
 #include "json_stuff.hpp"
-#include "rpgmmz/system_mz.hpp"
+#include "settings.hpp"
+//#include "rpgmmz/system_mz.hpp"
 
 #include <QFile>
-#include <QSettings>
 #include <QMessageBox>
 
 
@@ -16,14 +16,17 @@ Database *Database::Get()
 
 bool Database::load(Type type)
 {
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
+	if (Settings::Get()->lastPath.isEmpty())
+		return false;
+
+	QString path = Settings::Get()->lastPath;
 	std::string buffer;
 	QString errorMessage;
 
 	// ------------ Items ------------
 	if (type & Type::ITEMS)
 	{
-		QString filename = settings.value("path").toString() + "/data/Items.json";
+		QString filename = path + "/data/Items.json";
 		if (!loadJson(filename, getVector<Item>()))
 			errorMessage += "Failed to load 'Items.json'\n";
 	}
@@ -31,7 +34,7 @@ bool Database::load(Type type)
 	// ----------- Weapons ------------
 	if (type & Type::WEAPONS)
 	{
-		QString filename = settings.value("path").toString() + "/data/Weapons.json";
+		QString filename = path + "/data/Weapons.json";
 		if (!loadJson(filename, getVector<Weapon>()))
 			errorMessage += "Failed to load 'Weapons.json'\n";
 	}
@@ -39,7 +42,7 @@ bool Database::load(Type type)
 	// ----------- Armors -------------
 	if (type & Type::ARMORS)
 	{
-		QString filename = settings.value("path").toString() + "/data/Armors.json";
+		QString filename = path + "/data/Armors.json";
 		if (!loadJson(filename, getVector<Armor>()))
 			errorMessage += "Failed to load 'Armors.json'\n";
 	}
@@ -47,7 +50,7 @@ bool Database::load(Type type)
 	// ----------- Events ------------
 	if (type & Type::EVENTS)
 	{
-		QString filename = settings.value("path").toString() + "/data/CommonEvents.json";
+		QString filename = path + "/data/CommonEvents.json";
 		if (!loadJson(filename, getVector<Event>()))
 			errorMessage += "Failed to load 'CommonEvents.json'\n";
 	}
@@ -55,9 +58,10 @@ bool Database::load(Type type)
 	// ----------- System -----------
 	if (type & Type::SYSTEM)
 	{
-		QString filename = settings.value("path").toString() + "/data/System.json";
+		QString filename = path + "/data/System.json";
 		if (!loadJson(filename, systemObject))
-		{
+			errorMessage += "Failed to load 'System.json'\n";
+		/*{
 			errorMessage += "Failed to load 'System.json'\n";
 			MZ::System systemMZObject;
 			if (!loadJson(filename, systemMZObject))
@@ -72,13 +76,13 @@ bool Database::load(Type type)
 		else
 		{
 			currentVersion = Version::MV;
-		}
+		}*/
 	}
 
 	// ---------- Map Info -----------
 	if (type & Type::MAP_INFO)
 	{
-		QString filename = settings.value("path").toString() + "/data/MapInfos.json";
+		QString filename = path + "/data/MapInfos.json";
 		if (!loadJson(filename, getVector<MapInfo>()))
 			errorMessage += "Failed to load 'MapInfos.json'\n";
 	}
@@ -86,7 +90,7 @@ bool Database::load(Type type)
 	// ---------- Tile Sets ----------
 	if (type & Type::TILE_SETS)
 	{
-		QString filename = settings.value("path").toString() + "/data/Tilesets.json";
+		QString filename = path + "/data/Tilesets.json";
 		if (!loadJson(filename, getVector<TileSet>()))
 			errorMessage += "Failed to load 'Tilesets.json'\n";
 	}
@@ -94,7 +98,7 @@ bool Database::load(Type type)
 	// --------- Animations ----------
 	if (type & Type::ANIMATION)
 	{
-		QString filename = settings.value("path").toString() + "/data/Animations.json";
+		QString filename = path + "/data/Animations.json";
 		if (!loadJson(filename, getVector<Animation>()))
 			errorMessage += "Failed to load 'Animations.json'\n";
 	}
@@ -102,7 +106,7 @@ bool Database::load(Type type)
 	// ----------- Skills ------------
 	if (type & Type::SKILLS)
 	{
-		QString filename = settings.value("path").toString() + "/data/Skills.json";
+		QString filename = path + "/data/Skills.json";
 		if (!loadJson(filename, getVector<Skill>()))
 			errorMessage += "Failed to load 'Skills.json'\n";
 	}
@@ -110,7 +114,7 @@ bool Database::load(Type type)
 	// ----------- States ------------
 	if (type & Type::STATE)
 	{
-		QString filename = settings.value("path").toString() + "/data/States.json";
+		QString filename = path + "/data/States.json";
 		if (!loadJson(filename, getVector<State>()))
 			errorMessage += "Failed to load 'States.json'\n";
 	}
@@ -130,12 +134,15 @@ bool Database::load(Type type)
 
 bool Database::save(Type type)
 {
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
+	if (Settings::Get()->lastPath.isEmpty())
+		return false;
+
+	QString path = Settings::Get()->lastPath;
 
 	// ------------ Items ------------
 	if (type & Type::ITEMS)
 	{
-		QString filename = settings.value("path").toString() + "/data/Items.json";
+		QString filename = path + "/data/Items.json";
 		if (!saveJson<Item>(filename, getVector<Item>()))
 			qDebug() << "Error while saving Items.json";
 	}
@@ -143,7 +150,7 @@ bool Database::save(Type type)
 	// ----------- Weapons ------------
 	if (type & Type::WEAPONS)
 	{
-		QString filename = settings.value("path").toString() + "/data/Weapons.json";
+		QString filename = path + "/data/Weapons.json";
 		if (!saveJson<Weapon>(filename, getVector<Weapon>()))
 			qDebug() << "Error while saving Weapons.json";
 	}
@@ -151,7 +158,7 @@ bool Database::save(Type type)
 	// ------------ Events ------------
 	if (type & Type::EVENTS)
 	{
-		QString filename = settings.value("path").toString() + "/data/CommonEvents.json";
+		QString filename = path + "/data/CommonEvents.json";
 		if (!saveJson<Event>(filename, getVector<Event>()))
 			qDebug() << "Error while saving CommonEvents.json";
 	}
@@ -161,9 +168,12 @@ bool Database::save(Type type)
 
 void Database::saveMap(int id)
 {
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
-	QString filename = settings.value("path").toString() + QString("/data/Map%1.json")
-			.arg(id, 3, 10, '0');
+	if (Settings::Get()->lastPath.isEmpty())
+		return;
+
+	QString path = Settings::Get()->lastPath;
+	QString filename = path + QString("/data/Map%1.json")
+			.arg(id, 3, 10, QChar('0'));
 	saveJson<Map>(filename, mapObject);
 }
 
@@ -210,11 +220,14 @@ Map *Database::map(int id)
 	if (it != maps.end())
 		return &it->second;*/
 
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
-	QString filename = QString("Map%1.json").arg(id, 3, 10, '0');
+	if (Settings::Get()->lastPath.isEmpty())
+		return nullptr;
+
+	QString path = Settings::Get()->lastPath;
+	QString filename = QString("Map%1.json").arg(id, 3, 10, QChar('0'));
 
 	//maps[id] = {};
-	if (!loadJson(settings.value("path").toString() + "/data/" + filename, mapObject))
+	if (!loadJson(path + "/data/" + filename, mapObject))
 	{
 		qDebug() << QString("Failed to load '%1'").arg(filename);
 		//maps.erase(id);

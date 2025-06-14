@@ -1,19 +1,15 @@
 #include "map_view.hpp"
-#include "database.hpp"
-#include "images.hpp"
 
-#include <QSettings>
 #include <QFile>
 #include <QMouseEvent>
 #include <QScrollBar>
-#include <QPixmapCache>
 #include <QGraphicsPixmapItem>
 
 bool EventGraphicsItem::drawFullItem = false;
 
-EventGraphicsItem::EventGraphicsItem(int eventId, QGraphicsItem *parent): QGraphicsItem(parent)
+EventGraphicsItem::EventGraphicsItem(MapEvent *event, QGraphicsItem *parent): QGraphicsItem(parent)
 {
-	id = eventId;
+	this->event = event;
 	setOpacity(0.5f);
 }
 
@@ -33,7 +29,6 @@ void EventGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	if (drawFullItem)
 	{
 		QBrush brush(QColor::fromRgb(0, 0, 0, 128));
-		//painter->setBrush(brush);
 		painter->fillRect(QRect(3, 3, 43, 43), brush);
 	}
 }
@@ -58,35 +53,13 @@ void MapView::load(Map *map, TileMap *tileMap)
 	scene->clear();
 	scene->setSceneRect(0, 0, tileMap->width() * tileSize, tileMap->height() * tileSize);
 
-	for (int layer = 0; layer < 5; layer++) // 6 - region
-	{
-		bool empty = true;
-		for (int y = 0; y < tileMap->height(); y++)
-		{
-			for (int x = 0; x < tileMap->width(); x++)
-			{
-				int tileId = tileMap->tileId(x, y, layer);
-				if (tileId == 0)
-					continue;
-
-				empty = false;
-			}
-		}
-
-		//GraphicsItemGroup group;
-		//group.items.reserve(width * height);
-
-		if (empty)
-			emit layerIsEmpty(layer);
-	}
-
 	for (auto &eventOptional: map->events)
 	{
 		if (!eventOptional.has_value())
 			continue;
 
 		MapEvent &event = eventOptional.value();
-		EventGraphicsItem *item = new EventGraphicsItem(event.id);
+		EventGraphicsItem *item = new EventGraphicsItem(&event);
 		item->setPos(event.x * tileSize, event.y * tileSize);
 		scene->addItem(item);
 		eventItemMap[event.y * tileMap->width() + event.x] = item;
@@ -155,13 +128,6 @@ void MapView::setCurrentMode(int mode)
 	cursor->setRect(0, 0, tileSize, tileSize);
 }
 
-/*void MapView::setCurrentTileSingle(int layer, TileGraphicsInfo tileInfo)
-{
-	//currentLayer = layer;
-	currentTileInfo = tileInfo;
-	currentOp = PAINT_SINGLE;
-	cursor->setRect(0, 0, tileSize, tileSize);
-}*/
 
 void MapView::setCurrentTileSingle(TileSet::Set setIndex, int x, int y)
 {
@@ -174,7 +140,7 @@ void MapView::setCurrentTileSingle(TileSet::Set setIndex, int x, int y)
 
 void MapView::setCurrentTileMultiple(TileSet::Set setIndex, const QRect &rect)
 {
-	QList<TileGraphicsInfo> tileInfos;
+	QList<TileItemInfo> tileInfos;
 	tileInfos.reserve(rect.width() * rect.height());
 	for (int y = rect.top(); y <= rect.bottom(); y++)
 	{
@@ -218,7 +184,7 @@ void MapView::drawBackground(QPainter *painter, const QRectF &rect)
 				if (layer == 0 && tileId == 0)
 					continue;
 
-				TileGraphicsInfo info = tileMap->tileItemInfo(tileId);
+				TileItemInfo info = tileMap->tileItemInfo(tileId);
 				QRect dstRect(x * tileSize, y * tileSize, tileSize, tileSize);
 				painter->drawPixmap(dstRect, *info.pixmap, info.rect);
 			}

@@ -3,8 +3,9 @@
 #include "tileset.hpp"
 #include <QPixmap>
 #include <bitset>
+#include <span>
 
-struct TileGraphicsInfo
+struct TileItemInfo
 {
 	QRect rect = QRect();
 	QPixmap *pixmap = nullptr;
@@ -28,8 +29,8 @@ public:
 
 	QPixmap *pixmap(int index) { return &tileSets[index]; }
 	int tileId(int x, int y, int z);
-	TileGraphicsInfo tileItemInfo(int tileId);
-	TileGraphicsInfo tileItemInfo(int x, int y, TileSet::Set setIndex);
+	TileItemInfo tileItemInfo(int tileId);
+	TileItemInfo tileItemInfo(int x, int y, TileSet::Set setIndex);
 
 	void putTile(int x, int y, int z, int id);
 

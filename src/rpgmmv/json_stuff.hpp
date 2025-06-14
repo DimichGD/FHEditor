@@ -1,5 +1,4 @@
 #pragma once
-#include "map.hpp"
 #include <vector>
 #include <optional>
 
@@ -8,13 +7,13 @@
 void printParsingError(const std::string &message, const QString &filename, int location);
 
 template<typename T>
-bool loadJson(QString filename, std::vector<std::optional<T>> &vector);
+bool loadJson(const QString &filename, std::vector<std::optional<T>> &vector);
 
 template<typename T>
-bool loadJson(QString filename, T &object);
+bool loadJson(const QString &filename, T &object);
 
 template<typename T>
-bool saveJson(QString filename, std::vector<std::optional<T>> &vector);
+bool saveJson(const QString &filename, std::vector<std::optional<T>> &vector);
 
 template<typename T>
-bool saveJson(QString filename, T &object);
+bool saveJson(const QString &filename, T &object);

@@ -9,6 +9,7 @@ class MapInfoModel;
 class TilePickerView;
 class QCheckBox;
 class QButtonGroup;
+class QProcess;
 
 class MapTab: public QWidget
 {
@@ -37,5 +38,6 @@ private:
 	std::array<TilePickerView *, 6> tilePickerViews;
 	std::array<QCheckBox *, 6> layerCheckBoxes;
 	//QButtonGroup *layersCheckBoxGroup = nullptr;
+	QProcess *process = nullptr;
 };
 

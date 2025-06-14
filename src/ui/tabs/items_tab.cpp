@@ -73,9 +73,9 @@ void ItemsTab::init()
 	ui->itemApplyButton->setEnabled(false);
 	ui->itemDamageElementComboBox->clear(); // Normal Attack and None only present in items?
 	ui->itemDamageElementComboBox->addItem("Normal Attack"); // -1
-	for (std::string &elementName: Database::Get()->system()->elements) // 1..x
-		if (!elementName.empty())
-			ui->itemDamageElementComboBox->addItem(QString::fromStdString(elementName));
+	for (const QString &elementName: Database::Get()->system()->elements) // 1..x
+		if (!elementName.isEmpty())
+			ui->itemDamageElementComboBox->addItem(elementName);
 		else
 			ui->itemDamageElementComboBox->addItem("Empty element");
 	ui->itemDamageElementComboBox->setItemText(1, "None");  // 0

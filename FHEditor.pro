@@ -30,23 +30,19 @@ SOURCES += \
     src/models/map_event_pages_model.cpp \
     src/models/map_events_model.cpp \
     src/models/map_info_model.cpp \
-    src/rpgmmv/animation.cpp \
-    src/rpgmmv/armor.cpp \
     src/rpgmmv/database.cpp \
     src/rpgmmv/effect.cpp \
     src/rpgmmv/iconset.cpp \
-    src/rpgmmv/item.cpp \
     src/rpgmmv/json_stuff.cpp \
-    src/rpgmmv/skill.cpp \
-    src/rpgmmv/state.cpp \
     src/rpgmmz/system_mz.cpp \
+    src/ui/dialogs/games_list_dialog.cpp \
     src/ui/events/create_command_dialog.cpp \
     src/ui/events/command_text_dialog.cpp \
     src/ui/dialogs/change_maximum_dialog.cpp \
     src/ui/dialogs/icon_picker_dialog.cpp \
     src/ui/dialogs/item_effect_dialog.cpp \
-    src/ui/dialogs/settings_dialog.cpp \
     src/ui/dialogs/simple_chooser_dialog.cpp \
+    src/ui/settings.cpp \
     src/ui/tabs/armors_tab.cpp \
     src/ui/tabs/common_events_tab.cpp \
     src/ui/tabs/items_tab.cpp \
@@ -108,6 +104,8 @@ HEADERS += \
     src/rpgmmv/trait.hpp \
     src/rpgmmv/weapon.hpp \
     src/rpgmmz/system_mz.hpp \
+    src/ui/dialogs/games_list_dialog.hpp \
+    src/ui/settings.hpp \
     src/ui/widgets/attrib_combo_box.hpp \
     src/ui/dialogs/change_maximum_dialog.hpp \
     src/ui/widgets/clickable_label.hpp \
@@ -128,7 +126,6 @@ HEADERS += \
     src/ui/tabs/items_tab.hpp \
     src/ui/main_window.hpp \
     src/ui/map_view.hpp \
-    src/ui/dialogs/settings_dialog.hpp \
     src/ui/tabs/map_event_page.hpp \
     src/ui/tabs/map_events_tab.hpp \
     src/ui/tabs/map_tab.hpp \
@@ -139,9 +136,9 @@ HEADERS += \
 
 FORMS += \
     src/ui/dialogs/change_maximum_dialog.ui \
+    src/ui/dialogs/games_list_dialog.ui \
     src/ui/dialogs/icon_picker_dialog.ui \
     src/ui/dialogs/item_effect_dialog.ui \
-    src/ui/dialogs/settings_dialog.ui \
     src/ui/dialogs/simple_chooser_dialog.ui \
     src/ui/events/command_text_dialog.ui \
     src/ui/events/create_command_dialog.ui \

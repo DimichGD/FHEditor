@@ -1,12 +1,12 @@
 #include "map_tab.hpp"
 #include "map_events_tab.hpp"
 #include "map_info_model.hpp"
+#include "settings.hpp"
 #include "ui_map_tab.h"
 
 #include <QButtonGroup>
 #include <QDateTime>
 #include <QProcess>
-#include <QSettings>
 
 MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 {
@@ -21,7 +21,6 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	ui->modeButtonGroup->setId(ui->tileModeButton, MapView::Mode::TILES);
 	ui->modeButtonGroup->setId(ui->eventModeButton, MapView::Mode::EVENTS);
 	ui->modeButtonGroup->setId(ui->pickerModeButton, MapView::Mode::PICKER);
-	//ui->paintLayerButtonGroup->setId(ui->layerButton_0, 0);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_1, 2);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_2, 3);
 
@@ -34,12 +33,7 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	//connect(ui->mapInfoTable, &QAbstractItemView::activated, this, &MapTab::mapInfoTableDoubleClicked);
 	connect(ui->mapInfoTable, &QAbstractItemView::clicked, this, &MapTab::mapInfoTableDoubleClicked);
 	connect(ui->mapNameFilter, &QLineEdit::textChanged, ui->mapInfoTable, &BaseTable::setFilterText);
-	//connect(ui->visibleLayersButtonGroup, &QButtonGroup::idToggled, ui->mapView, &MapView::layersToggled);
-	connect(ui->mapView, &MapView::layerIsEmpty, ui->visibleLayersButtonGroup, [this](int index)
-	{
-		ui->visibleLayersButtonGroup->button(index)->setChecked(false);
-		ui->visibleLayersButtonGroup->button(index)->setEnabled(false);
-	});
+	connect(ui->visibleLayersButtonGroup, &QButtonGroup::idToggled, ui->mapView, &MapView::layersToggled);
 
 	connect(ui->toggleMapTableButton, &QPushButton::clicked, [this]()
 	{
@@ -96,11 +90,14 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 
 	connect(ui->runButton, &QPushButton::clicked, [this]()
 	{
-		QSettings settings("settings.ini", QSettings::Format::IniFormat);
-		QString path = settings.value("path").toString();
-		QStringList arguments { "--url", path };
-		QProcess *process = new QProcess(this);
-		process->start("/home/dimich/.local/RPG Maker MV/nwjs-lnx-test/Game", arguments);
+		if (Settings::Get()->rpgmPath.isEmpty())
+			return;
+
+		QString path = Settings::Get()->lastPath;
+		QStringList arguments { path, "test" };
+
+		process = new QProcess(this); // FIXME: check rpgmPath is valid path
+		process->start(Settings::Get()->rpgmPath + "/nwjs-lnx-test/Game", arguments);
 	});
 
 	connect(ui->mapView, &MapView::editEvent, [this](int eventId)
@@ -128,6 +125,13 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 
 MapTab::~MapTab()
 {
+	if (process)
+	{
+		process->terminate();
+		process->waitForFinished(5000);
+		delete process;
+	}
+
 	delete ui;
 }
 
@@ -135,7 +139,6 @@ void MapTab::init()
 {
 	model = new MapInfoModel(ui->mapInfoTable);
 	ui->mapInfoTable->setModel2(model);
-	//ui->mapInfoTable->hideColumn(1);
 }
 
 void MapTab::loadMap(int id)
@@ -152,6 +155,28 @@ void MapTab::loadMap(int id)
 	}
 
 	tileMap.loadTileMap(id);
+
+	for (int layer = 0; layer < 6; layer++) // 6 - region
+	{
+		bool empty = true;
+		for (int y = 0; y < tileMap.height(); y++)
+		{
+			for (int x = 0; x < tileMap.width(); x++)
+			{
+				int tileId = tileMap.tileId(x, y, layer);
+				if (tileId == 0)
+					continue;
+
+				empty = false;
+			}
+		}
+
+		if (empty)
+		{
+			ui->visibleLayersButtonGroup->button(layer)->setChecked(false);
+			ui->visibleLayersButtonGroup->button(layer)->setEnabled(false);
+		}
+	}
 
 	for (int i = 0; i < 5; i++)
 	{

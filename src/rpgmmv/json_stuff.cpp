@@ -1,8 +1,12 @@
 #include "json_stuff.hpp"
+#include "armor.hpp"
+#include "item.hpp"
 #include "map.hpp"
 #include "animation.hpp"
 #include "map_info.hpp"
-#include "rpgmmz/system_mz.hpp"
+//#include "rpgmmz/system_mz.hpp"
+#include "skill.hpp"
+#include "state.hpp"
 #include "system.hpp"
 #include "tileset.hpp"
 #include "weapon.hpp"
@@ -187,11 +191,11 @@ struct glz::from<glz::JSON>
 	}
 };
 
-bool showParsingError(glz::error_ctx err, QString filename)
+bool showParsingError(glz::error_ctx err, const QString &filename)
 {
 	if (err)
 	{
-		qDebug() << glz::format_error(err, std::string{});
+		qDebug() << QString::fromStdString(glz::format_error(err));
 		QFile file(filename);
 		file.open(QIODevice::ReadOnly);
 		if (err.location > 10)
@@ -206,64 +210,102 @@ bool showParsingError(glz::error_ctx err, QString filename)
 	return true;
 }
 
-/*template<>
-bool loadJson<Item>(QString filename, std::vector<std::optional<Item>> &vector)
+template<>
+bool loadJson<Item>(const QString &filename, std::vector<std::optional<Item>> &vector)
 {
 	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Armor>(const QString &filename, std::vector<std::optional<Armor>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Weapon>(const QString &filename, std::vector<std::optional<Weapon>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Event>(const QString &filename, std::vector<std::optional<Event>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<MapInfo>(const QString &filename, std::vector<std::optional<MapInfo>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<TileSet>(const QString &filename, std::vector<std::optional<TileSet>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Map>(const QString &filename, Map &object)
+{
+	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<System>(const QString &filename, System &object)
+{
+	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Skill>(const QString &filename, std::vector<std::optional<Skill>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<State>(const QString &filename, std::vector<std::optional<State>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Animation>(const QString &filename, std::vector<std::optional<Animation>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	if (err)
+	{
+		printParsingError(glz::format_error(err, std::string{}), filename, err.location);
+		return false;
+	}
+
+	Animation normalAttack { .id = -1, .name = "Normal Attack" };
+	vector.insert(vector.begin(), normalAttack);
+	vector[1] = { .id = 0, .name = "None" };
+
+	return true;
+}
+
+/*template<>
+bool loadJson<MZ::System>(const QString &filename, MZ::System &object)
+{
+	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
 	return showParsingError(err, filename);
 }*/
 
 template<>
-bool loadJson<Weapon>(QString filename, std::vector<std::optional<Weapon>> &vector)
-{
-	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
-	return showParsingError(err, filename);
-}
-
-template<>
-bool loadJson<Event>(QString filename, std::vector<std::optional<Event>> &vector)
-{
-	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
-	return showParsingError(err, filename);
-}
-
-template<>
-bool loadJson<MapInfo>(QString filename, std::vector<std::optional<MapInfo>> &vector)
-{
-	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
-	return showParsingError(err, filename);
-}
-
-template<>
-bool loadJson<TileSet>(QString filename, std::vector<std::optional<TileSet>> &vector)
-{
-	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
-	return showParsingError(err, filename);
-}
-
-template<>
-bool loadJson<Map>(QString filename, Map &object)
-{
-	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
-	return showParsingError(err, filename);
-}
-
-template<>
-bool loadJson<System>(QString filename, System &object)
-{
-	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
-	return showParsingError(err, filename);
-}
-
-template<>
-bool loadJson<MZ::System>(QString filename, MZ::System &object)
-{
-	glz::error_ctx err = glz::read_file_json(object, filename.toUtf8().data(), std::string{});
-	return showParsingError(err, filename);
-}
-
-template<>
-bool saveJson<Weapon>(QString filename, std::vector<std::optional<Weapon>> &vector)
+bool saveJson<Item>(const QString &filename, std::vector<std::optional<Item>> &vector)
 {
 	QFile json_file(filename);
 	if (!json_file.open(QFile::WriteOnly))
@@ -295,7 +337,103 @@ bool saveJson<Weapon>(QString filename, std::vector<std::optional<Weapon>> &vect
 }
 
 template<>
-bool saveJson<Event>(QString filename, std::vector<std::optional<Event>> &vector)
+bool saveJson<Weapon>(const QString &filename, std::vector<std::optional<Weapon>> &vector)
+{
+	QFile json_file(filename);
+	if (!json_file.open(QFile::WriteOnly))
+		return false;
+
+	json_file.write("[\n");
+
+	std::string buffer;
+	glz::error_ctx err;
+	bool first = true;
+
+	for (size_t i = 0; i < vector.size(); i++)
+	{
+		json_file.write(first ? "\n" : ",\n");
+
+		err = glz::write_json(vector.at(i), buffer);
+		if (err)
+		{
+			qDebug() << err;
+			return false;
+		}
+
+		json_file.write(buffer.data(), buffer.size());
+		first = false;
+	}
+
+	json_file.write("\n]");
+	return true;
+}
+
+template<>
+bool saveJson<Event>(const QString &filename, std::vector<std::optional<Event>> &vector)
+{
+	QFile json_file(filename);
+	if (!json_file.open(QFile::WriteOnly))
+		return false;
+
+	json_file.write("[\n");
+
+	std::string buffer;
+	glz::error_ctx err;
+	bool first = true;
+
+	for (size_t i = 0; i < vector.size(); i++)
+	{
+		json_file.write(first ? "\n" : ",\n");
+
+		err = glz::write_json(vector.at(i), buffer);
+		if (err)
+		{
+			qDebug() << err;
+			return false;
+		}
+
+		json_file.write(buffer.data(), buffer.size());
+		first = false;
+	}
+
+	json_file.write("\n]");
+	return true;
+}
+
+template<>
+bool saveJson<Skill>(const QString &filename, std::vector<std::optional<Skill>> &vector)
+{
+	QFile json_file(filename);
+	if (!json_file.open(QFile::WriteOnly))
+		return false;
+
+	json_file.write("[\n");
+
+	std::string buffer;
+	glz::error_ctx err;
+	bool first = true;
+
+	for (size_t i = 0; i < vector.size(); i++)
+	{
+		json_file.write(first ? "\n" : ",\n");
+
+		err = glz::write_json(vector.at(i), buffer);
+		if (err)
+		{
+			qDebug() << err;
+			return false;
+		}
+
+		json_file.write(buffer.data(), buffer.size());
+		first = false;
+	}
+
+	json_file.write("\n]");
+	return true;
+}
+
+template<>
+bool saveJson<State>(const QString &filename, std::vector<std::optional<State>> &vector)
 {
 	QFile json_file(filename);
 	if (!json_file.open(QFile::WriteOnly))
@@ -331,7 +469,7 @@ void printParsingError(const std::string &message, const QString &filename, int 
 	if (!message.empty())
 	{
 		//qDebug() << glz::format_error(err, std::string{});
-		qDebug() << message;
+		qDebug() << QString::fromStdString(message);
 		QFile file(filename);
 		file.open(QIODevice::ReadOnly);
 		if (location > 10)
@@ -344,9 +482,9 @@ void printParsingError(const std::string &message, const QString &filename, int 
 }
 
 template<>
-bool saveJson<Map>(QString filename, Map &object)
+bool saveJson<Map>(const QString &filename, Map &object)
 {
-	glz::error_ctx err = glz::write_file_json(object, filename.toLatin1().data(), std::string{});
+	glz::error_ctx err = glz::write_file_json(object, filename.toUtf8().data(), std::string{});
 	return showParsingError(err, filename);
 }
 

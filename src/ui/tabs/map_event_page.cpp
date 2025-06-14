@@ -63,17 +63,17 @@ MapEventPage::~MapEventPage()
 
 void MapEventPage::connectCheckBoxToWidget(QCheckBox *checkBox, QWidget *widget)
 {
-	connect(checkBox, &QCheckBox::checkStateChanged, this,
-			[widget](Qt::CheckState state)
-			{ widget->setEnabled(state == Qt::CheckState::Checked); });
+	connect(checkBox, &QCheckBox::stateChanged, this,
+			[widget](int state)
+			{ widget->setEnabled(state == Qt::Checked); });
 }
 
 void MapEventPage::connectCheckBoxToWidget(QCheckBox *checkBox, QList<QWidget *> widgets)
 {
-	connect(checkBox, &QCheckBox::checkStateChanged, this,
-			[&widgets](Qt::CheckState state)
+	connect(checkBox, &QCheckBox::stateChanged, this,
+			[&widgets](int state)
 			{
-				for (auto widget: widgets)
-					widget->setEnabled(state == Qt::CheckState::Checked);
+				for (auto &widget: widgets)
+					widget->setEnabled(state == Qt::Checked);
 			});
 }

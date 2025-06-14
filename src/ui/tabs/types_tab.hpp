@@ -1,9 +1,7 @@
 #pragma once
 #include <QWidget>
 
-namespace Ui {
-class TypesTab;
-}
+namespace Ui { class TypesTab; }
 
 class QTableWidget;
 
@@ -16,9 +14,9 @@ public:
 	~TypesTab();
 
 	void init();
-	void fillTable(QTableWidget *widget, std::vector<std::string> &strings);
+	void fillTable(QTableWidget *widget, const std::vector<QString> &strings);
 
 private:
-	Ui::TypesTab *ui;
+	Ui::TypesTab *ui = nullptr;
 };
 

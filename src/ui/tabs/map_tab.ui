@@ -223,9 +223,6 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_13">
          <item>
-          <widget class="QLineEdit" name="mapNameFilter"/>
-         </item>
-         <item>
           <widget class="QPushButton" name="toggleMapTableButton">
            <property name="maximumSize">
             <size>
@@ -237,6 +234,9 @@
             <string>-</string>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="mapNameFilter"/>
          </item>
         </layout>
        </item>
@@ -550,12 +550,12 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="paintLayerButtonGroup"/>
+  <buttongroup name="modeButtonGroup"/>
   <buttongroup name="visibleLayersButtonGroup">
    <property name="exclusive">
     <bool>false</bool>
    </property>
   </buttongroup>
-  <buttongroup name="modeButtonGroup"/>
-  <buttongroup name="paintLayerButtonGroup"/>
  </buttongroups>
 </ui>

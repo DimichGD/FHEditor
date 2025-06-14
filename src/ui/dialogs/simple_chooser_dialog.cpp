@@ -34,13 +34,13 @@ int readModel(QStandardItemModel *model, int targetId)
 	return currentRow;
 }
 
-int readStrings(QStandardItemModel *model, const std::vector<std::string> &strings, int targetId)
+int readStrings(QStandardItemModel *model, const std::vector<QString> &strings, int targetId)
 {
 	int currentRow = 0;
 	int counter = 0;
 	for (auto &item: strings)
 	{
-		model->appendRow(newItem(QString::fromStdString(item), counter));
+		model->appendRow(newItem(item, counter));
 		if (counter == targetId)
 			currentRow = counter;
 

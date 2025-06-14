@@ -32,7 +32,7 @@ void TypesTab::init()
 	fillTable(ui->equipmentTypeTableWidget, Database::Get()->system()->equipTypes);
 }
 
-void TypesTab::fillTable(QTableWidget *widget, std::vector<std::string> &strings)
+void TypesTab::fillTable(QTableWidget *widget, const std::vector<QString> &strings)
 {
 	widget->setRowCount(0);
 
@@ -42,7 +42,7 @@ void TypesTab::fillTable(QTableWidget *widget, std::vector<std::string> &strings
 		widget->insertRow(lastRow);
 
 		QTableWidgetItem *idItem = new QTableWidgetItem(QString::number(lastRow));
-		QTableWidgetItem *nameItem = new QTableWidgetItem(QString::fromStdString(string));
+		QTableWidgetItem *nameItem = new QTableWidgetItem(string);
 
 		idItem->setData(Qt::UserRole, lastRow);
 		idItem->setFlags(idItem->flags() & ~(Qt::ItemIsEditable));

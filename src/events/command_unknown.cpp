@@ -27,7 +27,7 @@ void Command_Unknown::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	QString str = QString("Unknown Command %1: %2")
 			.arg(codeId)
-			.arg(parameters);
+			.arg(QString::fromStdString(parameters));
 	drawText(painter, selected, rect, str, ConstantColors::grey);
 }
 

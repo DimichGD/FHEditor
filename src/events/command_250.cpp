@@ -41,7 +41,7 @@ Command_250 Command_250::parse(const std::string &parameters)
 	std::tuple<Sound> params;
 	glz::error_ctx err = glz::read_json(params, parameters);
 	if (err)
-		qDebug() << glz::format_error(err);
+		qDebug() << QString::fromStdString(glz::format_error(err));
 
 	return std::make_from_tuple<Command_250>(params);
 }

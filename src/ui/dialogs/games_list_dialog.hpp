@@ -1,16 +1,15 @@
 #pragma once
-#include <QTableWidgetItem>
 #include <QDialog>
 
 namespace Ui { class SettingsDialog; }
 
-class SettingsDialog : public QDialog
+class GamesListDialog: public QDialog
 {
 	Q_OBJECT
 
 public:
-	explicit SettingsDialog(QWidget *parent = nullptr);
-	~SettingsDialog();
+	explicit GamesListDialog(QWidget *parent = nullptr);
+	~GamesListDialog();
 
 public slots:
 	void addGameClicked();
@@ -21,6 +20,6 @@ protected:
 	void addRow(const QString &name, const QString &path);
 
 private:
-	Ui::SettingsDialog *ui;
+	Ui::SettingsDialog *ui = nullptr;
 };
 

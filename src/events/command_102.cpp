@@ -43,7 +43,7 @@ void Command_102::read(const std::string &parameters)
 	std::tuple<std::vector<std::string>, int, int, int, int> params;
 	glz::error_ctx err = glz::read_json(params, parameters);
 	if (err)
-		qDebug() << glz::format_error(err);
+		qDebug() << QString::fromStdString(glz::format_error(err));
 
 	choices = std::get<0>(params);
 	value_0 = std::get<1>(params);
@@ -59,7 +59,7 @@ std::string Command_102::write()
 	glz::expected<std::string, glz::error_ctx> result = glz::write_json(params);
 	if (!result.has_value())
 	{
-		qDebug() << glz::format_error(result.error());
+		qDebug() << QString::fromStdString(glz::format_error(result.error()));
 		return "";
 	}
 

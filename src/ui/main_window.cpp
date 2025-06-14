@@ -11,23 +11,20 @@
 #include "database.hpp"
 #include "images.hpp"
 #include "iconset.hpp"
+#include "settings.hpp"
 
-#include "settings_dialog.hpp"
+#include "games_list_dialog.hpp"
 #include "ui_main_window.h"
 
-#include <QSettings>
-#include <QPixmapCache>
-#include <QImageReader>
-#include <QBuffer>
-//#include <QGraphicsPixmapItem>
-//#include <QFile>
-//#include <QFileDialog>
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
 	resize(1280, 720);
-	//QPixmapCache::setCacheLimit(128 * 1024);
+
+	if (!Settings::Get()->load())
+		qDebug() << "Can't load settings.";
 
 
 	mapTab = new MapTab(this);
@@ -74,8 +71,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::openSettingsDialog);
 	connect(mapTab, &MapTab::mapLoaded, mapEventsTab, &MapEventsTab::init);
 
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
-	if (!settings.contains("path") || settings.value("path").toString().isEmpty())
+	if (Settings::Get()->lastPath.isEmpty())
 	{
 		openSettingsDialog();
 	}
@@ -92,9 +88,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadGame()
 {
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
-	if (!settings.contains("path") || settings.value("path").toString().isEmpty())
+	if (Settings::Get()->lastPath.isEmpty())
+	{
+		qDebug() << "lastPath is empty";
 		return;
+	}
 
 	Images::Get()->load();
 	if (!IconSet::Get()->load())
@@ -116,7 +114,7 @@ void MainWindow::loadGame()
 
 void MainWindow::openSettingsDialog()
 {
-	SettingsDialog dialog(this);
+	GamesListDialog dialog(this);
 	if (dialog.exec())
 		loadGame();
 }

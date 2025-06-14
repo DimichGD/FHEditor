@@ -31,13 +31,13 @@ void SelectorButton::changeId(int id)
 	}
 	else if (source == SimpleChooserDialog::SWITCH)
 	{
-		std::string value = Database::Get()->system()->switches.at(id);
-		setText(QString::fromStdString(value)); // TODO: '?' if id >= switches.size()
+		QString value = Database::Get()->system()->switches.at(id);
+		setText(value); // TODO: '?' if id >= switches.size()
 	}
 	else if (source == SimpleChooserDialog::VARIABLE)
 	{
-		std::string value = Database::Get()->system()->variables.at(id);
-		setText(QString::fromStdString(value)); // TODO: '?' if id >= variables.size()
+		QString value = Database::Get()->system()->variables.at(id);
+		setText(value); // TODO: '?' if id >= variables.size()
 	}
 	else if (source == SimpleChooserDialog::ITEM)
 	{

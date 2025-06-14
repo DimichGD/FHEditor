@@ -1,14 +1,17 @@
 #include "tile_picker_view.hpp"
-//#include <QApplication>
-//#include <QStyle>
+
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QGraphicsRectItem>
 
-TilePickerScene::TilePickerScene(QObject *parent): QGraphicsScene(parent)
+
+TilePickerView::TilePickerView(QWidget *parent): QGraphicsView(parent)
 {
+	scene = new QGraphicsScene(this);
+	setScene(scene);
+
 	cursorItem = new QGraphicsRectItem();
-	addItem(cursorItem);
+	scene->addItem(cursorItem);
 
 	QPen whitePen = QPen(QColorConstants::Magenta);
 	whitePen.setWidth(2);
@@ -17,86 +20,32 @@ TilePickerScene::TilePickerScene(QObject *parent): QGraphicsScene(parent)
 	cursorItem->setPen(whitePen);
 }
 
-void TilePickerScene::setBackgroundPixmap(QPixmap *pixmap)
-{
-	backgroundPixmap = pixmap;
-	if (!pixmap)
-		return;
-
-	if (pixmap->width() == 768) // TODO: calc from width in tiles, assuming 8 is desired width
-	{
-		is16x16 = true;
-		setSceneRect(0, 0, pixmap->width() / 2, pixmap->height() * 2);
-	}
-	else
-	{
-		setSceneRect(0, 0, pixmap->width(), pixmap->height());
-	}
-}
-
-void TilePickerScene::setSelectionRect(const QRect &rect)
-{
-	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
-	cursorItem->show();
-}
-
-void TilePickerScene::clearSelection()
-{
-	cursorItem->hide();
-}
-
-void TilePickerScene::drawBackground(QPainter *painter, const QRectF &rect)
-{
-	if (backgroundPixmap)
-	{
-		if (!is16x16)
-		{
-			painter->drawPixmap(rect, *backgroundPixmap, rect);
-			return;
-		}
-
-		float dx = 384;
-		float dy = 768;
-		QRectF rect1(0, 0, 384, 768);
-		QRectF rect2(0, 768, 384, 768);
-		QRectF intersection1 = rect.intersected(rect1);
-		QRectF intersection2 = rect.intersected(rect2);
-
-		painter->drawPixmap(intersection1, *backgroundPixmap, intersection1);
-		painter->drawPixmap(intersection2, *backgroundPixmap, intersection2.adjusted(dx, -dy, dx, -dy));
-
-		return;
-	}
-
-	QGraphicsScene::drawBackground(painter, rect);
-}
-
-// --------------------------------------------------------
-
-TilePickerView::TilePickerView(QWidget *parent): QGraphicsView(parent)
-{
-	scene = new TilePickerScene(this);
-	setScene(scene);
-}
-
 void TilePickerView::setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap *pixmap)
 {
 	this->setIndex = setIndex;
 	this->tileSize = tileSize;
 	skipEvents = (!pixmap || pixmap->isNull());
 
-	scene->setBackgroundPixmap(pixmap);
-	scene->clearSelection();
-	scene->update();
 
 	if (pixmap)
 		pixmapWidth = (pixmap->width() == 768) ? pixmap->width() / 2 : pixmap->width();
+
+	backgroundPixmap = pixmap;
+	if (!pixmap)
+		return;
+
+	if (setIndex >= TileSet::B && setIndex <= TileSet::E)
+	{
+		scene->setSceneRect(0, 0, pixmap->width() / 2, pixmap->height() * 2);
+	}
+	else
+	{
+		scene->setSceneRect(0, 0, pixmap->width(), pixmap->height());
+	}
+
+	scene->update();
 }
 
-/*void TilePickerView::setTileSize(int size)
-{
-	tileSize = size;
-}*/
 
 void TilePickerView::selectRect(const QPoint &first, const QPoint &second)
 {
@@ -112,7 +61,8 @@ void TilePickerView::selectRect(const QPoint &first, const QPoint &second)
 	if (y2 < y1) std::swap(y1, y2);
 
 	QRect rect(QPoint(x1, y1) * tileSize, QPoint(x2 + 1, y2 + 1) * tileSize - QPoint(1, 1));
-	scene->setSelectionRect(rect);
+	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
+	cursorItem->show();
 
 	tilesSelectionRect = QRect(QPoint(x1, y1), QPoint(x2, y2));
 	if (tilesSelectionRect != lastTilesSelectionRect)
@@ -134,13 +84,15 @@ void TilePickerView::selectPoint(const QPoint &point)
 	tilesSelectionRect.setWidth(1);
 	tilesSelectionRect.setHeight(1);
 
-	scene->setSelectionRect({ x * tileSize, y * tileSize, tileSize, tileSize });
+	QRect rect( x * tileSize, y * tileSize, tileSize, tileSize );
+	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
+	cursorItem->show();
 	scene->update();
 }
 
 void TilePickerView::clearSelection()
 {
-	scene->clearSelection();
+	cursorItem->hide();
 	scene->update();
 }
 
@@ -150,8 +102,36 @@ void TilePickerView::selectTile(int tileId)
 	int x = tileId % 8;
 	int y = tileId / 8;
 
-	scene->setSelectionRect({ x * tileSize, y * tileSize, tileSize, tileSize });
+	QRect rect( x * tileSize, y * tileSize, tileSize, tileSize );
+	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
+	cursorItem->show();
 	scene->update();
+}
+
+void TilePickerView::drawBackground(QPainter *painter, const QRectF &rect)
+{
+	QGraphicsView::drawBackground(painter, rect);
+
+	if (!backgroundPixmap)
+		return;
+
+	if (setIndex == TileSet::A5)
+	{
+		painter->drawPixmap(rect, *backgroundPixmap, rect);
+		return;
+	}
+
+	float dx = 384;
+	float dy = 768;
+	QRectF rect1(0, 0, 384, 768);
+	QRectF rect2(0, 768, 384, 768);
+	QRectF intersection1 = rect.intersected(rect1);
+	QRectF intersection2 = rect.intersected(rect2);
+
+	painter->drawPixmap(intersection1, *backgroundPixmap, intersection1);
+	painter->drawPixmap(intersection2, *backgroundPixmap, intersection2.adjusted(dx, -dy, dx, -dy));
+
+	return;
 }
 
 void TilePickerView::mousePressEvent(QMouseEvent *event)

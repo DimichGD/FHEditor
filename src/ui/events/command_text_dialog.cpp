@@ -6,20 +6,22 @@
 #include "ui_command_text_dialog.h"
 
 CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, QWidget *parent):
-	QDialog(parent), ui(new Ui::CommandTextDialog)
+	CommandDialog(parent), ui(new Ui::CommandTextDialog)
 {
 	ui->setupUi(this);
-	this->editing = editing;
 
-	selectionSize = indices.size();
-	event = indices[0].data(Qt::UserRole + 0).value<Event *>();
 	Command::It command = indices[0].data(Qt::UserRole + 1).value<Command::It>();
-	rootCommand = command;
-	if (command->code == CommandFactory::TEXT) // editing
+	indent = command->indent;
+
+	if (editing)
 	{
-		auto params = command->parameters.staticCast<Command_101>();
-		ui->backgroundComboBox->setCurrentIndex(params->background);
-		ui->windowPositionComboBox->setCurrentIndex(params->windowPosition);
+		//auto params = command->parameters.staticCast<Command_101>();
+		//ui->backgroundComboBox->setCurrentIndex(params->background);
+		//ui->windowPositionComboBox->setCurrentIndex(params->windowPosition);
+
+		auto params = std::get<Command_101_Params>(command->parameters);
+		ui->backgroundComboBox->setCurrentIndex(std::get<2>(params));
+		ui->windowPositionComboBox->setCurrentIndex(std::get<3>(params));
 
 		for (int i = 1; i < indices.size(); i++)
 		{
@@ -30,19 +32,21 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 				continue;
 			}
 
-			auto params = command->parameters.staticCast<Command_401>();
-			ui->messageLinesEdit->appendPlainText(params->line);
+			//auto params = command->parameters.staticCast<Command_401>();
+			//ui->messageLinesEdit->appendPlainText(params->line);
+			auto params = std::get<Command_401_Params>(command->parameters);
+			ui->messageLinesEdit->appendPlainText(std::get<0>(params));
 		}
 
-		if (!params->faceName.empty())
+		QString &faceName = std::get<0>(params);
+		//if (!params->faceName.empty())
+		if (!faceName.isEmpty())
 		{
-			ui->faceLabel->setIconMode(ClickableLabel::Mode::FACES,
+			/*ui->faceLabel->setIconMode(ClickableLabel::Mode::FACES,
 							Images::Get()->face(QString::fromStdString(params->faceName)));
-			ui->faceLabel->setIconIndex(params->faceIndex);
+			ui->faceLabel->setIconIndex(params->faceIndex);*/
 		}
 	}
-
-	connect(this, &QDialog::accepted, this, &CommandTextDialog::makeChanges);
 }
 
 CommandTextDialog::~CommandTextDialog()
@@ -50,27 +54,25 @@ CommandTextDialog::~CommandTextDialog()
 	delete ui;
 }
 
-void CommandTextDialog::makeChanges()
+std::list<Command> CommandTextDialog::resultCommands()
 {
-	Command::It command = rootCommand;
+	std::list<Command> resultList;
 
-	if (editing)
-	{
-		for (int i = 0; i < selectionSize; i++)
-			command = event->list.erase(command);
-	}
-
-	int indent = rootCommand->indent; // FIXME: read from deleted iterator?
-	command = event->list.insert(command, { CommandFactory::TEXT, indent, {} });
-	int backgoundIndex = ui->backgroundComboBox->currentIndex();
+	int backgroundIndex = ui->backgroundComboBox->currentIndex();
 	int windowPositionIndex = ui->windowPositionComboBox->currentIndex();
-	command->parameters = CommandFactory::createCommand<Command_101>("", 0, backgoundIndex, windowPositionIndex);
+	//auto rootParams = CommandFactory::createCommand<Command_101>("", 0, backgroundIndex, windowPositionIndex);
+	QString emptyString {};
+	int emptyInt = 0;
+	Command_101_Params rootParams = std::tie(emptyString, emptyInt, backgroundIndex, windowPositionIndex);
+	resultList.push_back({ CommandFactory::TEXT, indent, rootParams });
 
-	std::advance(command, 1);
 	QStringList lines = ui->messageLinesEdit->toPlainText().split('\n');
 	for (auto &line: lines)
 	{
-		auto newCommand = event->list.insert(command, { CommandFactory::LINE, indent, {} });
-		newCommand->parameters = CommandFactory::createCommand<Command_401>(line);
+		//auto lineParams = CommandFactory::createCommand<Command_401>(line);
+		Command_401_Params lineParams = std::tie(line);
+		resultList.push_back({ CommandFactory::LINE, indent, lineParams });
 	}
+
+	return resultList;
 }

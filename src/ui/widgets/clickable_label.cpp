@@ -1,5 +1,5 @@
 #include "clickable_label.hpp"
-#include "iconset.hpp"
+//#include "iconset.hpp"
 #include "images.hpp"
 
 #include <QMouseEvent>

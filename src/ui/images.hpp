@@ -9,11 +9,12 @@ public:
 	bool load();
 	QPixmap loadImage(const QString &name);
 
-	QPixmap iconSet();
+	QPixmap &iconSet();
 	QPixmap face(const QString &name);
 	QPixmap tileSet(const QString &name);
 
 private:
 	QString path {};
+	QPixmap iconSetPixmap;
 };
 

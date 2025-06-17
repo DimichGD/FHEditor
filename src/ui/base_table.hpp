@@ -17,17 +17,29 @@ public:
 };
 
 
-/*class IconDelegate: public QStyledItemDelegate
+class IconDelegate: public QStyledItemDelegate
 {
 public:
-	IconDelegate(QObject * parent): QStyledItemDelegate(parent) {}
+	IconDelegate(QPixmap *iconSetPixmap, QObject * parent)
+		: QStyledItemDelegate(parent), pixmap(iconSetPixmap) {}
+
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 	{
-		QStyleOptionViewItem opt = option;
-		opt.decorationAlignment = Qt::AlignCenter;
-		QStyledItemDelegate::paint(painter, opt, index);
+		int iconIndex = index.data(Qt::DecorationRole).toInt();
+		int y = iconIndex / 16; // TODO: Check boundaries
+		int x = iconIndex % 16;
+
+		QRect rect;
+		rect.setX(option.rect.x() + (option.rect.width() - 32) / 2);
+		rect.setY(option.rect.y() + (option.rect.height() - 32) / 2);
+		rect.setWidth(32);
+		rect.setHeight(32);
+		painter->drawPixmap(rect, *pixmap, { x * 32, y * 32, 32, 32 });
 	}
-};*/
+
+private:
+	QPixmap *pixmap = nullptr;
+};
 
 
 class BaseTable: public QTableView
@@ -45,7 +57,7 @@ public:
 	//void addRow(int id, std::string name, int iconIndex);
 	//void updateRow(int rowIndex, QString name, int iconIndex = -1);
 	//void removeRows(int rowIndex, int count);
-	void setModel2(QAbstractItemModel *model);
+	void setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap = nullptr);
 
 public slots:
 	void setFilterText(const QString &text);

@@ -1,6 +1,6 @@
 #include "base_table.hpp"
 #include "database.hpp"
-#include "iconset.hpp"
+//#include "iconset.hpp"
 
 #include <QFile>
 #include <QHeaderView>
@@ -23,30 +23,7 @@ BaseTable::BaseTable(QWidget *parent): QTableView(parent)
 	//setItemDelegateForColumn(1, new IconDelegate(this));
 }
 
-/*void BaseTable::addRow(int id, std::string name, int iconIndex)
-{
-	Database::Get()->addRow(model, id, name, iconIndex);
-}
-
-void BaseTable::updateRow(int rowIndex, QString name, int iconIndex)
-{
-	if (iconIndex == -1)
-	{
-		model->item(rowIndex, 1)->setData(name, Qt::DisplayRole);
-	}
-	else
-	{
-		model->item(rowIndex, 1)->setData(IconSet::Get()->get(iconIndex), Qt::DecorationRole);
-		model->item(rowIndex, 2)->setData(name, Qt::DisplayRole);
-	}
-}
-
-void BaseTable::removeRows(int rowIndex, int count)
-{
-	model->removeRows(rowIndex, count);
-}*/
-
-void BaseTable::setModel2(QAbstractItemModel *model)
+void BaseTable::setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap)
 {
 	filterModel = new ProxyModel(this);
 	filterModel->setSourceModel(model);
@@ -56,7 +33,9 @@ void BaseTable::setModel2(QAbstractItemModel *model)
 	QTableView::setModel(filterModel);
 	//sortByColumn(0, Qt::SortOrder::AscendingOrder);
 
-	resizeColumnsToContents();
+	resizeColumnToContents(0);
+	if (model->columnCount() == 3)
+		resizeColumnToContents(1);
 	//resizeRowsToContents();
 	//verticalHeader()->setDefaultSectionSize(40);
 
@@ -64,6 +43,9 @@ void BaseTable::setModel2(QAbstractItemModel *model)
 		this, &BaseTable::onSelectionChanged);
 
 	this->model = model;
+
+	if (iconSetPixmap)
+		setItemDelegateForColumn(1, new IconDelegate(iconSetPixmap, this));
 }
 
 int BaseTable::originalRow(int filteredRow)
@@ -83,7 +65,8 @@ void BaseTable::setFilterText(const QString &text)
 
 void BaseTable::selectRow(int row)
 {
-	QTableView::selectRow(filterModel->mapFromSource(model->index(row, 0)).row());
+	//QTableView::selectRow(filterModel->mapFromSource(model->index(row, 0)).row());
+	QTableView::selectRow(row);
 }
 
 void BaseTable::onSelectionChanged(const QModelIndex &selected, const QModelIndex &)

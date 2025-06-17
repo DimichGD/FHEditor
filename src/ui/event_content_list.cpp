@@ -68,8 +68,11 @@ void EventContentList::actionCommandNewTriggered(bool)
 	CreateCommandDialog dialog(selectedIndices[0], this);
 	if (dialog.exec())
 	{
-		emit model->dataChanged(model->index(0), model->index(model->rowCount()));
-		selectionModel()->select(selectedIndices[0], QItemSelectionModel::Select);
+		int firstRow = selectedIndices[0].row();
+		model->insertCommands(firstRow, dialog.resultCommands());
+
+		selectionModel()->clearSelection();
+		setCurrentIndex(model->index(firstRow));
 	}
 }
 
@@ -78,20 +81,26 @@ void EventContentList::actionCommandEditTriggered(bool)
 	if (!selectionModel()->hasSelection())
 		return;
 
-	QDialog *dialog = nullptr;
+	CommandDialog *dialog = nullptr;
 	auto selectedIndices = selectionModel()->selection()[0].indexes();
 	Command::It command = selectedIndices[0].data(Qt::UserRole + 1).value<Command::It>();
 
 	switch (command->code)
 	{
 		case CommandFactory::TEXT: dialog = new CommandTextDialog(true, selectedIndices, this); break;
-		case CommandFactory::PLAY_SE: dialog = new PlaySoundDialog(true, selectedIndices[0], this); break;
+		case CommandFactory::PLAY_SE: dialog = new PlaySoundDialog(PlaySoundDialog::SE, true, selectedIndices[0], this); break;
 	}
 
 	if (dialog && dialog->exec())
 	{
-		selectionModel()->select(selectedIndices[0], QItemSelectionModel::Select);
-		emit model->dataChanged(model->index(0), model->index(model->rowCount())); // TODO: narrow range
+		int firstRow = selectedIndices[0].row();
+		model->removeCommands(firstRow, selectedIndices.size());
+		model->insertCommands(firstRow, dialog->resultCommands());
+
+		selectionModel()->clearSelection();
+		setCurrentIndex(model->index(firstRow));
+
+		delete dialog;
 	}
 }
 
@@ -101,12 +110,9 @@ void EventContentList::actionCommandDeleteTriggered(bool)
 		return;
 
 	auto selectedIndices = selectionModel()->selection()[0].indexes();
-	Command::It command = selectedIndices[0].data(Qt::UserRole + 1).value<Command::It>();
-	for (int i = 0; i < selectedIndices.size(); i++)
-		command = currentList->erase(command);
 
-	selectionModel()->clearSelection();
-	emit model->dataChanged(model->index(0), model->index(model->rowCount()));
+	int firstRow = selectedIndices[0].row();
+	model->removeCommands(firstRow, selectedIndices.size());
 }
 
 void EventContentList::contextMenuRequested(const QPoint &pos)
@@ -119,6 +125,9 @@ void EventContentList::contextMenuRequested(const QPoint &pos)
 		actionCommandNew->setEnabled(command->parameters->canAdd());
 		actionCommandEdit->setEnabled(command->parameters->canEdit());
 		actionCommandDelete->setEnabled(command->parameters->canDelete());
+
+		selectionModel()->clearSelection();
+		setCurrentIndex(index);
 	}
 	else
 	{

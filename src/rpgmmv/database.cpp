@@ -1,5 +1,5 @@
 #include "database.hpp"
-#include "iconset.hpp"
+//#include "iconset.hpp"
 #include "json_stuff.hpp"
 #include "settings.hpp"
 //#include "rpgmmz/system_mz.hpp"
@@ -364,7 +364,7 @@ QStandardItemModel *Database::createModel(QStringList columns)
 	model->appendRow(item_row);
 }*/
 
-void Database::addRow(QStandardItemModel *model, int id, std::string name, int iconIndex)
+/*void Database::addRow(QStandardItemModel *model, int id, std::string name, int iconIndex)
 {
 	QStandardItem *idItem = new QStandardItem();
 	idItem->setData(id, Qt::DisplayRole);
@@ -390,4 +390,4 @@ void Database::removeRow(QStandardItemModel *model, int index)
 	Q_UNUSED(model)
 	Q_UNUSED(index)
 	qDebug() << "Database::removeRow";
-}
+}*/

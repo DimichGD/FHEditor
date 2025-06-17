@@ -20,6 +20,8 @@ bool Images::load()
 	if (!imgDir.exists())
 		return false;
 
+	iconSetPixmap = loadImage("system/IconSet");
+
 	return true;
 }
 
@@ -62,9 +64,10 @@ QPixmap Images::loadImage(const QString &name)
 	return pixmap;*/
 }
 
-QPixmap Images::iconSet()
+QPixmap &Images::iconSet()
 {
-	return loadImage("system/IconSet");
+	//return loadImage("system/IconSet");
+	return iconSetPixmap;
 }
 
 QPixmap Images::face(const QString &name)

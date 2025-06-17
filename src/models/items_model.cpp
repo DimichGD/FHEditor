@@ -1,5 +1,5 @@
 #include "items_model.hpp"
-#include "iconset.hpp"
+//#include "iconset.hpp"
 
 Item *ItemsModel::item(int row)
 {
@@ -28,7 +28,8 @@ QVariant ItemsModel::iconForDisplay(int row, int column) const
 	if (!item)
 		return QVariant();
 
-	return IconSet::Get()->get(item->iconIndex);
+	//return IconSet::Get()->get(item->iconIndex);
+	return item->iconIndex;
 }
 
 QVariant ItemsModel::dataForMapper(int row, int column) const

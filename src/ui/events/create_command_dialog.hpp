@@ -1,4 +1,6 @@
 #pragma once
+#include "command_dialog.hpp"
+#include "event.hpp"
 #include <QDialog>
 #include <QModelIndex>
 
@@ -12,12 +14,15 @@ public:
 	explicit CreateCommandDialog(QModelIndex index, QWidget *parent = nullptr);
 	~CreateCommandDialog();
 
+	std::list<Command> resultCommands();
+
 protected:
 	void openShowTextDialog();
-	void openPlaySoundDialog();
+	void openPlaySEDialog();
 
 private:
-	Ui::CreateCommandDialog *ui;
+	Ui::CreateCommandDialog *ui = nullptr;
+	CommandDialog *dialog = nullptr;
 	QModelIndex currentIndex;
 };
 

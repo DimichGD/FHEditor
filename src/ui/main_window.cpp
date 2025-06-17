@@ -10,7 +10,7 @@
 
 #include "database.hpp"
 #include "images.hpp"
-#include "iconset.hpp"
+//#include "iconset.hpp"
 #include "settings.hpp"
 
 #include "games_list_dialog.hpp"
@@ -94,9 +94,8 @@ void MainWindow::loadGame()
 		return;
 	}
 
-	Images::Get()->load();
-	if (!IconSet::Get()->load())
-		qDebug() << "Failed to load IconSet";
+	if (!Images::Get()->load())
+		qDebug() << "Failed to load Images";
 
 	uint64_t start = QDateTime::currentMSecsSinceEpoch();
 

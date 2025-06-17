@@ -30,7 +30,7 @@ ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 	connect(ui->actionEffectDelete, &QAction::triggered, this, &ItemsTab::actionEffectDeleteTriggered);
 
 	connect(ui->itemEffectsList, &QTableWidget::customContextMenuRequested, this, &ItemsTab::contextMenuRequested);
-	connect(ui->itemEffectsList, &QTableWidget::doubleClicked, [this](const QModelIndex &) { actionEffectEditTriggered(true); });
+	connect(ui->itemEffectsList, &QTableWidget::doubleClicked, ui->itemEffectsList, [this](const QModelIndex &) { actionEffectEditTriggered(true); });
 
 	connect(ui->itemsTable, &BaseTable::rowSelected, this, &ItemsTab::itemRowSelected);
 	connect(ui->itemNameFilter, &QLineEdit::textChanged, ui->itemsTable, &BaseTable::setFilterText);
@@ -61,14 +61,21 @@ void ItemsTab::changeIcon(int index)
 	// TODO: make an update(row, column) method?
 }
 
+
+
 void ItemsTab::init()
 {
-	// TODO: delete and nullify model pointer
-	// delete via deleteLater() ?
+	if (mapper)
+		delete mapper;
+
+	if (model)
+		delete model;
+
 	ui->itemIconLabel->setIconMode(ClickableLabel::Mode::ICON_SET, Images::Get()->iconSet());
 
 	model = new ItemsModel(ui->itemsTable);
-	ui->itemsTable->setModel2(model);
+	iconSetPixmap = Images::Get()->iconSet();
+	ui->itemsTable->setModel2(model, &iconSetPixmap);
 
 	ui->itemApplyButton->setEnabled(false);
 	ui->itemDamageElementComboBox->clear(); // Normal Attack and None only present in items?
@@ -107,7 +114,7 @@ void ItemsTab::init()
 
 	ui->itemsTable->selectRow(0);
 
-	connect(model, &QAbstractItemModel::dataChanged,
+	connect(model, &QAbstractItemModel::dataChanged, model,
 			[this](const QModelIndex &, const QModelIndex &, const QList<int> &)
 	{ ui->itemApplyButton->setEnabled(true); });
 }
@@ -137,7 +144,7 @@ void ItemsTab::itemRowSelected(int row)
 
 		auto stringList = effectToStringList(&effect);
 		QTableWidgetItem *item = new QTableWidgetItem(stringList.at(0));
-		item->setData(Qt::UserRole, lastRow);
+		//item->setData(Qt::UserRole, lastRow);
 		ui->itemEffectsList->setItem(lastRow, 0, item);
 		ui->itemEffectsList->setItem(lastRow, 1, new QTableWidgetItem(stringList.at(1)));
 	}
@@ -159,10 +166,8 @@ void ItemsTab::itemIconClicked()
 		return;
 
 	IconPickerDialog dialog(this, currentItem->iconIndex);
-	connect(&dialog, &QDialog::accepted,
-		[this, &dialog]() { changeIcon(dialog.index()); });
-
-	dialog.exec();
+	if (dialog.exec())
+		changeIcon(dialog.index());
 }
 
 void ItemsTab::contextMenuRequested(const QPoint &pos)
@@ -201,7 +206,7 @@ void ItemsTab::actionEffectEditTriggered(bool)
 	if (list.empty() || !currentItem)
 		return;
 
-	int effectIndex = list[0]->data(Qt::UserRole).toInt();
+	int effectIndex = list[0]->row();
 	ItemEffectDialog dialog(currentItem->effects.at(effectIndex), this);
 	if (dialog.exec())
 	{

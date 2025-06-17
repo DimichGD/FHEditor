@@ -12,22 +12,30 @@ CreateCommandDialog::CreateCommandDialog(QModelIndex index, QWidget *parent):
 
 	currentIndex = index;
 	connect(ui->showTextButton, &QPushButton::clicked, this, &CreateCommandDialog::openShowTextDialog);
-	connect(ui->playSEButton, &QPushButton::clicked, this, &CreateCommandDialog::openPlaySoundDialog);
+	connect(ui->playSEButton, &QPushButton::clicked, this, &CreateCommandDialog::openPlaySEDialog);
 }
 
 CreateCommandDialog::~CreateCommandDialog()
 {
+	delete dialog;
 	delete ui;
+}
+
+std::list<Command> CreateCommandDialog::resultCommands()
+{
+	return dialog ? dialog->resultCommands() : std::list<Command> {};
 }
 
 void CreateCommandDialog::openShowTextDialog()
 {
-	CommandTextDialog dialog(false, { currentIndex }, this);
-	if (dialog.exec()) accept();
+	//CommandTextDialog dialog(false, { currentIndex }, this);
+	//if (dialog.exec()) accept();
+	dialog = new CommandTextDialog(false, { currentIndex }, this);
+	if (dialog->exec()) accept();
 }
 
-void CreateCommandDialog::openPlaySoundDialog()
+void CreateCommandDialog::openPlaySEDialog()
 {
-	PlaySoundDialog dialog(false, { currentIndex }, this);
-	if (dialog.exec()) accept();
+	dialog = new PlaySoundDialog(PlaySoundDialog::SE, false, currentIndex, this);
+	if (dialog->exec()) accept();
 }

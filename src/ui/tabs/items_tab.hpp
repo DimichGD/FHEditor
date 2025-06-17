@@ -46,5 +46,6 @@ private:
 	Item *currentItem = nullptr;
 	ItemsModel *model = nullptr;
 	DataMapper *mapper = nullptr;
+	QPixmap iconSetPixmap;
 };
 

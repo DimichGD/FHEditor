@@ -10,7 +10,6 @@ public:
 		QItemSelectionModel(model, parent) {}
 
 public slots:
-	//void select(const QModelIndex &index, SelectionFlags command) override;
-	void select(const QItemSelection &selection, SelectionFlags flags) override;
+	void select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags flags) override;
 };
 

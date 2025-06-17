@@ -1,4 +1,4 @@
-QT     += core gui widgets
+QT     += core gui widgets multimedia
 CONFIG += c++latest
 CONFIG -= debug_and_release debug_and_release_target qml_debug
 
@@ -32,10 +32,10 @@ SOURCES += \
     src/models/map_info_model.cpp \
     src/rpgmmv/database.cpp \
     src/rpgmmv/effect.cpp \
-    src/rpgmmv/iconset.cpp \
     src/rpgmmv/json_stuff.cpp \
     src/rpgmmz/system_mz.cpp \
     src/ui/dialogs/games_list_dialog.cpp \
+    src/ui/events/command_dialog.cpp \
     src/ui/events/create_command_dialog.cpp \
     src/ui/events/command_text_dialog.cpp \
     src/ui/dialogs/change_maximum_dialog.cpp \
@@ -92,7 +92,6 @@ HEADERS += \
     src/rpgmmv/database.hpp \
     src/rpgmmv/effect.hpp \
     src/rpgmmv/event.hpp \
-    src/rpgmmv/iconset.hpp \
     src/rpgmmv/item.hpp \
     src/rpgmmv/json_qstring.hpp \
     src/rpgmmv/json_stuff.hpp \
@@ -107,6 +106,7 @@ HEADERS += \
     src/rpgmmv/weapon.hpp \
     src/rpgmmz/system_mz.hpp \
     src/ui/dialogs/games_list_dialog.hpp \
+    src/ui/events/command_dialog.hpp \
     src/ui/events/play_sound_dialog.hpp \
     src/ui/settings.hpp \
     src/ui/widgets/attrib_combo_box.hpp \

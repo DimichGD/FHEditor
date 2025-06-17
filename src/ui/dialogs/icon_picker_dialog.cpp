@@ -1,5 +1,6 @@
 #include "icon_picker_dialog.hpp"
-#include "iconset.hpp"
+#include "images.hpp"
+//#include "iconset.hpp"
 
 #include <QGraphicsPixmapItem>
 
@@ -8,13 +9,13 @@ IconPickerDialog::IconPickerDialog(QWidget *parent, int icon_index): QDialog(par
 	ui = new Ui::IconPickerDialog();
 	ui->setupUi(this);
 	ui->graphicsView->setTileSize(32);
-	ui->graphicsView->setPixmap(IconSet::Get()->pixmap());
+	ui->graphicsView->setPixmap(Images::Get()->iconSet());
 
 	int y = icon_index / 16;
 	int x = icon_index % 16;
 	ui->graphicsView->setPos(x, y);
 
-	QPixmap &pixmap = IconSet::Get()->pixmap();
+	QPixmap &pixmap = Images::Get()->iconSet();
 	resize(pixmap.width() + 64, pixmap.height() + 64);
 	//ui->graphicsView->fitInView2();
 }

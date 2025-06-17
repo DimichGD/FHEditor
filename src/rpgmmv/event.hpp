@@ -2,8 +2,12 @@
 #include "base_command.hpp"
 #include "sound.hpp"
 #include <optional>
+#include <variant>
 #include <vector>
 #include <list>
+
+using Command_101_Params = std::tuple<QString, int, int, int>;
+using Command_401_Params = std::tuple<QString>;
 
 struct Command
 {
@@ -11,7 +15,8 @@ struct Command
 
 	int code;
 	int indent;
-	QSharedPointer<ICommand> parameters;
+	//QSharedPointer<ICommand> parameters;
+	std::variant<QString, Sound, Command_101_Params, Command_401_Params> parameters;
 };
 
 struct Event

@@ -167,8 +167,8 @@ public:
 		return model;
 	}
 
-	void addRow(QStandardItemModel *model, int id, std::string name, int iconIndex = -1);
-	void removeRow(QStandardItemModel *model, int index);
+	//void addRow(QStandardItemModel *model, int id, std::string name, int iconIndex = -1);
+	//void removeRow(QStandardItemModel *model, int index);
 
 private:
 	System systemObject;

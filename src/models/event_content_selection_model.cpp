@@ -27,8 +27,8 @@ void EventContentSelectionModel::select(const QItemSelection &selection, Selecti
 	static std::map<int, Holder> codesMap = {
 		{ CommandFactory::TEXT,          { CommandFactory::LINE,        SELECT_WHILE, false } },
 		{ CommandFactory::BEGIN_CHOICES, { CommandFactory::END_CHOICES, SELECT_UNTIL, true } },
-		{ 402, { 0, SELECT_UNTIL, false } },
-		{ 411, { 0, SELECT_UNTIL, false } },
+		{ 402, { 0, SELECT_UNTIL, true } },
+		{ 411, { 0, SELECT_UNTIL, true } },
 	};
 
 	QItemSelection rowSelection;

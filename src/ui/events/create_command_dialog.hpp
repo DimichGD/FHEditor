@@ -14,6 +14,7 @@ public:
 
 protected:
 	void openShowTextDialog();
+	void openPlaySoundDialog();
 
 private:
 	Ui::CreateCommandDialog *ui;

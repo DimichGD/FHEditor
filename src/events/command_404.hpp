@@ -9,5 +9,9 @@ struct Command_404: ICommand
 	void read(const std::string &str) override { (void)str; };
 	auto write() -> std::string override { return "[]"; };
 
+	bool canAdd() override { return false; }
+	bool canEdit() override { return false; }
+	bool canDelete() override { return false; }
+
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
 };

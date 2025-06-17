@@ -9,12 +9,12 @@ struct ICommand
 	virtual ~ICommand() = default;
 	virtual int code() { return -1; };
 	virtual void drawImpl(QPainter *painter, bool selected, QRect &rect) = 0;
-	virtual void read(const std::string &parameters) { (void)parameters; }
-	virtual auto write() -> std::string { return "[]"; };
+	virtual void read(const std::string &parameters) = 0;
+	virtual auto write() -> std::string = 0;
 
-	virtual bool canAdd() { return false; }
-	virtual bool canEdit() { return false; }
-	virtual bool canDelete() { return false; }
+	virtual bool canAdd() = 0;
+	virtual bool canEdit() = 0;
+	virtual bool canDelete() = 0;
 
 	void draw(QPainter *painter, bool selected, QRect rect, int indent)
 	{
@@ -26,10 +26,8 @@ struct ICommand
 	void drawText(QPainter *painter, bool selected, QRect &rect, const QString &text, QColor color)
 	{
 		QPen pen = painter->pen();
-		if (selected)
-			pen.setColor(QColorConstants::White);
-		else
-			pen.setColor(color);
+		pen.setColor(selected ? QColorConstants::White : color);
+
 		painter->setPen(pen);
 		painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, text);
 

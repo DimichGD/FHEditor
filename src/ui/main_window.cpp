@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->tabWidget->setCurrentIndex(mapTabIndex);
 
 	connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
-	connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::openSettingsDialog);
+	connect(ui->actionGamesList, &QAction::triggered, this, &MainWindow::openSettingsDialog);
 	connect(mapTab, &MapTab::mapLoaded, mapEventsTab, &MapEventsTab::init);
 
 	if (Settings::Get()->lastPath.isEmpty())

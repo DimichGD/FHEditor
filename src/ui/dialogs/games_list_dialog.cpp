@@ -16,12 +16,14 @@ GamesListDialog::GamesListDialog(QWidget *parent): QDialog(parent), ui(new Ui::S
 	{
 		addRow(game.name, game.path);
 
-		if (game.name == Settings::Get()->lastPath)
+		if (game.path == Settings::Get()->lastPath)
 			ui->gameTable->selectRow(ui->gameTable->rowCount() - 1);
 	}
 
 	connect(ui->addGameButton, &QPushButton::clicked, this, &GamesListDialog::addGameClicked);
 	connect(ui->removeGameButton, &QPushButton::clicked, this, &GamesListDialog::removeGameClicked);
+	connect(ui->moveUpButton, &QPushButton::clicked, this, &GamesListDialog::moveUpClicked);
+	connect(ui->moveDownButton, &QPushButton::clicked, this, &GamesListDialog::moveDownClicked);
 	connect(ui->gameTable, &QTableWidget::itemDoubleClicked, this, &QDialog::accept);
 	connect(this, &QDialog::accepted, this, &GamesListDialog::saveSettings);
 }
@@ -72,12 +74,31 @@ void GamesListDialog::removeGameClicked()
 
 void GamesListDialog::saveSettings()
 {
-	if (ui->gameTable->currentRow() < 0)
+	if (ui->gameTable->currentRow() >= 0)
+	{
+		QTableWidgetItem *pathItem = ui->gameTable->item(ui->gameTable->currentRow(), 1);
+		Settings::Get()->lastPath = pathItem->data(Qt::DisplayRole).toString();
+	}
+
+	Settings::Get()->save();
+}
+
+void GamesListDialog::moveUpClicked()
+{
+	int srcRow = ui->gameTable->currentRow();
+	if (ui->gameTable->currentRow() <= 0)
 		return;
 
-	QTableWidgetItem *pathItem = ui->gameTable->item(ui->gameTable->currentRow(), 1);
-	Settings::Get()->lastPath = pathItem->data(Qt::DisplayRole).toString();
-	Settings::Get()->save();
+	swapRows(srcRow, srcRow - 1);
+}
+
+void GamesListDialog::moveDownClicked()
+{
+	int srcRow = ui->gameTable->currentRow();
+	if (srcRow < 0 || srcRow == ui->gameTable->rowCount() - 1)
+			return;
+
+	swapRows(srcRow, srcRow + 1);
 }
 
 void GamesListDialog::addRow(const QString &name, const QString &path)
@@ -88,4 +109,20 @@ void GamesListDialog::addRow(const QString &name, const QString &path)
 	ui->gameTable->setItem(lastRow, 1, new QTableWidgetItem(path));
 	ui->gameTable->resizeColumnToContents(0);
 	ui->gameTable->resizeRowsToContents();
+}
+
+void GamesListDialog::swapRows(int srcRow, int dstRow)
+{
+	QTableWidgetItem *item1 = ui->gameTable->takeItem(srcRow, 0);
+	QTableWidgetItem *item2 = ui->gameTable->takeItem(srcRow, 1);
+	QTableWidgetItem *item3 = ui->gameTable->takeItem(dstRow, 0);
+	QTableWidgetItem *item4 = ui->gameTable->takeItem(dstRow, 1);
+
+	ui->gameTable->setItem(dstRow, 0, item1);
+	ui->gameTable->setItem(dstRow, 1, item2);
+	ui->gameTable->setItem(srcRow, 0, item3);
+	ui->gameTable->setItem(srcRow, 1, item4);
+	ui->gameTable->selectRow(dstRow);
+
+	Settings::Get()->gamesList.swapItemsAt(srcRow, dstRow);
 }

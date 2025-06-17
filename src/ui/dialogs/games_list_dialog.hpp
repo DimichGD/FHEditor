@@ -15,9 +15,12 @@ public slots:
 	void addGameClicked();
 	void removeGameClicked();
 	void saveSettings();
+	void moveUpClicked();
+	void moveDownClicked();
 
 protected:
 	void addRow(const QString &name, const QString &path);
+	void swapRows(int srcRow, int dstRow);
 
 private:
 	Ui::SettingsDialog *ui = nullptr;

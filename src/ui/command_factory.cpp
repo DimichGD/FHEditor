@@ -53,6 +53,7 @@ QSharedPointer<ICommand> CommandFactory::createCommand2(int code)
 		case ZERO:           command = createCommand<Command_000>(); break;
 		case TEXT:           command = createCommand<Command_101>(); break;
 		case BEGIN_CHOICES:  command = createCommand<Command_102>(); break;
+		case PLAY_SE:        command = createCommand<Command_250>(); break;
 		case LINE:           command = createCommand<Command_401>(); break;
 		case END_CHOICES:    command = createCommand<Command_404>(); break;
 		default:             command = createCommand<Command_Unknown>(code); break;

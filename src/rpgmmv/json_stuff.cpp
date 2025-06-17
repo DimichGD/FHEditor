@@ -12,11 +12,8 @@
 #include "weapon.hpp"
 #include "event.hpp"
 #include "command_factory.hpp"
+#include "json_qstring.hpp"
 
-#include "glaze/json/read.hpp"
-#include "glaze/json/write.hpp"
-//#include "glaze/glaze.hpp"
-//#include "glaze/json/raw_string.hpp"
 
 #include <QFile>
 #include <QDebug>
@@ -83,10 +80,7 @@ struct glz::from<glz::JSON, Command>
 
 		skip_ws<Opts>(ctx, it, end);
 		if (match<'}'>(ctx, it))
-		{
-			//qDebug().noquote() << value.parameters;
 			return;
-		}
 	}
 };
 
@@ -101,42 +95,7 @@ struct glz::to<glz::JSON, QSharedPointer<ICommand>>
 	}
 };
 
-namespace glz
-{
-	template<>
-	struct from<JSON, QString>
-	{
-		template <auto Opts>
-		static void op(QString& value, auto&&... args)
-		{
-			std::string buffer {};
-			parse<JSON>::op<Opts>(buffer, args...);
-			value = QString::fromStdString(buffer);
-		}
-	};
 
-	template<>
-	struct to<JSON, QString>
-	{
-		template <auto Opts>
-		static void op(QString& value, auto&&... args)
-		{
-			std::string buffer = value.toStdString();
-			serialize<JSON>::op<Opts>(buffer, args...);
-		}
-	};
-}
-
-
-/*template <>
-struct glz::meta<Command>
-{
-	using T = Command;
-	static constexpr auto value = glz::object("code", &T::code,
-											  "indent", &T::indent,
-											  //"parameters", glz::raw<&T::parameters>,
-											  "parameters", &T::parameters);
-};*/
 
 /*template <>
 struct glz::to<glz::JSON, Command>
@@ -172,9 +131,6 @@ struct glz::to<glz::JSON, Route>
 	template <auto Opts>
 	static void op(Route& value, is_context auto&& ctx, auto&& it, auto&& end)
 	{
-		/*const auto start = it++;
-		skip_until_closed<Opts, '{', '}'>(ctx, it, end);
-		value.parseLater = { start, size_t(it - start) };*/
 		serialize<JSON>::op<glz::opts{.raw = true}>(value.parseLater, ctx, it, end);
 	}
 };
@@ -185,6 +141,7 @@ struct glz::from<glz::JSON>
 	template <auto Opts>
 	static void op(Timing& value, is_context auto&& ctx, auto&& it, auto&& end)
 	{
+		(void)value;
 		const auto start = it++;
 		skip_until_closed<Opts, '{', '}'>(ctx, it, end);
 		//value.parseLater = { start, size_t(it - start) };

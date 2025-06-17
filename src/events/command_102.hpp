@@ -20,5 +20,9 @@ struct Command_102: ICommand
 	void read(const std::string &parameters) override;
 	auto write() -> std::string override;
 
+	bool canAdd() override { return true; }
+	bool canEdit() override { return true; }
+	bool canDelete() override { return true; }
+
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
 };

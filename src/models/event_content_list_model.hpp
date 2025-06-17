@@ -14,6 +14,7 @@ public:
 	QVariant data(const QModelIndex &index, int role) const override;
 
 private:
+	//std::list<
 	Event *currentEvent = nullptr;
 };
 

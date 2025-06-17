@@ -36,7 +36,7 @@
      <x>0</x>
      <y>0</y>
      <width>836</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -51,11 +51,11 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menuSettings">
     <property name="title">
-     <string>Edit</string>
+     <string>Settings</string>
     </property>
-    <addaction name="actionSettings"/>
+    <addaction name="actionGamesList"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -64,7 +64,7 @@
     <addaction name="actionAboutQt"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -83,12 +83,15 @@
     <string>Exit</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::QuitRole</enum>
+    <enum>QAction::QuitRole</enum>
    </property>
   </action>
-  <action name="actionSettings">
+  <action name="actionGamesList">
    <property name="text">
-    <string>Settings</string>
+    <string>Games List</string>
+   </property>
+   <property name="toolTip">
+    <string>Games List</string>
    </property>
   </action>
   <action name="actionSave_Current_Tab">
@@ -115,19 +118,10 @@
     <string>About Qt</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::AboutQtRole</enum>
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
  </widget>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="layersCheckBoxGroup">
-   <property name="exclusive">
-    <bool>false</bool>
-   </property>
-  </buttongroup>
-  <buttongroup name="layersButtonGroup"/>
-  <buttongroup name="mapViewModeButtonsGroup"/>
- </buttongroups>
 </ui>

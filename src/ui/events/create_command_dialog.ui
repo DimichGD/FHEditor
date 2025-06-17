@@ -114,6 +114,15 @@
          <property name="title">
           <string>Audio and Video</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <widget class="QPushButton" name="playSEButton">
+            <property name="text">
+             <string>Play SE</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -166,10 +175,10 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::StandardButton::Cancel</set>
+      <set>QDialogButtonBox::Cancel</set>
      </property>
     </widget>
    </item>

@@ -8,5 +8,4 @@ struct Command_230: ICommand
 
 	Command_230(int frames);
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
-	static Command_230 parse(const std::string &parameters);
 };

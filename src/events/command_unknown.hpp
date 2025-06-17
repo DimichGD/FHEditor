@@ -12,5 +12,9 @@ struct Command_Unknown: ICommand
 	void read(const std::string &str) override;
 	std::string write() override;
 
+	bool canAdd() override { return false; }
+	bool canEdit() override { return false; }
+	bool canDelete() override { return false; }
+
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
 };

@@ -1,27 +1,34 @@
 #include "command_250.hpp"
-
-#include "glaze/json/read.hpp"
+#include "json_qstring.hpp"
 
 #include <QDebug>
-
-namespace glz
-{
-	template<>
-	struct from<JSON, QString>
-	{
-		template <auto Opts>
-		static void op(QString& value, auto&&... args)
-		{
-			std::string buffer {};
-			parse<JSON>::op<Opts>(buffer, args...);
-			value = QString::fromStdString(buffer);
-		}
-	};
-}
 
 Command_250::Command_250(Sound sound)
 {
 	this->sound = sound;
+}
+
+void Command_250::read(const std::string &parameters)
+{
+	std::tuple<Sound> params;
+	glz::error_ctx err = glz::read_json(params, parameters);
+	if (err)
+		qDebug() << QString::fromStdString(glz::format_error(err));
+
+	sound = std::get<0>(params);
+}
+
+std::string Command_250::write()
+{
+	std::tuple<Sound> params = std::tie(sound);
+	glz::expected<std::string, glz::error_ctx> result = glz::write_json(params);
+	if (!result.has_value())
+	{
+		qDebug() << QString::fromStdString(glz::format_error(result.error()));
+		return "";
+	}
+
+	return result.value();
 }
 
 void Command_250::drawImpl(QPainter *painter, bool selected, QRect &rect)
@@ -34,14 +41,4 @@ void Command_250::drawImpl(QPainter *painter, bool selected, QRect &rect)
 			.arg(sound.pitch)
 			.arg(sound.pan);
 	drawText(painter, selected, rect, str, ConstantColors::shit);
-}
-
-Command_250 Command_250::parse(const std::string &parameters)
-{
-	std::tuple<Sound> params;
-	glz::error_ctx err = glz::read_json(params, parameters);
-	if (err)
-		qDebug() << QString::fromStdString(glz::format_error(err));
-
-	return std::make_from_tuple<Command_250>(params);
 }

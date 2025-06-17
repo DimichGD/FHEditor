@@ -76,16 +76,3 @@ void Command_101::drawImpl(QPainter *painter, bool selected, QRect &rect)
 			.arg(faceToString(), backgroundToString(), windowPositionToString());
 	drawText(painter, selected, rect, str, ConstantColors::grey);
 }
-
-/*template<>
-QSharedPointer<ICommand> parseCommand<Command_101>(const std::string &parameters)
-{
-	std::tuple<std::string, int, int, int> params;
-	glz::error_ctx err = glz::read_json(params, parameters);
-	if (err)
-		qDebug() << glz::format_error(err);
-
-	//return std::make_shared<Command_101>(std::make_from_tuple<Command_101>(params));
-	return QSharedPointer<ICommand>(new Command_101(std::make_from_tuple<Command_101>(params)));
-}*/
-

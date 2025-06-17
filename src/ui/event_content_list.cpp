@@ -6,6 +6,7 @@
 #include "event_content_selection_model.hpp"
 #include "events/command_text_dialog.hpp"
 #include "events/create_command_dialog.hpp"
+#include "play_sound_dialog.hpp"
 
 #include <QStyledItemDelegate>
 #include <QMenu>
@@ -84,6 +85,7 @@ void EventContentList::actionCommandEditTriggered(bool)
 	switch (command->code)
 	{
 		case CommandFactory::TEXT: dialog = new CommandTextDialog(true, selectedIndices, this); break;
+		case CommandFactory::PLAY_SE: dialog = new PlaySoundDialog(true, selectedIndices[0], this); break;
 	}
 
 	if (dialog && dialog->exec())

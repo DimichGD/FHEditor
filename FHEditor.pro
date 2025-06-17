@@ -42,6 +42,7 @@ SOURCES += \
     src/ui/dialogs/icon_picker_dialog.cpp \
     src/ui/dialogs/item_effect_dialog.cpp \
     src/ui/dialogs/simple_chooser_dialog.cpp \
+    src/ui/events/play_sound_dialog.cpp \
     src/ui/settings.cpp \
     src/ui/tabs/armors_tab.cpp \
     src/ui/tabs/common_events_tab.cpp \
@@ -93,6 +94,7 @@ HEADERS += \
     src/rpgmmv/event.hpp \
     src/rpgmmv/iconset.hpp \
     src/rpgmmv/item.hpp \
+    src/rpgmmv/json_qstring.hpp \
     src/rpgmmv/json_stuff.hpp \
     src/rpgmmv/map.hpp \
     src/rpgmmv/map_info.hpp \
@@ -105,6 +107,7 @@ HEADERS += \
     src/rpgmmv/weapon.hpp \
     src/rpgmmz/system_mz.hpp \
     src/ui/dialogs/games_list_dialog.hpp \
+    src/ui/events/play_sound_dialog.hpp \
     src/ui/settings.hpp \
     src/ui/widgets/attrib_combo_box.hpp \
     src/ui/dialogs/change_maximum_dialog.hpp \
@@ -142,6 +145,7 @@ FORMS += \
     src/ui/dialogs/simple_chooser_dialog.ui \
     src/ui/events/command_text_dialog.ui \
     src/ui/events/create_command_dialog.ui \
+    src/ui/events/play_sound_dialog.ui \
     src/ui/main_window.ui \
     src/ui/tabs/armors_tab.ui \
     src/ui/tabs/common_events_tab.ui \

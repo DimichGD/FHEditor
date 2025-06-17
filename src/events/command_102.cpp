@@ -77,30 +77,8 @@ void Command_102::drawImpl(QPainter *painter, bool selected, QRect &rect)
 	drawText(painter, selected, rect, stringList.join(", "), ConstantColors::blue);
 
 	QString str = QString(" (%1, %2, #%3, #%4)")
-			.arg(backgroundToString())
-			.arg(windowPositionToString())
+			.arg(backgroundToString(), windowPositionToString())
 			.arg(value_1)
 			.arg(value_0);
 	drawText(painter, selected, rect, str, ConstantColors::grey);
 }
-
-/*Command_102 Command_102::parse(const std::string &parameters)
-{
-	std::tuple<std::vector<std::string>, int, int, int, int> params;
-	glz::error_ctx err = glz::read_json(params, parameters);
-	if (err)
-		qDebug() << glz::format_error(err);
-
-	return std::make_from_tuple<Command_102>(params);
-}*/
-
-/*template<>
-QSharedPointer<ICommand> parseCommand<Command_102>(const std::string &parameters)
-{
-	std::tuple<std::vector<std::string>, int, int, int, int> params;
-	glz::error_ctx err = glz::read_json(params, parameters);
-	if (err)
-		qDebug() << glz::format_error(err);
-
-	return QSharedPointer<ICommand>(new Command_102(std::make_from_tuple<Command_102>(params)));
-}*/

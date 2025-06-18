@@ -1,7 +1,7 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_Unknown: ICommand
+struct Command_Unknown: ICommandParams
 {
 	Command_Unknown(int codeId);
 

@@ -31,12 +31,12 @@ namespace glz
 	};
 }
 
-Command_401::Command_401(QString line)
+Command_401_Params::Command_401_Params(QString line)
 {
 	this->line = line;
 }
 
-void Command_401::read(const std::string &str)
+void Command_401_Params::read(const std::string &str)
 {
 	std::tuple<QString> params;
 	glz::error_ctx err = glz::read_json(params, str);
@@ -46,7 +46,7 @@ void Command_401::read(const std::string &str)
 	line = std::get<0>(params);
 }
 
-std::string Command_401::write()
+std::string Command_401_Params::write()
 {
 	std::tuple<QString> params;
 	params = std::tie(line);
@@ -61,7 +61,7 @@ std::string Command_401::write()
 }
 
 
-void Command_401::drawImpl(QPainter *painter, bool selected, QRect &rect)
+void Command_401_Params::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	drawText(painter, selected, rect, "    : ", ConstantColors::purple);
 	drawText(painter, selected, rect, line, ConstantColors::blue);

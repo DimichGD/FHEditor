@@ -42,3 +42,5 @@ void Command_250::drawImpl(QPainter *painter, bool selected, QRect &rect)
 			.arg(sound.pan);
 	drawText(painter, selected, rect, str, ConstantColors::shit);
 }
+
+

@@ -12,7 +12,7 @@ class MapEventsTab: public QWidget
 	Q_OBJECT
 
 public:
-	explicit MapEventsTab(QWidget *parent = nullptr);
+	explicit MapEventsTab(QWidget *parent = nullptr, bool newEvent = false);
 	~MapEventsTab();
 
 	void init(Map *map);
@@ -26,5 +26,6 @@ private:
 	MapEventPagesModel *pagesModel = nullptr;
 	Map *currentMap = nullptr;
 	Ui::MapEventsTab *ui = nullptr;
+	bool newEvent = false;
 };
 

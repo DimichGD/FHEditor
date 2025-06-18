@@ -1,13 +1,7 @@
 #pragma once
 #include "base_command.hpp"
-#include "sound.hpp"
-#include <optional>
-#include <variant>
 #include <vector>
 #include <list>
-
-using Command_101_Params = std::tuple<QString, int, int, int>;
-using Command_401_Params = std::tuple<QString>;
 
 struct Command
 {
@@ -15,8 +9,7 @@ struct Command
 
 	int code;
 	int indent;
-	//QSharedPointer<ICommand> parameters;
-	std::variant<QString, Sound, Command_101_Params, Command_401_Params> parameters;
+	QSharedPointer<ICommandParams> parameters;
 };
 
 struct Event
@@ -35,19 +28,19 @@ struct Event
 
 struct Condition
 {
-	int actorId;
-	bool actorValid;
-	int itemId;
-	bool itemValid;
-	QString selfSwitchCh;
-	bool selfSwitchValid;
-	int switch1Id;
-	bool switch1Valid;
-	int switch2Id;
-	bool switch2Valid;
-	int variableId;
-	bool variableValid;
-	int variableValue;
+	int actorId = 1;
+	bool actorValid = false;
+	int itemId = 1;
+	bool itemValid = false;
+	QString selfSwitchCh { 'A' };
+	bool selfSwitchValid = false;
+	int switch1Id = 1;
+	bool switch1Valid = false;
+	int switch2Id = 1;
+	bool switch2Valid = false;
+	int variableId = 1;
+	bool variableValid = false;
+	int variableValue = 0;
 };
 
 struct Image
@@ -80,7 +73,7 @@ struct RouteEntry3
 
 struct Route
 {
-	std::string parseLater;
+	std::string parseLater { R"({"list":[{"code":0,"parameters":[]}],"repeat":true,"skippable":false,"wait":false})" };
 };
 
 

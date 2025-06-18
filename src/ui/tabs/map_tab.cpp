@@ -31,7 +31,7 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	tilePickerViews[4] = ui->tilePicker_E;
 
 	//connect(ui->mapInfoTable, &QAbstractItemView::activated, this, &MapTab::mapInfoTableDoubleClicked);
-	connect(ui->mapInfoTable, &QAbstractItemView::clicked, this, &MapTab::mapInfoTableDoubleClicked);
+	connect(ui->mapInfoTable, &QAbstractItemView::clicked, this, &MapTab::mapInfoTableClicked);
 	connect(ui->mapNameFilter, &QLineEdit::textChanged, ui->mapInfoTable, &BaseTable::setFilterText);
 	connect(ui->visibleLayersButtonGroup, &QButtonGroup::idToggled, ui->mapView, &MapView::layersToggled);
 
@@ -42,32 +42,21 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	});
 
 	connect(ui->modeButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentMode);
-	/*{
-		ui->mapView->currentMode = MapView::Mode(id);
-		ui->mapView->updateEventTiles();
-	});*/
-
 	connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentLayer);
 
 	connect(ui->tilesTabWidget, &QTabWidget::currentChanged, ui->tilesTabWidget, [this](int index)
 	{
 		if (index == 0)
 		{
-			//ui->layerButton_0->setEnabled(true);
 			ui->mapView->setCurrentLayer(0);
 			ui->layerButton_1->setEnabled(false);
 			ui->layerButton_2->setEnabled(false);
-			//ui->layerButton_0->click();
 		}
 		else
 		{
-			//ui->layerButton_0->setEnabled(false);
 			ui->mapView->setCurrentLayer(ui->paintLayerButtonGroup->checkedId());
 			ui->layerButton_1->setEnabled(true);
 			ui->layerButton_2->setEnabled(true);
-
-			//if (ui->paintLayerButtonGroup->checkedId() == 0)
-			//	ui->layerButton_1->click();
 		}
 	});
 
@@ -107,6 +96,16 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		mapEventsTab->setWindowModality(Qt::ApplicationModal);
 		mapEventsTab->init(currentMap);
 		mapEventsTab->selectEvent(eventId);
+		mapEventsTab->show();
+	});
+
+	connect(ui->mapView, &MapView::newEvent, [this](int x, int y)
+	{
+		MapEventsTab *mapEventsTab = new MapEventsTab(nullptr, true);
+		mapEventsTab->resize(1280, 720);
+		mapEventsTab->setWindowModality(Qt::ApplicationModal);
+		mapEventsTab->init(currentMap);
+		//mapEventsTab->selectEvent(eventId);
 		mapEventsTab->show();
 	});
 
@@ -199,7 +198,7 @@ void MapTab::loadMap(int id)
 	emit mapLoadTime(end - start);
 }
 
-void MapTab::mapInfoTableDoubleClicked(const QModelIndex &)
+void MapTab::mapInfoTableClicked(const QModelIndex &)
 {
 	int id = ui->mapInfoTable->selectedId();
 	currentMapId = id;

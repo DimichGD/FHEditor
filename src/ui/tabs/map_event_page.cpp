@@ -5,9 +5,9 @@ MapEventPage::MapEventPage(MapEventPagesModel *model, int index, Page *page, QWi
 {
 	ui->setupUi(this);
 
-	Event *event = new Event();
-	event->list = page->list;
-	ui->eventContentList->loadList(event, &event->list);
+	//Event *event = new Event();
+	//event->list = page->list;
+	ui->eventContentList->loadList(&page->list);
 	ui->switch1Button->setSource(SimpleChooserDialog::SWITCH);
 	ui->switch2Button->setSource(SimpleChooserDialog::SWITCH);
 	ui->variableButton->setSource(SimpleChooserDialog::VARIABLE);

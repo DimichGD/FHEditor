@@ -44,17 +44,17 @@
 }*/
 
 
-QSharedPointer<ICommand> CommandFactory::createCommand2(int code)
+QSharedPointer<ICommandParams> CommandFactory::createCommand2(int code)
 {
-	QSharedPointer<ICommand> command;
+	QSharedPointer<ICommandParams> command;
 
 	switch (code)
 	{
 		case ZERO:           command = createCommand<Command_000>(); break;
-		case TEXT:           command = createCommand<Command_101>(); break;
+		case TEXT:           command = createCommand<Command_101_Params>(); break;
 		case BEGIN_CHOICES:  command = createCommand<Command_102>(); break;
 		case PLAY_SE:        command = createCommand<Command_250>(); break;
-		case LINE:           command = createCommand<Command_401>(); break;
+		case LINE:           command = createCommand<Command_401_Params>(); break;
 		case END_CHOICES:    command = createCommand<Command_404>(); break;
 		default:             command = createCommand<Command_Unknown>(code); break;
 	}

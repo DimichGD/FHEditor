@@ -53,6 +53,7 @@ public slots:
 signals:
 	//void layerIsEmpty(int index);
 	//void tileSelected(int x, int y, int tilesetIndex);
+	void newEvent(int x, int y);
 	void editEvent(int eventId);
 	void pickTile(int tileId);
 

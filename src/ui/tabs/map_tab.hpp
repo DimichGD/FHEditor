@@ -23,7 +23,7 @@ public:
 	void loadMap(int id);
 
 public slots:
-	void mapInfoTableDoubleClicked(const QModelIndex &);
+	void mapInfoTableClicked(const QModelIndex &);
 
 signals:
 	void mapLoadTime(int msecs);

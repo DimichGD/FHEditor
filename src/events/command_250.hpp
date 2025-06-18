@@ -2,7 +2,7 @@
 #include "base_command.hpp"
 #include "sound.hpp"
 
-struct Command_250: ICommand
+struct Command_250: ICommandParams
 {
 	Sound sound;
 

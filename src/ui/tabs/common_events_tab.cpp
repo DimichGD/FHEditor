@@ -9,7 +9,7 @@
 #include <QStyledItemDelegate>
 #include <QMenu>
 
-Q_DECLARE_METATYPE(QSharedPointer<ICommand>);
+Q_DECLARE_METATYPE(QSharedPointer<ICommandParams>);
 Q_DECLARE_METATYPE(Command::It);
 
 
@@ -80,7 +80,7 @@ void CommonEventsTab::eventRowSelected(int row)
 	mapper->setCurrentIndex(row);
 
 	//ui->eventContentList->clear();
-	ui->eventContentList->loadList(currentEvent, &currentEvent->list);
+	ui->eventContentList->loadList(&currentEvent->list);
 }
 
 /*void CommonEventsTab::contextMenuRequested(const QPoint &pos)

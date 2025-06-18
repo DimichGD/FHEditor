@@ -85,9 +85,9 @@ public:
 	bool save(Type type);
 	void saveMap(int id);
 
-	Item *item(int id);
-	Weapon *weapon(int id);
-	Armor *armor(int id);
+	//Item *item(int id);
+	//Weapon *weapon(int id);
+	//Armor *armor(int id);
 	Event *event(int id);
 	MapInfo *mapInfo(int id);
 	Map *map(int id);
@@ -96,7 +96,6 @@ public:
 	Skill *skill(int id);
 	State *state(int id);
 	System *system();
-	Version version() const { return currentVersion; }
 
 	template<typename ValueType>
 	ValueType *value(int id)
@@ -130,46 +129,6 @@ public:
 		return std::get<Storage<ValueType>>(storage);
 	}
 
-	template<typename ValueType>
-	QStandardItemModel *createModel2(std::initializer_list<QString> columns)
-	{
-		QStandardItemModel *model = new QStandardItemModel();
-		model = new QStandardItemModel();
-		model->setColumnCount(columns.size());
-
-		int listIndex = 0;
-		for (const QString &title: columns)
-			model->setHeaderData(listIndex++, Qt::Horizontal, title);
-
-		for (auto &entry: getVector<ValueType>())
-		{
-			if (!entry.has_value())
-				continue;
-
-			if constexpr (std::is_same_v<QString, decltype(entry.value().name)>)
-			{
-				ValueType &value = entry.value();
-				if constexpr (hasIconIndex<ValueType>)
-					addRow(model, value.id, value.name.toStdString(), value.iconIndex);
-				else
-					addRow(model, value.id, value.name.toStdString());
-			}
-			else
-			{
-				ValueType &value = entry.value();
-				if constexpr (hasIconIndex<ValueType>)
-					addRow(model, value.id, value.name, value.iconIndex);
-				else
-					addRow(model, value.id, value.name);
-			}
-		}
-
-		return model;
-	}
-
-	//void addRow(QStandardItemModel *model, int id, std::string name, int iconIndex = -1);
-	//void removeRow(QStandardItemModel *model, int index);
-
 private:
 	System systemObject;
 	Map mapObject;
@@ -177,8 +136,6 @@ private:
 	std::tuple<Storage<Item>, Storage<Weapon>, Storage<Armor>,
 		Storage<Event>, Storage<MapInfo>, Storage<TileSet>,
 		Storage<Animation>, Storage<Skill>, Storage<State>> storage;
-
-	Version currentVersion = Version::MV;
 };
 
 
@@ -200,42 +157,42 @@ class Accessor: public IAccessor
 public:
 	Accessor()
 	{
-		this->storage = Database::Get()->getStorage<T>();
+		this->storage = &Database::Get()->getStorage<T>();
 	}
 
 	int size() override
 	{
-		return storage.vector.size();
+		return storage->vector.size();
 	}
 
 	T *element(int index)
 	{
-		return storage.value(index);
+		return storage->value(index);
 	}
 
 	const T *element(int index) const
 	{
-		return storage.value(index);
+		return storage->value(index);
 	}
 
 	void clearElement(int index) override
 	{
-		int prevId = storage.value(index)->id;
-		*storage.value(index) = { .id = prevId };
+		int prevId = storage->value(index)->id;
+		*storage->value(index) = { .id = prevId };
 	}
 
 	void insertToEnd(int count) override
 	{
-		int nextId = storage.vector.back().value().id + 1;
+		int nextId = storage->vector.back().value().id + 1;
 		for (int i = 0; i < count; i++)
-			storage.vector.push_back({{ .id = nextId++ }});
+			storage->vector.push_back({{ .id = nextId++ }});
 	}
 
 	void removeFromEnd(int count) override
 	{
-		storage.vector.erase(storage.vector.end() - count, storage.vector.end());
+		storage->vector.erase(storage->vector.end() - count, storage->vector.end());
 	}
 
 private:
-	Storage<T> storage;
+	Storage<T> *storage;
 };

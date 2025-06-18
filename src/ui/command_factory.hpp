@@ -10,12 +10,12 @@ class CommandFactory
 {
 public:
 	template<typename T, typename ...Args>
-	static QSharedPointer<ICommand> createCommand(Args&& ...args)
+	static QSharedPointer<ICommandParams> createCommand(Args&& ...args)
 	{
-		return QSharedPointer<ICommand>(new T(std::forward<Args>(args)...));
+		return QSharedPointer<ICommandParams>(new T(std::forward<Args>(args)...));
 	}
 
-	static QSharedPointer<ICommand> createCommand2(int code);
+	static QSharedPointer<ICommandParams> createCommand2(int code);
 
 	enum Code
 	{

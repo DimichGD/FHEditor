@@ -1,7 +1,7 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_102: ICommand
+struct Command_102: ICommandParams
 {
 	std::vector<std::string> choices;
 	int value_0; // cancel (-2: add Cancel barnch, -1: Disallow, 0..5: #1-#6)

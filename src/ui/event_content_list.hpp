@@ -13,7 +13,7 @@ class EventContentList: public QListView
 
 public:
 	EventContentList(QWidget *parent = nullptr);
-	void loadList(Event *event, std::list<Command> *list);
+	void loadList(std::list<Command> *list);
 
 public slots:
 	void actionCommandNewTriggered(bool);

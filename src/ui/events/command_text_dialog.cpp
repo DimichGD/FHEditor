@@ -15,13 +15,9 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 
 	if (editing)
 	{
-		//auto params = command->parameters.staticCast<Command_101>();
-		//ui->backgroundComboBox->setCurrentIndex(params->background);
-		//ui->windowPositionComboBox->setCurrentIndex(params->windowPosition);
-
-		auto params = std::get<Command_101_Params>(command->parameters);
-		ui->backgroundComboBox->setCurrentIndex(std::get<2>(params));
-		ui->windowPositionComboBox->setCurrentIndex(std::get<3>(params));
+		auto params = command->parameters.staticCast<Command_101_Params>();
+		ui->backgroundComboBox->setCurrentIndex(params->background);
+		ui->windowPositionComboBox->setCurrentIndex(params->windowPosition);
 
 		for (int i = 1; i < indices.size(); i++)
 		{
@@ -32,19 +28,15 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 				continue;
 			}
 
-			//auto params = command->parameters.staticCast<Command_401>();
-			//ui->messageLinesEdit->appendPlainText(params->line);
-			auto params = std::get<Command_401_Params>(command->parameters);
-			ui->messageLinesEdit->appendPlainText(std::get<0>(params));
+			auto params = command->parameters.staticCast<Command_401_Params>();
+			ui->messageLinesEdit->appendPlainText(params->line);
 		}
 
-		QString &faceName = std::get<0>(params);
-		//if (!params->faceName.empty())
-		if (!faceName.isEmpty())
+		if (!params->faceName.isEmpty())
 		{
-			/*ui->faceLabel->setIconMode(ClickableLabel::Mode::FACES,
-							Images::Get()->face(QString::fromStdString(params->faceName)));
-			ui->faceLabel->setIconIndex(params->faceIndex);*/
+			ui->faceLabel->setIconMode(ClickableLabel::Mode::FACES,
+							Images::Get()->face(params->faceName));
+			ui->faceLabel->setIconIndex(params->faceIndex);
 		}
 	}
 }
@@ -60,17 +52,13 @@ std::list<Command> CommandTextDialog::resultCommands()
 
 	int backgroundIndex = ui->backgroundComboBox->currentIndex();
 	int windowPositionIndex = ui->windowPositionComboBox->currentIndex();
-	//auto rootParams = CommandFactory::createCommand<Command_101>("", 0, backgroundIndex, windowPositionIndex);
-	QString emptyString {};
-	int emptyInt = 0;
-	Command_101_Params rootParams = std::tie(emptyString, emptyInt, backgroundIndex, windowPositionIndex);
+	auto rootParams = CommandFactory::createCommand<Command_101_Params>("", 0, backgroundIndex, windowPositionIndex);
 	resultList.push_back({ CommandFactory::TEXT, indent, rootParams });
 
 	QStringList lines = ui->messageLinesEdit->toPlainText().split('\n');
 	for (auto &line: lines)
 	{
-		//auto lineParams = CommandFactory::createCommand<Command_401>(line);
-		Command_401_Params lineParams = std::tie(line);
+		auto lineParams = CommandFactory::createCommand<Command_401_Params>(line);
 		resultList.push_back({ CommandFactory::LINE, indent, lineParams });
 	}
 

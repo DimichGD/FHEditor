@@ -1,7 +1,7 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_000: ICommand
+struct Command_000: ICommandParams
 {
 	Command_000() = default;
 

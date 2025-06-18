@@ -1,15 +1,15 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_101: ICommand
+struct Command_101_Params: ICommandParams
 {
-	std::string faceName;
+	QString faceName;
 	int faceIndex;
 	int background;
 	int windowPosition;
 
-	Command_101() = default;
-	Command_101(std::string faceName, int faceIndex, int background, int windowPosition);
+	Command_101_Params() = default;
+	Command_101_Params(QString faceName, int faceIndex, int background, int windowPosition);
 
 	QString backgroundToString();
 	QString windowPositionToString();

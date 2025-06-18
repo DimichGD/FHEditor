@@ -2,17 +2,17 @@
 #include "event.hpp"
 
 
-void EventContentListModel::load(Event *event)
+void EventContentListModel::load(std::list<Command> *list)
 {
-	currentEvent = event;
-	commandList = &event->list;
+	//currentEvent = event;
+	commandList = list;
 	emit dataChanged(index(0), index(rowCount()));
 }
 
 int EventContentListModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
-	return currentEvent ? currentEvent->list.size() : 0;
+	return commandList ? commandList->size() : 0;
 }
 
 QVariant EventContentListModel::data(const QModelIndex &index, int role) const
@@ -22,7 +22,7 @@ QVariant EventContentListModel::data(const QModelIndex &index, int role) const
 
 	if (role == Qt::UserRole + 1)
 	{
-		Command::It it = currentEvent->list.begin();
+		Command::It it = commandList->begin();
 		std::advance(it, index.row());
 		return QVariant::fromValue(it);
 	}

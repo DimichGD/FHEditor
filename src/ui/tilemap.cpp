@@ -88,6 +88,12 @@ void TileMap::loadTileSet(int id)
 void TileMap::loadTileMap(int id)
 {
 	map = Database::Get()->map(id);
+	if (!map)
+	{
+		qDebug() << "Failed to load map";
+		return;
+	}
+
 	size_t arraySize = map->width * map->height;
 
 	if (map->data.size() != arraySize * 6)

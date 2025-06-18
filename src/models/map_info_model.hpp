@@ -10,7 +10,6 @@ public:
 
 protected:
 	QVariant dataForDisplay(int row, int column) const override;
-	QVariant iconForDisplay(int row, int column) const override;
 
 private:
 	Accessor<MapInfo> accessor;

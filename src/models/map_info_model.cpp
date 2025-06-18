@@ -19,8 +19,3 @@ QVariant MapInfoModel::dataForDisplay(int row, int column) const
 	return QVariant();
 }
 
-QVariant MapInfoModel::iconForDisplay(int row, int column) const
-{
-	return QVariant();
-}
-

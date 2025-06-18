@@ -189,7 +189,7 @@ T *vectorValue(std::vector<std::optional<T>> &vector, int id)
 	return &vector[id].value();
 }
 
-Item *Database::item(int id)
+/*Item *Database::item(int id)
 {
 	return vectorValue(getVector<Item>(), id);
 }
@@ -202,7 +202,7 @@ Weapon *Database::weapon(int id)
 Armor *Database::armor(int id)
 {
 	return vectorValue(getVector<Armor>(), id);
-}
+}*/
 
 Event *Database::event(int id)
 {

@@ -51,11 +51,11 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 	connect(this, &EventContentList::customContextMenuRequested, this, &EventContentList::contextMenuRequested);
 }
 
-void EventContentList::loadList(Event *event, std::list<Command> *list)
+void EventContentList::loadList(std::list<Command> *list)
 {
 	currentList = list;
 	//currentEvent = event;
-	model->load(event);
+	model->load(list);
 }
 
 void EventContentList::actionCommandNewTriggered(bool)

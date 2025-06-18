@@ -1,11 +1,9 @@
 #include "command_101.hpp"
-
-#include "glaze/json/read.hpp"
-#include "glaze/json/write.hpp"
+#include "json_qstring.hpp"
 
 #include <QDebug>
 
-Command_101::Command_101(std::string faceName, int faceIndex, int background, int windowPosition)
+Command_101_Params::Command_101_Params(QString faceName, int faceIndex, int background, int windowPosition)
 {
 	this->faceName = faceName;
 	this->faceIndex = faceIndex;
@@ -13,7 +11,7 @@ Command_101::Command_101(std::string faceName, int faceIndex, int background, in
 	this->windowPosition = windowPosition;
 }
 
-QString Command_101::backgroundToString()
+QString Command_101_Params::backgroundToString()
 {
 	switch (background)
 	{
@@ -24,7 +22,7 @@ QString Command_101::backgroundToString()
 	return "Unknown";
 }
 
-QString Command_101::windowPositionToString()
+QString Command_101_Params::windowPositionToString()
 {
 	switch (windowPosition)
 	{
@@ -35,15 +33,15 @@ QString Command_101::windowPositionToString()
 	return "Unknown";
 }
 
-QString Command_101::faceToString()
+QString Command_101_Params::faceToString()
 {
-	QString actualFaceName = faceName.empty() ? "Null" : QString::fromStdString(faceName);
+	QString actualFaceName = faceName.isEmpty() ? "Null" : faceName;
 	return QString("%1(%2)").arg(actualFaceName).arg(faceIndex);
 }
 
-void Command_101::read(const std::string &parameters)
+void Command_101_Params::read(const std::string &parameters)
 {
-	std::tuple<std::string, int, int, int> params;
+	std::tuple<QString, int, int, int> params;
 	glz::error_ctx err = glz::read_json(params, parameters);
 	if (err)
 		qDebug() << QString::fromStdString(glz::format_error(err));
@@ -54,9 +52,9 @@ void Command_101::read(const std::string &parameters)
 	windowPosition = std::get<3>(params);
 }
 
-std::string Command_101::write()
+std::string Command_101_Params::write()
 {
-	std::tuple<std::string, int, int, int> params;
+	std::tuple<QString, int, int, int> params;
 	params = std::tie(faceName, faceIndex, background, windowPosition);
 	glz::expected<std::string, glz::error_ctx> result = glz::write_json(params);
 	if (!result.has_value())
@@ -68,7 +66,7 @@ std::string Command_101::write()
 	return result.value();
 }
 
-void Command_101::drawImpl(QPainter *painter, bool selected, QRect &rect)
+void Command_101_Params::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	drawText(painter, selected, rect, "Text: ", ConstantColors::purple);
 

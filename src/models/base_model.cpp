@@ -97,6 +97,13 @@ bool BaseModel::removeRows(int row, int count, const QModelIndex &parent)
 	return true;
 }
 
+QVariant BaseModel::iconForDisplay(int row, int column) const
+{
+	Q_UNUSED(row)
+	Q_UNUSED(column)
+	return QVariant();
+}
+
 QVariant BaseModel::dataForMapper(int row, int column) const
 {
 	Q_UNUSED(row)

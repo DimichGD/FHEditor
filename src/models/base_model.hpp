@@ -24,7 +24,7 @@ public:
 
 protected:
 	virtual QVariant dataForDisplay(int row, int column) const = 0;
-	virtual QVariant iconForDisplay(int row, int column) const = 0;
+	virtual QVariant iconForDisplay(int row, int column) const;
 	virtual QVariant dataForMapper(int row, int column) const;
 	virtual void setDataFromMapper(int row, int column, const QVariant &value);
 

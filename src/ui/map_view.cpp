@@ -30,6 +30,8 @@ void EventGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	{
 		QBrush brush(QColor::fromRgb(0, 0, 0, 128));
 		painter->fillRect(QRect(3, 3, 43, 43), brush);
+		//painter->setFont(QFont("Noto Sans Mono", 8));
+		//painter->drawText(QPoint(5, 15), event->name);
 	}
 }
 
@@ -365,7 +367,7 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 	}
 	else
 	{
-		// new
+		emit newEvent(lastTilePos.x(), lastTilePos.y());
 	}
 }
 

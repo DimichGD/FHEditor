@@ -1,7 +1,7 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_122: ICommand
+struct Command_122: ICommandParams
 {
 	int value_0;
 	int value_1;

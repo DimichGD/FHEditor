@@ -86,10 +86,10 @@ struct glz::from<glz::JSON, Command>
 
 
 template <>
-struct glz::to<glz::JSON, QSharedPointer<ICommand>>
+struct glz::to<glz::JSON, QSharedPointer<ICommandParams>>
 {
 	template <auto Opts>
-	static void op(QSharedPointer<ICommand>& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+	static void op(QSharedPointer<ICommandParams>& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
 	{
 		serialize<JSON>::op<glz::opts{.raw = true}>(value->write(), ctx, it, end);
 	}

@@ -9,7 +9,7 @@ class EventContentListModel: public QAbstractListModel
 
 public:
 	explicit EventContentListModel(QObject *parent = nullptr): QAbstractListModel(parent) {}
-	void load(Event *event);
+	void load(std::list<Command> *list);
 
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	QVariant data(const QModelIndex &index, int role) const override;
@@ -19,6 +19,6 @@ public:
 
 private:
 	std::list<Command> *commandList = nullptr;
-	Event *currentEvent = nullptr;
+	//Event *currentEvent = nullptr;
 };
 

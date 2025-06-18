@@ -1,7 +1,7 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_404: ICommand
+struct Command_404: ICommandParams
 {
 	Command_404() = default;
 

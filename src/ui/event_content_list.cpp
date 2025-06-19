@@ -18,6 +18,9 @@ public:
 
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
 	{
+		if (!index.isValid())
+			return;
+
 		QRect rect = option.rect;
 		QStyledItemDelegate::paint(painter, option, index);
 
@@ -32,9 +35,9 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 {
 	this->setItemDelegateForColumn(0, new EventItemDelegate(this));
 
-	model = new EventContentListModel(this);
+	/*model = new EventContentListModel(this);
 	setModel(model);
-	setSelectionModel(new EventContentSelectionModel(model, this));
+	setSelectionModel(new EventContentSelectionModel(model, this));*/
 
 	actionCommandNew = new QAction("New", this);
 	actionCommandEdit = new QAction("Edit", this);
@@ -53,9 +56,20 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 
 void EventContentList::loadList(std::list<Command> *list)
 {
-	currentList = list;
-	//currentEvent = event;
-	model->load(list);
+	//currentList = list;
+
+	model = new EventContentListModel(list, this);
+
+	setModel(model);
+	setSelectionModel(new EventContentSelectionModel(model, this));
+}
+
+void EventContentList::clear()
+{
+	setModel(nullptr);
+
+	if (model)
+		delete model;
 }
 
 void EventContentList::actionCommandNewTriggered(bool)
@@ -88,7 +102,10 @@ void EventContentList::actionCommandEditTriggered(bool)
 	switch (command->code)
 	{
 		case CommandFactory::TEXT: dialog = new CommandTextDialog(true, selectedIndices, this); break;
-		case CommandFactory::PLAY_SE: dialog = new PlaySoundDialog(PlaySoundDialog::SE, true, selectedIndices[0], this); break;
+		case CommandFactory::PLAY_BGM: dialog = new PlaySoundDialog(CommandSound::BGM, true, selectedIndices[0], this); break;
+		case CommandFactory::PLAY_BGS: dialog = new PlaySoundDialog(CommandSound::BGS, true, selectedIndices[0], this); break;
+		case CommandFactory::PLAY_ME: dialog = new PlaySoundDialog(CommandSound::ME, true, selectedIndices[0], this); break;
+		case CommandFactory::PLAY_SE: dialog = new PlaySoundDialog(CommandSound::SE, true, selectedIndices[0], this); break;
 	}
 
 	if (dialog && dialog->exec())
@@ -122,9 +139,9 @@ void EventContentList::contextMenuRequested(const QPoint &pos)
 	{
 		Command::It command = index.data(Qt::UserRole + 1).value<Command::It>();
 
-		actionCommandNew->setEnabled(command->parameters->canAdd());
-		actionCommandEdit->setEnabled(command->parameters->canEdit());
-		actionCommandDelete->setEnabled(command->parameters->canDelete());
+		actionCommandNew->setEnabled(command->parameters->flags() & ICommandParams::CAN_ADD);
+		actionCommandEdit->setEnabled(command->parameters->flags() & ICommandParams::CAN_EDIT);
+		actionCommandDelete->setEnabled(command->parameters->flags() & ICommandParams::CAN_DELETE);
 
 		selectionModel()->clearSelection();
 		setCurrentIndex(index);

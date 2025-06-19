@@ -3,6 +3,7 @@
 #include "map_info_model.hpp"
 #include "settings.hpp"
 #include "ui_map_tab.h"
+#include "command_factory.hpp"
 
 #include <QButtonGroup>
 #include <QDateTime>
@@ -31,7 +32,7 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	tilePickerViews[4] = ui->tilePicker_E;
 
 	//connect(ui->mapInfoTable, &QAbstractItemView::activated, this, &MapTab::mapInfoTableDoubleClicked);
-	connect(ui->mapInfoTable, &QAbstractItemView::clicked, this, &MapTab::mapInfoTableClicked);
+	connect(ui->mapInfoTable, &BaseTable::rowSelected, this, &MapTab::mapInfoTableClicked);
 	connect(ui->mapNameFilter, &QLineEdit::textChanged, ui->mapInfoTable, &BaseTable::setFilterText);
 	connect(ui->visibleLayersButtonGroup, &QButtonGroup::idToggled, ui->mapView, &MapView::layersToggled);
 
@@ -91,22 +92,36 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 
 	connect(ui->mapView, &MapView::editEvent, [this](int eventId)
 	{
-		MapEventsTab *mapEventsTab = new MapEventsTab();
+		/*MapEventsTab *mapEventsTab = new MapEventsTab();
 		mapEventsTab->resize(1280, 720);
 		mapEventsTab->setWindowModality(Qt::ApplicationModal);
 		mapEventsTab->init(currentMap);
 		mapEventsTab->selectEvent(eventId);
-		mapEventsTab->show();
+		mapEventsTab->show();*/
+
+		emit editMapEvent(eventId);
 	});
 
 	connect(ui->mapView, &MapView::newEvent, [this](int x, int y)
 	{
-		MapEventsTab *mapEventsTab = new MapEventsTab(nullptr, true);
+		/*MapEventsTab *mapEventsTab = new MapEventsTab(nullptr, true);
 		mapEventsTab->resize(1280, 720);
 		mapEventsTab->setWindowModality(Qt::ApplicationModal);
 		mapEventsTab->init(currentMap);
-		//mapEventsTab->selectEvent(eventId);
-		mapEventsTab->show();
+		mapEventsTab->selectEvent(eventId);
+		mapEventsTab->show();*/
+
+		int lastEventId = currentMap->events.back().value().id + 1;
+		MapEvent event {};
+		event.id = lastEventId;
+		event.name = QString("EV%1").arg(lastEventId, 3, 10, QChar('0'));
+		event.x = x;
+		event.y = y;
+		event.pages.emplace_back();
+		event.pages.back().list.push_back({ CommandFactory::ZERO, 0, CommandFactory::createCommand2(0) });
+		currentMap->events.push_back(event);
+
+		emit editMapEvent(lastEventId);
 	});
 
 	connect(ui->mapView, &MapView::pickTile, [this](int tileId)
@@ -198,10 +213,10 @@ void MapTab::loadMap(int id)
 	emit mapLoadTime(end - start);
 }
 
-void MapTab::mapInfoTableClicked(const QModelIndex &)
+void MapTab::mapInfoTableClicked(int row)
 {
-	int id = ui->mapInfoTable->selectedId();
-	currentMapId = id;
-	loadMap(id);
+	//int id = ui->mapInfoTable->selectedRow();
+	currentMapId = row;
+	loadMap(row);
 	emit mapLoaded(currentMap);
 }

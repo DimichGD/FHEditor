@@ -5,10 +5,9 @@
 
 #include <QItemSelectionModel>
 
-MapEventsTab::MapEventsTab(QWidget *parent, bool newEvent): QWidget(parent), ui(new Ui::MapEventsTab)
+MapEventsTab::MapEventsTab(QWidget *parent): QWidget(parent), ui(new Ui::MapEventsTab)
 {
 	ui->setupUi(this);
-	this->newEvent = newEvent;
 }
 
 MapEventsTab::~MapEventsTab()
@@ -18,9 +17,12 @@ MapEventsTab::~MapEventsTab()
 
 void MapEventsTab::init(Map *map)
 {
+	if (model)
+		delete model;
+
 	currentMap = map;
 
-	if (newEvent)
+	/*if (newEvent)
 	{
 		int lastEventId = map->events.back().value().id;
 		MapEvent event {};
@@ -29,20 +31,22 @@ void MapEventsTab::init(Map *map)
 		event.pages.emplace_back();
 		event.pages.back().list.push_back({ CommandFactory::ZERO, 0, CommandFactory::createCommand2(0) });
 		map->events.push_back(event);
-	}
+	}*/
 
 	model = new MapEventsModel(map, ui->mapEventsTable);
 	ui->mapEventsTable->setModel2(model);
 
-	connect(ui->mapEventsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &MapEventsTab::mapEventsTableDoubleClicked);
+	//connect(ui->mapEventsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &MapEventsTab::mapEventsTableClicked);
+	connect(ui->mapEventsTable, &BaseTable::rowSelected, this, &MapEventsTab::mapEventsTableClicked);
 }
 
-void MapEventsTab::mapEventsTableDoubleClicked(const QModelIndex &, const QModelIndex &)
+//void MapEventsTab::mapEventsTableClicked(const QModelIndex &, const QModelIndex &)
+void MapEventsTab::mapEventsTableClicked(int row)
 {
-	int id = ui->mapEventsTable->selectedId();
+	//int id = ui->mapEventsTable->selectedId();
 	MapEvent *event = nullptr;
-	if (currentMap->events[id].has_value())
-		event = &currentMap->events[id].value();
+	if (currentMap->events[row].has_value())
+		event = &currentMap->events[row].value();
 
 	if (!event)
 		return;
@@ -52,7 +56,7 @@ void MapEventsTab::mapEventsTableDoubleClicked(const QModelIndex &, const QModel
 	ui->mapEventPagesWidget->clear();
 	for (size_t i = 0; i < event->pages.size(); i++)
 	{
-		MapEventPage *page = new MapEventPage(pagesModel, i, &event->pages[i], this);
+		MapEventPage *page = new MapEventPage(pagesModel, i, &event->pages[i], ui->mapEventPagesWidget);
 		ui->mapEventPagesWidget->addTab(page, QString::number(i));
 	}
 }

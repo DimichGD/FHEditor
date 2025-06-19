@@ -21,7 +21,7 @@
        <item>
         <widget class="QTabWidget" name="tilesTabWidget">
          <property name="tabPosition">
-          <enum>QTabWidget::TabPosition::South</enum>
+          <enum>QTabWidget::South</enum>
          </property>
          <property name="currentIndex">
           <number>0</number>
@@ -46,13 +46,13 @@
            <item>
             <widget class="TilePickerView" name="tilePicker_A">
              <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
              <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
@@ -78,13 +78,13 @@
            <item>
             <widget class="TilePickerView" name="tilePicker_B">
              <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
              <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
@@ -110,13 +110,13 @@
            <item>
             <widget class="TilePickerView" name="tilePicker_C">
              <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
              <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
@@ -142,13 +142,13 @@
            <item>
             <widget class="TilePickerView" name="tilePicker_D">
              <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
              <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
@@ -174,13 +174,13 @@
            <item>
             <widget class="TilePickerView" name="tilePicker_E">
              <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
              <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
@@ -206,13 +206,13 @@
            <item>
             <widget class="TilePickerView" name="tilePicker_R">
              <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+              <enum>Qt::ScrollBarAlwaysOff</enum>
              </property>
              <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
              </property>
             </widget>
            </item>
@@ -243,16 +243,19 @@
        <item>
         <widget class="BaseTable" name="mapInfoTable">
          <property name="editTriggers">
-          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
          <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
          </property>
          <property name="wordWrap">
           <bool>false</bool>
@@ -358,10 +361,10 @@
          <item>
           <widget class="Line" name="line">
            <property name="frameShadow">
-            <enum>QFrame::Shadow::Raised</enum>
+            <enum>QFrame::Raised</enum>
            </property>
            <property name="orientation">
-            <enum>Qt::Orientation::Vertical</enum>
+            <enum>Qt::Vertical</enum>
            </property>
           </widget>
          </item>
@@ -410,10 +413,10 @@
          <item>
           <widget class="Line" name="line_2">
            <property name="frameShadow">
-            <enum>QFrame::Shadow::Raised</enum>
+            <enum>QFrame::Raised</enum>
            </property>
            <property name="orientation">
-            <enum>Qt::Orientation::Vertical</enum>
+            <enum>Qt::Vertical</enum>
            </property>
           </widget>
          </item>
@@ -470,7 +473,7 @@
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
+            <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -517,10 +520,10 @@
           <bool>false</bool>
          </property>
          <property name="cacheMode">
-          <set>QGraphicsView::CacheModeFlag::CacheBackground</set>
+          <set>QGraphicsView::CacheBackground</set>
          </property>
          <property name="viewportUpdateMode">
-          <enum>QGraphicsView::ViewportUpdateMode::SmartViewportUpdate</enum>
+          <enum>QGraphicsView::SmartViewportUpdate</enum>
          </property>
         </widget>
        </item>
@@ -550,12 +553,12 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="paintLayerButtonGroup"/>
-  <buttongroup name="modeButtonGroup"/>
   <buttongroup name="visibleLayersButtonGroup">
    <property name="exclusive">
     <bool>false</bool>
    </property>
   </buttongroup>
+  <buttongroup name="modeButtonGroup"/>
+  <buttongroup name="paintLayerButtonGroup"/>
  </buttongroups>
 </ui>

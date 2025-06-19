@@ -10,6 +10,7 @@ class ArmorsTab;
 class WeaponsTab;
 class CommonEventsTab;
 class TypesTab;
+class AnimationsTab;
 
 class MainWindow: public QMainWindow
 {
@@ -36,6 +37,7 @@ private:
 	WeaponsTab *weaponsTab = nullptr;
 	CommonEventsTab *commonEventsTab = nullptr;
 	TypesTab *typesTab = nullptr;
+	AnimationsTab *animationTab = nullptr;
 
 	int mapTabIndex = 0;
 	int mapEventsTabIndex = 0;
@@ -44,4 +46,5 @@ private:
 	int armorsTabIndex = 0;
 	int commonEventsTabIndex = 0;
 	int typesTabIndex = 0;
+	int animationTabIndex = 0;
 };

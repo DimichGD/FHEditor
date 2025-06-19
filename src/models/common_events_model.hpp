@@ -7,7 +7,7 @@ class CommonEventsModel: public BaseModel
 	Q_OBJECT
 
 public:
-	explicit CommonEventsModel(QObject *parent = nullptr): BaseModel(&accessor, 3, parent) {};
+	explicit CommonEventsModel(QObject *parent = nullptr): BaseModel(&accessor, 2, parent) {};
 	Event *eventFromRow(int row);
 
 protected:

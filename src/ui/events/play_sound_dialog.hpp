@@ -1,5 +1,6 @@
 #pragma once
 #include "command_dialog.hpp"
+#include "command_sound.hpp"
 
 #include <QStandardItemModel>
 #include <QMediaPlayer>
@@ -12,12 +13,12 @@ class PlaySoundDialog : public CommandDialog
 	Q_OBJECT
 
 public:
-	enum Type
+	/*enum Type
 	{
 		BGM, BGS, ME, SE,
-	};
+	};*/
 
-	explicit PlaySoundDialog(Type type, bool editing, QModelIndex index, QWidget *parent = nullptr);
+	explicit PlaySoundDialog(CommandSound::Type type, bool editing, QModelIndex index, QWidget *parent = nullptr);
 	~PlaySoundDialog();
 
 	std::list<Command> resultCommands() override;
@@ -31,7 +32,7 @@ private:
 	QStandardItemModel *model = nullptr;
 
 	int indent = 0;
-	Type type;
+	CommandSound::Type type;
 
 	QMediaPlayer *mediaPlayer = nullptr;
 	QAudioOutput *audioOutput = nullptr;

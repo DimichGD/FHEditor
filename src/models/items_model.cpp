@@ -4,12 +4,12 @@
 Item *ItemsModel::item(int row)
 {
 	// TODO: check for valid id
-	return accessor.element(row);
+	return accessor.value(row);
 }
 
 QVariant ItemsModel::dataForDisplay(int row, int column) const
 {
-	const Item *item = accessor.element(row);
+	const Item *item = accessor.value(row);
 	if (!item)
 		return QVariant();
 
@@ -24,7 +24,7 @@ QVariant ItemsModel::iconForDisplay(int row, int column) const
 	if (column != 1)
 		return QVariant();
 
-	const Item *item = accessor.element(row);
+	const Item *item = accessor.value(row);
 	if (!item)
 		return QVariant();
 
@@ -34,7 +34,7 @@ QVariant ItemsModel::iconForDisplay(int row, int column) const
 
 QVariant ItemsModel::dataForMapper(int row, int column) const
 {
-	const Item *item = accessor.element(row);
+	const Item *item = accessor.value(row);
 	if (!item)
 		return QVariant();
 
@@ -69,7 +69,7 @@ QVariant ItemsModel::dataForMapper(int row, int column) const
 
 void ItemsModel::setDataFromMapper(int row, int column, const QVariant &value)
 {
-	Item *item = accessor.element(row);
+	Item *item = accessor.value(row);
 	if (!item)
 		return;
 

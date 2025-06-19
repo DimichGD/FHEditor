@@ -6,15 +6,22 @@
 
 struct ICommandParams
 {
+	enum Flags
+	{
+		CAN_ADD = 1, CAN_EDIT = 2, CAN_DELETE = 4,
+	};
+
 	virtual ~ICommandParams() = default;
 	virtual int code() { return -1; };
 	virtual void drawImpl(QPainter *painter, bool selected, QRect &rect) = 0;
 	virtual void read(const std::string &parameters) = 0;
 	virtual auto write() -> std::string = 0;
 
-	virtual bool canAdd() = 0;
+	virtual int flags() = 0;
+
+	/*virtual bool canAdd() = 0;
 	virtual bool canEdit() = 0;
-	virtual bool canDelete() = 0;
+	virtual bool canDelete() = 0;*/
 
 	void draw(QPainter *painter, bool selected, QRect rect, int indent)
 	{

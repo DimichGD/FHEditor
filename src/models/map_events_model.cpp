@@ -1,7 +1,7 @@
 #include "map_events_model.hpp"
 
 
-int MapEventsModel::rowCount(const QModelIndex &parent) const
+/*int MapEventsModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent);
 	return currentMap->events.size();
@@ -33,4 +33,4 @@ QVariant MapEventsModel::data(const QModelIndex &index, int role) const
 	};
 
 	return QVariant();
-}
+}*/

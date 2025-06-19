@@ -27,6 +27,7 @@ void BaseTable::setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap)
 {
 	filterModel = new ProxyModel(this);
 	filterModel->setSourceModel(model);
+	filterModel->setDynamicSortFilter(true);
 	filterModel->setFilterKeyColumn(model->columnCount() - 1);
 	filterModel->setFilterCaseSensitivity(Qt::CaseSensitivity::CaseInsensitive);
 
@@ -53,11 +54,6 @@ int BaseTable::originalRow(int filteredRow)
 	return filterModel->mapToSource(filterModel->index(filteredRow, 0)).row();
 }
 
-/*int BaseTable::rowCount()
-{
-	return model->rowCount();
-}*/
-
 void BaseTable::setFilterText(const QString &text)
 {
 	filterModel->setFilterFixedString(text);
@@ -65,16 +61,16 @@ void BaseTable::setFilterText(const QString &text)
 
 void BaseTable::selectRow(int row)
 {
-	//QTableView::selectRow(filterModel->mapFromSource(model->index(row, 0)).row());
-	QTableView::selectRow(row);
+	QTableView::selectRow(filterModel->mapFromSource(model->index(row, 0)).row());
+	//QTableView::selectRow(row);
 }
 
 void BaseTable::onSelectionChanged(const QModelIndex &selected, const QModelIndex &)
 {
 	currentRow = originalRow(selected.row());
-	currentId = (currentRow == -1) ? -1 : selected.siblingAtColumn(0).data().toInt();
+	//currentId = (currentRow == -1) ? -1 : selected.siblingAtColumn(0).data().toInt();
 
-	emit rowSelected(currentRow, currentId);
+	emit rowSelected(currentRow);
 }
 
 bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const

@@ -19,9 +19,11 @@ struct Command_101_Params: ICommandParams
 	void read(const std::string &parameters) override;
 	auto write() -> std::string override;
 
-	bool canAdd() override { return true; }
+	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; };
+
+	/*bool canAdd() override { return true; }
 	bool canEdit() override { return true; }
-	bool canDelete() override { return true; }
+	bool canDelete() override { return true; }*/
 
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
 };

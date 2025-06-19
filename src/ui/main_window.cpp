@@ -1,5 +1,6 @@
 #include "main_window.hpp"
 
+#include "animations_tab.hpp"
 #include "map_tab.hpp"
 #include "map_events_tab.hpp"
 #include "items_tab.hpp"
@@ -34,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	armorsTab = new ArmorsTab(this);
 	commonEventsTab = new CommonEventsTab(this);
 	typesTab = new TypesTab(this);
+	animationTab = new AnimationsTab(this);
 
 	//qDebug().noquote() << db->system()->gameTitle;
 	//qDebug().noquote() << db->system()->terms.messages["levelUp"];
@@ -65,11 +67,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	armorsTabIndex = ui->tabWidget->addTab(armorsTab, "Armors");
 	commonEventsTabIndex = ui->tabWidget->addTab(commonEventsTab, "Common Events");
 	typesTabIndex = ui->tabWidget->addTab(typesTab, "Types");
-	ui->tabWidget->setCurrentIndex(mapTabIndex);
+	animationTabIndex = ui->tabWidget->addTab(animationTab, "Animations");
+	ui->tabWidget->setCurrentIndex(commonEventsTabIndex);
 
 	connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 	connect(ui->actionGamesList, &QAction::triggered, this, &MainWindow::openSettingsDialog);
 	connect(mapTab, &MapTab::mapLoaded, mapEventsTab, &MapEventsTab::init);
+	connect(mapTab, &MapTab::editMapEvent, mapTab, [this](int eventId)
+	{
+		ui->tabWidget->setCurrentIndex(mapEventsTabIndex);
+		mapEventsTab->selectEvent(eventId);
+	});
 
 	if (Settings::Get()->lastPath.isEmpty())
 	{
@@ -106,6 +114,7 @@ void MainWindow::loadGame()
 	commonEventsTab->init();
 	typesTab->init();
 	mapTab->init();
+	animationTab->init();
 
 	uint64_t end = QDateTime::currentMSecsSinceEpoch();
 	ui->statusBar->showMessage(QString("Database loaded in %1 msecs.").arg(end - start), 5000);

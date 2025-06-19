@@ -9,9 +9,11 @@ struct Command_000: ICommandParams
 	void read(const std::string &str) override { (void)str; };
 	auto write() -> std::string override { return "[]"; };
 
-	bool canAdd() override { return true; }
+	int flags() override { return CAN_ADD; };
+
+	/*bool canAdd() override { return true; }
 	bool canEdit() override { return false; }
-	bool canDelete() override { return false; }
+	bool canDelete() override { return false; }*/
 
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
 };

@@ -9,7 +9,7 @@
 #include <QStyledItemDelegate>
 #include <QMenu>
 
-Q_DECLARE_METATYPE(QSharedPointer<ICommandParams>);
+//Q_DECLARE_METATYPE(QSharedPointer<ICommandParams>);
 Q_DECLARE_METATYPE(Command::It);
 
 
@@ -51,7 +51,7 @@ void CommonEventsTab::init()
 	// delete via deleteLater() ?
 	model = new CommonEventsModel(ui->eventsTable);
 	ui->eventsTable->setModel2(model);
-	ui->eventsTable->hideColumn(1);
+	//ui->eventsTable->hideColumn(1);
 
 	mapper = new DataMapper(this);
 	mapper->setModel(model);
@@ -61,6 +61,8 @@ void CommonEventsTab::init()
 		{ ui->eventSwitchButton, Event::SWITCH_ID },
 	});
 	ui->eventsTable->selectRow(0);
+
+	ui->eventContentList->clear();
 }
 
 void CommonEventsTab::eventRowSelected(int row)
@@ -77,10 +79,12 @@ void CommonEventsTab::eventRowSelected(int row)
 	//if (!ui->generalBox->isEnabled())
 	//	enableGroupBoxes(true);
 
+	ui->eventContentList->loadList(&currentEvent->list);
+
 	mapper->setCurrentIndex(row);
 
 	//ui->eventContentList->clear();
-	ui->eventContentList->loadList(&currentEvent->list);
+
 }
 
 /*void CommonEventsTab::contextMenuRequested(const QPoint &pos)

@@ -12,13 +12,13 @@ class MapEventsTab: public QWidget
 	Q_OBJECT
 
 public:
-	explicit MapEventsTab(QWidget *parent = nullptr, bool newEvent = false);
+	explicit MapEventsTab(QWidget *parent = nullptr);
 	~MapEventsTab();
 
 	void init(Map *map);
 
 public slots:
-	void mapEventsTableDoubleClicked(const QModelIndex &, const QModelIndex &);
+	void mapEventsTableClicked(int row);
 	void selectEvent(int id);
 
 private:
@@ -26,6 +26,5 @@ private:
 	MapEventPagesModel *pagesModel = nullptr;
 	Map *currentMap = nullptr;
 	Ui::MapEventsTab *ui = nullptr;
-	bool newEvent = false;
 };
 

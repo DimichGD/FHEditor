@@ -24,8 +24,13 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>-1</number>
+       <number>0</number>
       </property>
+      <widget class="MapTab" name="tab">
+       <attribute name="title">
+        <string>Page</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -122,6 +127,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MapTab</class>
+   <extends>QWidget</extends>
+   <header>map_tab.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

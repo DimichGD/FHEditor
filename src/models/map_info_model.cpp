@@ -4,12 +4,12 @@
 MapInfo *MapInfoModel::mapInfo(int row)
 {
 	// TODO: check for valid id
-	return accessor.element(row);
+	return accessor.value(row);
 }
 
 QVariant MapInfoModel::dataForDisplay(int row, int column) const
 {
-	const MapInfo *info = accessor.element(row);
+	const MapInfo *info = accessor.value(row);
 	if (!info)
 		return QVariant();
 

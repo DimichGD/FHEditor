@@ -2,12 +2,15 @@
 #include "event.hpp"
 
 
-void EventContentListModel::load(std::list<Command> *list)
+EventContentListModel::EventContentListModel(std::list<Command> *list, QObject *parent)
+	: QAbstractListModel(parent), commandList(list) {}
+
+/*void EventContentListModel::load(std::list<Command> *list)
 {
 	//currentEvent = event;
 	commandList = list;
 	emit dataChanged(index(0), index(rowCount()));
-}
+}*/
 
 int EventContentListModel::rowCount(const QModelIndex &parent) const
 {

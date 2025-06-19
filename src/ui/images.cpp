@@ -79,3 +79,8 @@ QPixmap Images::tileSet(const QString &name)
 {
 	return loadImage("tilesets/" + name);
 }
+
+QPixmap Images::animation(const QString &name)
+{
+	return loadImage("animations/" + name);
+}

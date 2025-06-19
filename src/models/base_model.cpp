@@ -4,6 +4,11 @@ BaseModel::BaseModel(IAccessor *accessor, int columns, QObject *parent): QAbstra
 {
 	this->accessor = accessor;
 	this->columns = columns;
+
+	if (columns == 3)
+		headerTitle = { "ID", "Icon", "Name" };
+	else
+		headerTitle = { "ID", "Name" };
 }
 
 QModelIndex BaseModel::index(int row, int column, const QModelIndex &parent) const
@@ -64,13 +69,7 @@ QVariant BaseModel::headerData(int section, Qt::Orientation orientation, int rol
 	if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
 		return QVariant();
 
-	switch (section)
-	{
-		case 0: return QVariant("ID");
-		case 1: return QVariant("Icon");
-		case 2: return QVariant("Name");
-		default: return QVariant();
-	}
+	return headerTitle[section];
 }
 
 void BaseModel::clearItem(int row)

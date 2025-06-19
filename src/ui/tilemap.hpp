@@ -21,7 +21,6 @@ class TileMap
 public:
 	TileMap();
 
-	void loadTileSet(int id);
 	void loadTileMap(int id);
 
 	bool hasAutoTiles() const { return autoTilesFlag; }
@@ -40,6 +39,7 @@ public:
 
 protected:
 	//void generatePixmapForSet(int index);
+	void loadTileSet(int id);
 
 private:
 	bool autoTilesFlag = false;

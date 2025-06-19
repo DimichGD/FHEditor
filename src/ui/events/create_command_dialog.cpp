@@ -3,8 +3,6 @@
 #include "play_sound_dialog.hpp"
 #include "ui_create_command_dialog.h"
 
-//#include <QPushButton>
-
 CreateCommandDialog::CreateCommandDialog(QModelIndex index, QWidget *parent):
 	QDialog(parent), ui(new Ui::CreateCommandDialog)
 {
@@ -28,14 +26,12 @@ std::list<Command> CreateCommandDialog::resultCommands()
 
 void CreateCommandDialog::openShowTextDialog()
 {
-	//CommandTextDialog dialog(false, { currentIndex }, this);
-	//if (dialog.exec()) accept();
 	dialog = new CommandTextDialog(false, { currentIndex }, this);
 	if (dialog->exec()) accept();
 }
 
 void CreateCommandDialog::openPlaySEDialog()
 {
-	dialog = new PlaySoundDialog(PlaySoundDialog::SE, false, currentIndex, this);
+	dialog = new PlaySoundDialog(CommandSound::SE, false, currentIndex, this);
 	if (dialog->exec()) accept();
 }

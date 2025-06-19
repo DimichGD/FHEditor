@@ -1,5 +1,5 @@
 #include "play_sound_dialog.hpp"
-#include "command_250.hpp"
+#include "command_sound.hpp"
 #include "command_factory.hpp"
 #include "ui_play_sound_dialog.h"
 #include "settings.hpp"
@@ -9,7 +9,7 @@
 #include <QFile>
 #include <QAudioOutput>
 
-PlaySoundDialog::PlaySoundDialog(Type type, bool editing, QModelIndex index, QWidget *parent)
+PlaySoundDialog::PlaySoundDialog(CommandSound::Type type, bool editing, QModelIndex index, QWidget *parent)
 	: CommandDialog(parent), ui(new Ui::PlaySoundDialog)
 {
 	ui->setupUi(this);
@@ -17,10 +17,10 @@ PlaySoundDialog::PlaySoundDialog(Type type, bool editing, QModelIndex index, QWi
 
 	switch (type)
 	{
-		case BGM: dir = QDir(Settings::Get()->lastPath + "/audio/bgm"); break;
-		case BGS: dir = QDir(Settings::Get()->lastPath + "/audio/bgs"); break;
-		case ME: dir = QDir(Settings::Get()->lastPath + "/audio/me"); break;
-		case SE: dir = QDir(Settings::Get()->lastPath + "/audio/se"); break;
+		case CommandSound::BGM: dir = QDir(Settings::Get()->lastPath + "/audio/bgm"); break;
+		case CommandSound::BGS: dir = QDir(Settings::Get()->lastPath + "/audio/bgs"); break;
+		case CommandSound::ME: dir = QDir(Settings::Get()->lastPath + "/audio/me"); break;
+		case CommandSound::SE: dir = QDir(Settings::Get()->lastPath + "/audio/se"); break;
 	}
 
 	QStringList stringList = dir.entryList({ "*.rpgmvo", "*.ogg" }, QDir::Files | QDir::NoDotAndDotDot);
@@ -35,7 +35,7 @@ PlaySoundDialog::PlaySoundDialog(Type type, bool editing, QModelIndex index, QWi
 	QString expectedString;
 	if (editing)
 	{
-		auto params = command->parameters.staticCast<Command_250>();
+		auto params = command->parameters.staticCast<CommandSound>();
 		expectedString = params->sound.name;
 		ui->volumeSlider->setValue(params->sound.volume);
 		ui->volumeSpinBox->setValue(params->sound.volume);
@@ -82,8 +82,22 @@ std::list<Command> PlaySoundDialog::resultCommands()
 	int volume = ui->volumeSlider->value();
 	int pitch = ui->pitchSlider->value();
 	int pan = ui->panSlider->value();
-	auto rootParams = CommandFactory::createCommand<Command_250>(Sound { name, pan, pitch, volume });
-	resultList.push_back({ CommandFactory::PLAY_SE, indent, rootParams });
+	auto rootParams = CommandFactory::createCommand<CommandSound>(type, Sound { name, pan, pitch, volume });
+	/*switch (type)
+	{
+		case Command_250::BGM:
+			resultList.push_back({ CommandFactory::PLAY_BGM, indent, rootParams });
+			break;
+		case Command_250::BGS:
+		case Command_250::ME:
+		case Command_250::SE:
+			resultList.push_back({ CommandFactory::PLAY_SE, indent, rootParams });
+			break;
+	}*/
+
+	resultList.push_back({ CommandFactory::Code(type), indent, rootParams });
+
+	//resultList.push_back({ CommandFactory::PLAY_SE, indent, rootParams });
 
 	return resultList;
 }

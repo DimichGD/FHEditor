@@ -1,7 +1,6 @@
 #pragma once
 #include "sound.hpp"
 #include <optional>
-#include <string>
 #include <vector>
 #include <array>
 

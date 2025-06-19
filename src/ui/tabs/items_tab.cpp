@@ -112,7 +112,7 @@ void ItemsTab::init()
 		{ ui->itemTPGainSpinBox, Item::TP_GAIN },
 	});
 
-	ui->itemsTable->selectRow(0);
+	ui->itemsTable->selectRow(1);
 
 	connect(model, &QAbstractItemModel::dataChanged, model,
 			[this](const QModelIndex &, const QModelIndex &, const QList<int> &)

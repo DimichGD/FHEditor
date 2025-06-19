@@ -23,11 +23,12 @@ public:
 	void loadMap(int id);
 
 public slots:
-	void mapInfoTableClicked(const QModelIndex &);
+	void mapInfoTableClicked(int row);
 
 signals:
 	void mapLoadTime(int msecs);
 	void mapLoaded(Map *map);
+	void editMapEvent(int eventId);
 
 private:
 	Ui::MapTab *ui = nullptr;

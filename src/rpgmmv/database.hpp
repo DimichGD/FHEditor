@@ -89,13 +89,16 @@ public:
 	//Weapon *weapon(int id);
 	//Armor *armor(int id);
 	Event *event(int id);
-	MapInfo *mapInfo(int id);
+	//MapInfo *mapInfo(int id);
 	Map *map(int id);
 	TileSet *tileSet(int id);
 	Animation *animation(int id);
 	Skill *skill(int id);
 	State *state(int id);
 	System *system();
+	QString switchName(int id);
+	QString variableName(int id);
+
 
 	template<typename ValueType>
 	ValueType *value(int id)
@@ -131,7 +134,7 @@ public:
 
 private:
 	System systemObject;
-	Map mapObject;
+	std::map<int, Map> maps;
 
 	std::tuple<Storage<Item>, Storage<Weapon>, Storage<Armor>,
 		Storage<Event>, Storage<MapInfo>, Storage<TileSet>,
@@ -157,42 +160,70 @@ class Accessor: public IAccessor
 public:
 	Accessor()
 	{
-		this->storage = &Database::Get()->getStorage<T>();
+		this->storage = &Database::Get()->getStorage<T>().vector;
+	}
+
+	Accessor(std::vector<std::optional<T>> *storage)
+	{
+		this->storage = storage;
+	}
+
+	T *value(int id)
+	{
+		if (id < 0 || id >= std::ssize(*storage))
+			return nullptr;
+
+		if (!storage->at(id).has_value())
+			return nullptr;
+
+		return &storage->at(id).value();
+	}
+
+	const T *value(int id) const
+	{
+		if (id < 0 || id >= std::ssize(*storage))
+			return nullptr;
+
+		if (!storage->at(id).has_value())
+			return nullptr;
+
+		return &storage->at(id).value();
 	}
 
 	int size() override
 	{
-		return storage->vector.size();
+		return storage->size();
 	}
 
-	T *element(int index)
+	/*T *value(int index)
 	{
-		return storage->value(index);
+		return value(index);
 	}
 
-	const T *element(int index) const
+	const T *value(int index) const
 	{
-		return storage->value(index);
-	}
+		return value(index);
+	}*/
 
 	void clearElement(int index) override
 	{
-		int prevId = storage->value(index)->id;
-		*storage->value(index) = { .id = prevId };
+		int prevId = value(index)->id;
+		*value(index) = { .id = prevId };
 	}
 
 	void insertToEnd(int count) override
 	{
-		int nextId = storage->vector.back().value().id + 1;
+		int nextId = storage->back().value().id + 1;
 		for (int i = 0; i < count; i++)
-			storage->vector.push_back({{ .id = nextId++ }});
+			storage->push_back({{ .id = nextId++ }});
 	}
 
 	void removeFromEnd(int count) override
 	{
-		storage->vector.erase(storage->vector.end() - count, storage->vector.end());
+		storage->erase(storage->end() - count, storage->end());
 	}
 
 private:
-	Storage<T> *storage;
+	//Storage<T> *storage;
+	std::vector<std::optional<T>> *storage;
 };

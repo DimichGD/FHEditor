@@ -45,11 +45,11 @@ struct Condition
 
 struct Image
 {
-	int tileId;
-	std::string characterName;
-	int characterIndex;
-	int direction;
-	int pattern;
+	int tileId = 0;
+	std::string characterName {};
+	int characterIndex = 0;
+	int direction = 0;
+	int pattern = 0;
 };
 
 /*struct RouteEntry1
@@ -92,27 +92,27 @@ struct Page
 		THROUGH, TRIGGER, WALK_ANIME, COUNT,
 	};
 
-	Condition conditions;
-	bool directionFix;
-	Image image;
-	std::list<Command> list;
-	int moveFrequency;
-	Route moveRoute;
-	int moveSpeed;
-	int moveType;
-	int priorityType;
-	bool stepAnime;
-	bool through;
-	int trigger;
-	bool walkAnime;
+	Condition conditions {};
+	bool directionFix = false;
+	Image image {};
+	std::list<Command> list {};
+	int moveFrequency = 2;
+	Route moveRoute {};
+	int moveSpeed = 2;
+	int moveType = 0;
+	int priorityType = 0;
+	bool stepAnime = false;
+	bool through = false;
+	int trigger = 1;
+	bool walkAnime = false;
 };
 
 struct MapEvent
 {
 	int id;
-	QString name;
-	QString note;
-	std::vector<Page> pages;
-	int x;
-	int y;
+	QString name {};
+	QString note {};
+	std::vector<Page> pages {};
+	int x = 0;
+	int y = 0;
 };

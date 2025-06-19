@@ -89,15 +89,15 @@ void TileMap::loadTileMap(int id)
 {
 	map = Database::Get()->map(id);
 	if (!map)
-	{
-		qDebug() << "Failed to load map";
 		return;
-	}
 
 	size_t arraySize = map->width * map->height;
 
 	if (map->data.size() != arraySize * 6)
-		throw std::runtime_error("map->data.size() != width * height * 6");
+	{
+		qDebug() << "map->data.size() != width * height * 6";
+		return;
+	}
 
 	for (size_t i = 0; i < 6; i++)
 		tileLayers[i] = { map->data.begin() + arraySize * i, arraySize };
@@ -118,7 +118,7 @@ TileItemInfo TileMap::tileItemInfo(int tileId)
 	int x = tileId % 8;
 	int y = tileId / 8;
 
-	if (tileId >= 128) // FIXME: this will not work with A1..A4
+	if (y >= 16) // FIXME: this will not work with A1..A4
 	{
 		x += 8;
 		y -= 16;

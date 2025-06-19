@@ -12,6 +12,7 @@ public:
 	QPixmap &iconSet();
 	QPixmap face(const QString &name);
 	QPixmap tileSet(const QString &name);
+	QPixmap animation(const QString &name);
 
 private:
 	QString path {};

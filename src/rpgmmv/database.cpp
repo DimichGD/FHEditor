@@ -171,10 +171,16 @@ void Database::saveMap(int id)
 	if (Settings::Get()->lastPath.isEmpty())
 		return;
 
-	QString path = Settings::Get()->lastPath;
-	QString filename = path + QString("/data/Map%1.json")
+	auto it = maps.find(id);
+	if (it == maps.end())
+	{
+		qDebug() << "Database::saveMap id" << id << "not found in cache";
+		return;
+	}
+
+	QString filename = Settings::Get()->lastPath + QString("/data/Map%1.json")
 			.arg(id, 3, 10, QChar('0'));
-	saveJson<Map>(filename, mapObject);
+	saveJson<Map>(filename, maps[id]);
 }
 
 template<typename T>
@@ -209,16 +215,16 @@ Event *Database::event(int id)
 	return vectorValue(getVector<Event>(), id);
 }
 
-MapInfo *Database::mapInfo(int id)
+/*MapInfo *Database::mapInfo(int id)
 {
 	return vectorValue(getVector<MapInfo>(), id);
-}
+}*/
 
 Map *Database::map(int id)
 {
-	/*auto it = maps.find(id);
+	auto it = maps.find(id);
 	if (it != maps.end())
-		return &it->second;*/
+		return &it->second;
 
 	if (Settings::Get()->lastPath.isEmpty())
 		return nullptr;
@@ -226,15 +232,15 @@ Map *Database::map(int id)
 	QString path = Settings::Get()->lastPath;
 	QString filename = QString("Map%1.json").arg(id, 3, 10, QChar('0'));
 
-	//maps[id] = {};
-	if (!loadJson(path + "/data/" + filename, mapObject))
+	maps[id] = {};
+	if (!loadJson(path + "/data/" + filename, maps[id]))
 	{
 		qDebug() << QString("Failed to load '%1'").arg(filename);
-		//maps.erase(id);
+		maps.erase(id);
 		return nullptr;
 	}
 
-	return &mapObject;
+	return &maps[id];
 }
 
 TileSet *Database::tileSet(int id)
@@ -260,6 +266,16 @@ State *Database::state(int id)
 System *Database::system()
 {
 	return &systemObject;
+}
+
+QString Database::switchName(int id)
+{
+	return systemObject.switches[id]; // FIXME: validate id
+}
+
+QString Database::variableName(int id)
+{
+	return systemObject.variables[id]; // FIXME: validate id
 }
 
 template<typename T>

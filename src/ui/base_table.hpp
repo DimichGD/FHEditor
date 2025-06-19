@@ -29,11 +29,11 @@ public:
 		int y = iconIndex / 16; // TODO: Check boundaries
 		int x = iconIndex % 16;
 
-		QRect rect;
+		QRect rect(0, 0, 32, 32);
 		rect.setX(option.rect.x() + (option.rect.width() - 32) / 2);
 		rect.setY(option.rect.y() + (option.rect.height() - 32) / 2);
-		rect.setWidth(32);
-		rect.setHeight(32);
+		//rect.setWidth(32);
+		//rect.setHeight(32);
 		painter->drawPixmap(rect, *pixmap, { x * 32, y * 32, 32, 32 });
 	}
 
@@ -49,7 +49,7 @@ class BaseTable: public QTableView
 public:
 	BaseTable(QWidget *parent = nullptr);
 
-	int selectedId() const { return currentId; }
+	//int selectedId() const { return currentId; }
 	int selectedRow() const { return currentRow; }
 	int originalRow(int filteredRow); // TODO: move this to private?
 	//int rowCount();
@@ -67,10 +67,10 @@ protected:
 	QSortFilterProxyModel *filterModel = nullptr;
 	QAbstractItemModel *model = nullptr;
 	int currentRow = -1;
-	int currentId = -1;
+	//int currentId = -1;
 
 	void onSelectionChanged(const QModelIndex &selected, const QModelIndex &);
 
 signals:
-	void rowSelected(int row, int id);
+	void rowSelected(int row);
 };

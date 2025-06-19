@@ -30,6 +30,7 @@ protected:
 
 private:
 	int columns = 1;
+	QStringList headerTitle;
 	IAccessor *accessor = nullptr;
 };
 

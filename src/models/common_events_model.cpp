@@ -3,17 +3,17 @@
 Event *CommonEventsModel::eventFromRow(int row)
 {
 	// TODO: check for valid id
-	return accessor.element(row);
+	return accessor.value(row);
 }
 
 QVariant CommonEventsModel::dataForDisplay(int row, int column) const
 {
-	const Event *event = accessor.element(row);
+	const Event *event = accessor.value(row);
 	if (!event)
 		return QVariant();
 
 	if (column == 0) return event->id;
-	if (column == 2) return event->name;
+	if (column == 1) return event->name;
 
 	return QVariant();
 }
@@ -27,7 +27,7 @@ QVariant CommonEventsModel::iconForDisplay(int row, int column) const
 
 QVariant CommonEventsModel::dataForMapper(int row, int column) const
 {
-	const Event *event = accessor.element(row);
+	const Event *event = accessor.value(row);
 	if (!event)
 		return QVariant();
 
@@ -45,7 +45,7 @@ QVariant CommonEventsModel::dataForMapper(int row, int column) const
 
 void CommonEventsModel::setDataFromMapper(int row, int column, const QVariant &value)
 {
-	Event *event = accessor.element(row);
+	Event *event = accessor.value(row);
 	if (!event)
 		return;
 

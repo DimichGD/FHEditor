@@ -14,6 +14,7 @@ class EventContentList: public QListView
 public:
 	EventContentList(QWidget *parent = nullptr);
 	void loadList(std::list<Command> *list);
+	void clear();
 
 public slots:
 	void actionCommandNewTriggered(bool);
@@ -28,7 +29,7 @@ private:
 	QAction *actionCommandEdit = nullptr;
 	QAction *actionCommandDelete = nullptr;
 
-	std::list<Command> *currentList = nullptr;
+	//std::list<Command> *currentList = nullptr;
 	EventContentListModel *model = nullptr;
 };
 

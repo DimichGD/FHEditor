@@ -11,17 +11,19 @@ MOC_DIR = moc
 UI_DIR = ui
 
 SOURCES += \
+    src/events/command_111.cpp \
     src/events/command_230.cpp \
     src/events/command_000.cpp \
     src/events/command_101.cpp \
     src/events/command_102.cpp \
     src/events/command_122.cpp \
-    src/events/command_250.cpp \
     src/events/command_353.cpp \
     src/events/command_401.cpp \
-    src/events/command_404.cpp \
+    src/events/command_simple.cpp \
+    src/events/command_sound.cpp \
     src/events/command_unknown.cpp \
     src/main.cpp \
+    src/models/animations_model.cpp \
     src/models/base_model.cpp \
     src/models/common_events_model.cpp \
     src/models/event_content_list_model.cpp \
@@ -44,6 +46,7 @@ SOURCES += \
     src/ui/dialogs/simple_chooser_dialog.cpp \
     src/ui/events/play_sound_dialog.cpp \
     src/ui/settings.cpp \
+    src/ui/tabs/animations_tab.cpp \
     src/ui/tabs/armors_tab.cpp \
     src/ui/tabs/common_events_tab.cpp \
     src/ui/tabs/items_tab.cpp \
@@ -67,17 +70,19 @@ SOURCES += \
     src/ui/tilemap.cpp
 
 HEADERS += \
+    src/events/command_111.hpp \
     src/events/command_230.hpp \
     src/events/base_command.hpp \
     src/events/command_000.hpp \
     src/events/command_101.hpp \
     src/events/command_102.hpp \
     src/events/command_122.hpp \
-    src/events/command_250.hpp \
     src/events/command_353.hpp \
     src/events/command_401.hpp \
-    src/events/command_404.hpp \
+    src/events/command_simple.hpp \
+    src/events/command_sound.hpp \
     src/events/command_unknown.hpp \
+    src/models/animations_model.hpp \
     src/models/base_model.hpp \
     src/models/common_events_model.hpp \
     src/models/event_content_list_model.hpp \
@@ -109,6 +114,7 @@ HEADERS += \
     src/ui/events/command_dialog.hpp \
     src/ui/events/play_sound_dialog.hpp \
     src/ui/settings.hpp \
+    src/ui/tabs/animations_tab.hpp \
     src/ui/widgets/attrib_combo_box.hpp \
     src/ui/dialogs/change_maximum_dialog.hpp \
     src/ui/widgets/clickable_label.hpp \
@@ -147,6 +153,7 @@ FORMS += \
     src/ui/events/create_command_dialog.ui \
     src/ui/events/play_sound_dialog.ui \
     src/ui/main_window.ui \
+    src/ui/tabs/animations_tab.ui \
     src/ui/tabs/armors_tab.ui \
     src/ui/tabs/common_events_tab.ui \
     src/ui/tabs/items_tab.ui \

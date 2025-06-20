@@ -73,11 +73,11 @@ void TileMap::loadTileSet(int id)
 		if (name.isEmpty())
 			continue;
 
-		QPixmap pixmap = *Images::Get()->tileSet(name);
+		QPixmap *pixmap = Images::Get()->tileSet(name);
 		if (!pixmap)
 			continue;
 
-		tileSets[i] = std::move(pixmap);
+		tileSets[i] = pixmap;
 		if (i >= TileSet::A1 && i < TileSet::A5)
 			autoTilesFlag = true;
 
@@ -125,7 +125,7 @@ TileItemInfo TileMap::tileItemInfo(int tileId)
 	}
 
 	TileItemInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
-							&tileSets[index], tileId };
+							tileSets[index], tileId };
 	return info;
 }
 
@@ -140,7 +140,7 @@ TileItemInfo TileMap::tileItemInfo(int x, int y, TileSet::Set setIndex)
 	}
 
 	TileItemInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
-							&tileSets[setIndex], tileId };
+							tileSets[setIndex], tileId };
 	return info;
 }
 
@@ -155,7 +155,7 @@ void TileMap::clear()
 	autoTilesFlag = false;
 
 	for (int i = 0; i < TileSet::COUNT; i++)
-		tileSets[i] = QPixmap();
+		tileSets[i] = nullptr;
 }
 
 

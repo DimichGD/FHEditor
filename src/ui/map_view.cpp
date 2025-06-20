@@ -54,9 +54,6 @@ void MapView::load(Map *map, TileMap *tileMap)
 	this->tileMap = tileMap;
 	clear();
 
-	/*eventItemMap.clear();
-	scene->removeItem(cursor);
-	scene->clear();*/
 	scene->setSceneRect(0, 0, tileMap->width() * tileSize, tileMap->height() * tileSize);
 
 	for (auto &eventOptional: map->events)
@@ -101,22 +98,6 @@ void MapView::clear()
 	setTransform(QTransform());
 }
 
-void MapView::layersToggled(int id, bool toggled)
-{
-	/*if (scene->items().isEmpty())
-		return;
-
-	if (toggled)
-	{
-		for (auto item: groups[id].items)
-			item->show();
-	}
-	else
-	{
-		for (auto item: groups[id].items)
-			item->hide();
-	}*/
-}
 
 void MapView::setCurrentMode(int mode)
 {

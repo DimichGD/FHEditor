@@ -10,8 +10,8 @@ class TilePickerView: public QGraphicsView
 public:
 	TilePickerView(QWidget *parent = nullptr);
 	void setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap *pixmap);
-	void selectRect(const QPoint &first, const QPoint &second);
 	void selectPoint(const QPoint &point);
+	void selectRect(const QPoint &first, const QPoint &second);
 	void clearSelection();
 
 public slots:
@@ -33,11 +33,12 @@ private:
 	DragOp currentDragOp = NONE;
 	QPoint dragStart {};
 
-	bool skipEvents = true;
+	//bool skipEvents = true;
 	int tileSize = 0;
-	int pixmapWidth = 0;
+	//int pixmapWidth = 0;
 
 	TileSet::Set setIndex = TileSet::COUNT;
+	TileSet::Set cursorSetIndex = TileSet::COUNT;
 	QRect tilesSelectionRect {};
 	QRect lastTilesSelectionRect {};
 

@@ -24,12 +24,18 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	ui->modeButtonGroup->setId(ui->pickerModeButton, MapView::Mode::PICKER);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_1, 2);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_2, 3);
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButtonA, 0);
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButtonB, 1);
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButtonC, 2);
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButtonD, 3);
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButtonE, 4);
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButtonR, 5);
 
-	tilePickerViews[0] = ui->tilePicker_A;
+	/*tilePickerViews[0] = ui->tilePicker_A;
 	tilePickerViews[1] = ui->tilePicker_B;
 	tilePickerViews[2] = ui->tilePicker_C;
 	tilePickerViews[3] = ui->tilePicker_D;
-	tilePickerViews[4] = ui->tilePicker_E;
+	tilePickerViews[4] = ui->tilePicker_E;*/
 
 	//connect(ui->mapInfoTable, &QAbstractItemView::activated, this, &MapTab::mapInfoTableDoubleClicked);
 	connect(ui->mapInfoTable, &BaseTable::rowSelected, this, &MapTab::mapInfoTableClicked);
@@ -45,7 +51,7 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	connect(ui->modeButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentMode);
 	connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentLayer);
 
-	connect(ui->tilesTabWidget, &QTabWidget::currentChanged, ui->tilesTabWidget, [this](int index)
+	/*connect(ui->tilesTabWidget, &QTabWidget::currentChanged, ui->tilesTabWidget, [this](int index)
 	{
 		if (index == 0)
 		{
@@ -59,9 +65,9 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 			ui->layerButton_1->setEnabled(true);
 			ui->layerButton_2->setEnabled(true);
 		}
-	});
+	});*/
 
-	connect(ui->tilePicker_A, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
+	/*connect(ui->tilePicker_A, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
 	connect(ui->tilePicker_B, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
 	connect(ui->tilePicker_C, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
 	connect(ui->tilePicker_D, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
@@ -71,12 +77,10 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	connect(ui->tilePicker_B, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
 	connect(ui->tilePicker_C, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
 	connect(ui->tilePicker_D, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
-	connect(ui->tilePicker_E, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
+	connect(ui->tilePicker_E, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);*/
 
-	connect(ui->saveButton, &QPushButton::clicked, [this]()
-	{
-		Database::Get()->saveMap(currentMapId);
-	});
+	connect(ui->tilePickerView, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
+	connect(ui->tilePickerView, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
 
 	connect(ui->runButton, &QPushButton::clicked, [this]()
 	{
@@ -151,14 +155,34 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 
 	connect(ui->mapView, &MapView::pickTile, [this](int tileId)
 	{
-		TileSet::Set setIndex = tilesetIndexFromId(tileId);
+		/*TileSet::Set setIndex = tilesetIndexFromId(tileId);
 		if (setIndex >= TileSet::A1 && setIndex <= TileSet::A5)
 			ui->tilesTabWidget->setCurrentIndex(0);
 		else
 			ui->tilesTabWidget->setCurrentIndex(setIndex - 4);
 
 		TilePickerView *view = tilePickerViews[ui->tilesTabWidget->currentIndex()];
-		view->selectTile(tileId);
+		view->selectTile(tileId);*/
+	});
+
+	// TODO: remember last selection
+	connect(ui->tilePickerButtonGroup, &QButtonGroup::idClicked, [this](int id)
+	{
+		TileSet::Set setIndex = TileSet::Set(TileSet::A5 + id);
+		ui->tilePickerView->setBackgroundPixmap(setIndex, 48, tileMap.pixmap(setIndex));
+
+		if (id == 0)
+		{
+			ui->mapView->setCurrentLayer(0);
+			ui->layerButton_1->setEnabled(false);
+			ui->layerButton_2->setEnabled(false);
+		}
+		else
+		{
+			ui->mapView->setCurrentLayer(ui->paintLayerButtonGroup->checkedId());
+			ui->layerButton_1->setEnabled(true);
+			ui->layerButton_2->setEnabled(true);
+		}
 	});
 }
 
@@ -220,6 +244,12 @@ void MapTab::loadMap(int id)
 	for (int i = 0; i < 5; i++)
 	{
 		TileSet::Set setIndex = TileSet::Set(TileSet::A5 + i);
+		ui->tilePickerButtonGroup->button(i)->setEnabled(tileMap.hasTileSet(setIndex));
+	}
+
+	/*for (int i = 0; i < 5; i++)
+	{
+		TileSet::Set setIndex = TileSet::Set(TileSet::A5 + i);
 		if (tileMap.hasTileSet(setIndex))
 		{
 			tilePickerViews[i]->setBackgroundPixmap(setIndex, 48, tileMap.pixmap(setIndex));
@@ -230,10 +260,13 @@ void MapTab::loadMap(int id)
 			tilePickerViews[i]->setBackgroundPixmap(setIndex, 48, nullptr);
 			ui->tilesTabWidget->setTabEnabled(i, false);
 		}
-	}
+	}*/
 
 	ui->mapView->load(currentMap, &tileMap);
 	ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
+
+	ui->tilePickerButtonA->click(); // FIXME: tileset A5 may not be present, find first existing tileset
+	ui->tilePickerView->selectPoint(QPoint(0, 0));
 
 	uint64_t end = QDateTime::currentMSecsSinceEpoch();
 	emit mapLoadTime(end - start);

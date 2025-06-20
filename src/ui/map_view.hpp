@@ -45,7 +45,6 @@ public:
 	void clear();
 
 public slots:
-	void layersToggled(int id, bool toggled);
 	void setCurrentLayer(int layer) { currentLayer = layer; }
 	void setCurrentMode(int mode);
 	void setCurrentTileSingle(TileSet::Set setIndex, int x, int y);
@@ -74,7 +73,6 @@ protected:
 	};
 
 private:
-//public:
 	Operation currentOp = PAINT_SINGLE;
 	Mode currentMode = TILES;
 

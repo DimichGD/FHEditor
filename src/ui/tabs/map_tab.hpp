@@ -38,7 +38,7 @@ private:
 	Map *currentMap = nullptr;
 	MapInfoModel *model = nullptr;
 	TileMap tileMap;
-	std::array<TilePickerView *, 6> tilePickerViews;
+	//std::array<TilePickerView *, 6> tilePickerViews;
 	std::array<QCheckBox *, 6> layerCheckBoxes;
 	//QButtonGroup *layersCheckBoxGroup = nullptr;
 	QProcess *process = nullptr;

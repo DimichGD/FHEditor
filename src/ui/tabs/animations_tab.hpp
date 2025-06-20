@@ -63,7 +63,7 @@ private:
 	Animation *currentAnim = nullptr;
 	int currentFrame = 0;
 	std::vector<AnimationCell *> cells;
-	QPixmap stripes[2];
+	QPixmap *stripes[2];
 };
 
 class AnimationsTab: public QWidget

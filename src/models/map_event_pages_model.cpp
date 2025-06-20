@@ -78,8 +78,8 @@ bool MapEventPagesModel::setData(const QModelIndex &index, const QVariant &value
 		case Page::COND_VARIABLE_VALID: page->conditions.variableValid = value.toBool(); break;
 		case Page::COND_VARIABLE_VALUE: page->conditions.variableValue = value.toInt(); break;
 		case Page::DIRECTION_FIX: page->directionFix = value.toBool(); break;
-		case Page::MOVE_FREQ: page->moveFrequency = value.toInt(); break;
-		case Page::MOVE_SPEED: page->moveSpeed = value.toInt(); break;
+		case Page::MOVE_FREQ: page->moveFrequency = value.toInt() + 1; break;
+		case Page::MOVE_SPEED: page->moveSpeed = value.toInt() + 1; break;
 		case Page::MOVE_TYPE: page->moveType = value.toInt(); break;
 		case Page::PRIORITY_TYPE: page->priorityType = value.toInt(); break;
 		case Page::STEP_ANIME: page->stepAnime = value.toBool(); break;

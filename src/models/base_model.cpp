@@ -1,6 +1,6 @@
 #include "base_model.hpp"
 
-BaseModel::BaseModel(IAccessor *accessor, int columns, QObject *parent): QAbstractItemModel(parent)
+BaseModel::BaseModel(IAccessor *accessor, int columns, QObject *parent): QAbstractTableModel(parent)
 {
 	this->accessor = accessor;
 	this->columns = columns;
@@ -59,7 +59,8 @@ bool BaseModel::setData(const QModelIndex &index, const QVariant &value, int rol
 		return false;
 
 	setDataFromMapper(index.row(), index.column(), value);
-	emit dataChanged(createIndex(index.row(), 0), createIndex(index.row(), 2), { Qt::DisplayRole });
+	//emit dataChanged(createIndex(index.row(), 0), createIndex(index.row(), 2), { Qt::DisplayRole });
+	emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 2), { Qt::DisplayRole });
 
 	return true;
 }
@@ -72,11 +73,14 @@ QVariant BaseModel::headerData(int section, Qt::Orientation orientation, int rol
 	return headerTitle[section];
 }
 
+
 void BaseModel::clearItem(int row)
 {
 	accessor->clearElement(row);
-	emit dataChanged(createIndex(row, 1), createIndex(row, 2), { Qt::DisplayRole });
-	emit dataChanged(createIndex(row, 1), createIndex(row, Item::COUNT - 1), { Qt::EditRole });
+	//emit dataChanged(createIndex(row, 1), createIndex(row, 2), { Qt::DisplayRole });
+	//emit dataChanged(createIndex(row, 1), createIndex(row, Item::COUNT - 1), { Qt::EditRole });
+	emit dataChanged(index(row, 1), index(row, 2), { Qt::DisplayRole });
+	emit dataChanged(index(row, 1), index(row, Item::COUNT - 1), { Qt::EditRole });
 }
 
 bool BaseModel::insertRows(int row, int count, const QModelIndex &parent)

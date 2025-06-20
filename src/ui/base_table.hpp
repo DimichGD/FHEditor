@@ -64,13 +64,19 @@ public slots:
 	void selectRow(int row);
 
 protected:
-	QSortFilterProxyModel *filterModel = nullptr;
-	QAbstractItemModel *model = nullptr;
-	int currentRow = -1;
+	//QSortFilterProxyModel *filterModel = nullptr;
+	//QAbstractItemModel *model = nullptr;
+	//int currentRow = -1;
 	//int currentId = -1;
 
 	void onSelectionChanged(const QModelIndex &selected, const QModelIndex &);
+	void mousePressEvent(QMouseEvent *event) override;
 
 signals:
 	void rowSelected(int row);
+
+private:
+	QSortFilterProxyModel *filterModel = nullptr;
+	QAbstractItemModel *model = nullptr;
+	int currentRow = -1;
 };

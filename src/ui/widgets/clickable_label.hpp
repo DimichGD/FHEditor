@@ -15,7 +15,7 @@ public:
 
 	ClickableLabel(QWidget *parent = nullptr): QLabel(parent) {}
 	void setIconIndex(int index);
-	void setIconMode(Mode mode, QPixmap pixmap);
+	void setIconMode(Mode mode, QPixmap *pixmap);
 	void paintEvent(QPaintEvent *event) override;
 
 signals:
@@ -30,7 +30,7 @@ private:
 	QRect rect;
 	int iconIndex = 0;
 
-	QPixmap pixmap;
+	QPixmap *pixmap = nullptr;
 	Mode mode;
 	int iconSize = 32;
 	int iconSetPitch = 16;

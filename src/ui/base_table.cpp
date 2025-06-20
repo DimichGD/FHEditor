@@ -1,13 +1,13 @@
 #include "base_table.hpp"
-#include "database.hpp"
 //#include "iconset.hpp"
 
-#include <QFile>
+#include <QEvent>
+#include <QMouseEvent>
 #include <QHeaderView>
 
 BaseTable::BaseTable(QWidget *parent): QTableView(parent)
 {
-	QPalette pal = palette();
+	/*QPalette pal = palette();
 	pal.setColor(QPalette::Base, QColor::fromRgb(255, 255, 255));
 	pal.setColor(QPalette::AlternateBase, QColor::fromRgb(228, 236, 241));
 	pal.setColor(QPalette::Inactive, QPalette::Highlight,
@@ -18,7 +18,7 @@ BaseTable::BaseTable(QWidget *parent): QTableView(parent)
 
 	QFont currentFont = font();
 	currentFont.setPointSize(12);
-	setFont(currentFont);
+	setFont(currentFont);*/
 
 	//setItemDelegateForColumn(1, new IconDelegate(this));
 }
@@ -68,9 +68,18 @@ void BaseTable::selectRow(int row)
 void BaseTable::onSelectionChanged(const QModelIndex &selected, const QModelIndex &)
 {
 	currentRow = originalRow(selected.row());
-	//currentId = (currentRow == -1) ? -1 : selected.siblingAtColumn(0).data().toInt();
-
 	emit rowSelected(currentRow);
+}
+
+void BaseTable::mousePressEvent(QMouseEvent *event)
+{
+	if (!indexAt(event->position().toPoint()).isValid())
+	{
+		event->accept();
+		return;
+	}
+
+	QTableView::mousePressEvent(event);
 }
 
 bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const

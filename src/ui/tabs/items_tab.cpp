@@ -65,17 +65,23 @@ void ItemsTab::changeIcon(int index)
 
 void ItemsTab::init()
 {
-	if (mapper)
+	/*if (mapper)
 		delete mapper;
 
 	if (model)
-		delete model;
+		delete model;*/
+
+	delete mapper;
+	delete model;
+
+	//mapper->deleteLater();
+	//model->deleteLater();
 
 	ui->itemIconLabel->setIconMode(ClickableLabel::Mode::ICON_SET, Images::Get()->iconSet());
 
-	model = new ItemsModel(ui->itemsTable);
-	iconSetPixmap = Images::Get()->iconSet();
-	ui->itemsTable->setModel2(model, &iconSetPixmap);
+	model = new ItemsModel(this);
+	//iconSetPixmap = Images::Get()->iconSet();
+	ui->itemsTable->setModel2(model, Images::Get()->iconSet());
 
 	ui->itemApplyButton->setEnabled(false);
 	ui->itemDamageElementComboBox->clear(); // Normal Attack and None only present in items?
@@ -165,7 +171,7 @@ void ItemsTab::itemIconClicked()
 	if (!currentItem)
 		return;
 
-	IconPickerDialog dialog(this, currentItem->iconIndex);
+	IconPickerDialog dialog(this, PickerType::ICON_SET, "", currentItem->iconIndex);
 	if (dialog.exec())
 		changeIcon(dialog.index());
 }

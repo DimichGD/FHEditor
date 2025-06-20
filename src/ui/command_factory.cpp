@@ -4,6 +4,7 @@
 #include "command_102.hpp"
 #include "command_111.hpp"
 #include "command_230.hpp"
+#include "command_comment.hpp"
 #include "command_simple.hpp"
 #include "command_sound.hpp"
 #include "command_353.hpp"
@@ -51,19 +52,28 @@ QSharedPointer<ICommandParams> CommandFactory::createCommand2(int code)
 
 	switch (code)
 	{
-		case ZERO:           command = createCommand<Command_000>(); break;
-		case TEXT:           command = createCommand<Command_101_Params>(); break;
-		case BEGIN_CHOICES:  command = createCommand<Command_102>(); break;
-		case IF:             command = createCommand<Command_111>(); break;
-		case PLAY_BGM:       command = createCommand<CommandSound>(CommandSound::BGM); break;
-		case PLAY_BGS:       command = createCommand<CommandSound>(CommandSound::BGS); break;
-		case PLAY_ME:        command = createCommand<CommandSound>(CommandSound::ME); break;
-		case PLAY_SE:        command = createCommand<CommandSound>(CommandSound::SE); break;
-		case LINE:           command = createCommand<Command_401_Params>(); break;
-		case END_CHOICES:    command = createCommand<CommandSimple>(code); break;
-		case ELSE:           command = createCommand<CommandSimple>(code); break;
-		case END_IF:         command = createCommand<CommandSimple>(code); break;
-		default:             command = createCommand<Command_Unknown>(code); break;
+		case ZERO:             command = createCommand<Command_000>(); break;
+		case TEXT:             command = createCommand<Command_101_Params>(); break;
+		case BEGIN_CHOICES:    command = createCommand<Command_102>(); break;
+		case COMMENT:          command = createCommand<CommandComment>(); break;
+		case IF:               command = createCommand<Command_111>(); break;
+		case LOOP:             command = createCommand<CommandSimple>(code); break;
+		case BREAK_LOOP:       command = createCommand<CommandSimple>(code); break;
+		case GATHER_FOLLOWERS: command = createCommand<CommandSimple>(code); break;
+		case PLAY_BGM:         command = createCommand<CommandSound>(CommandSound::BGM); break;
+		case PLAY_BGS:         command = createCommand<CommandSound>(CommandSound::BGS); break;
+		case PLAY_ME:          command = createCommand<CommandSound>(CommandSound::ME); break;
+		case PLAY_SE:          command = createCommand<CommandSound>(CommandSound::SE); break;
+		case STOP_SE:          command = createCommand<CommandSimple>(code); break;
+		case OPEN_SAVE_SCREEN: command = createCommand<CommandSimple>(code); break;
+		case GAME_OVER:        command = createCommand<CommandSimple>(code); break;
+		case TEXT_LINE:        command = createCommand<Command_401_Params>(); break;
+		case END_CHOICES:      command = createCommand<CommandSimple>(code); break;
+		case COMMENT_LINE:     command = createCommand<CommandCommentLine>(); break;
+		case ELSE:             command = createCommand<CommandSimple>(code); break;
+		case END_IF:           command = createCommand<CommandSimple>(code); break;
+		case REPEAT_LOOP:      command = createCommand<CommandSimple>(code); break;
+		default:               command = createCommand<Command_Unknown>(code); break;
 	}
 
 	return command;

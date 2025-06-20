@@ -81,7 +81,7 @@ void AnimationView::doFrame(int frame)
 		int x = pattern % 5;
 		int y = pattern / 5;
 
-		cells[index]->updateCell(&stripes[stripIndex], x, y);
+		cells[index]->updateCell(stripes[stripIndex], x, y);
 		cells[index]->setPos(frameData[1], frameData[2]);
 		cells[index]->setScale(frameData[3] * 0.01f);
 		cells[index]->show();

@@ -17,12 +17,17 @@ public:
 	//void makeChanges();
 	std::list<Command> resultCommands() override;
 
+protected slots:
+	void openIconPickerDialog(QString faceName, int faceIndex);
+
 private:
 	//Command::It parentIt;
 	//bool editing = false;
 	//int selectionSize = 0;
 	//Event *event = nullptr;
 	//Command::It rootCommand;
+	QString faceName {};
+	int faceIndex = 0;
 	int indent = 0;
 	Ui::CommandTextDialog *ui = nullptr;
 };

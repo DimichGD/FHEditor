@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>866</width>
+    <height>382</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,15 +15,29 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="IconPickerView" name="graphicsView"/>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="7,20">
+     <item>
+      <widget class="DirectoryListView" name="listView">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="IconPickerView" name="graphicsView"/>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -34,6 +48,11 @@
    <class>IconPickerView</class>
    <extends>QGraphicsView</extends>
    <header>icon_picker_view.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>DirectoryListView</class>
+   <extends>QListView</extends>
+   <header>directory_list_view.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

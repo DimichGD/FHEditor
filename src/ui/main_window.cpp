@@ -17,6 +17,7 @@
 #include "games_list_dialog.hpp"
 #include "ui_main_window.h"
 
+#include <QCloseEvent>
 #include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
@@ -28,55 +29,57 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 		qDebug() << "Can't load settings.";
 
 
-	mapTab = new MapTab(this);
-	mapEventsTab = new MapEventsTab(this);
-	itemsTab = new ItemsTab(this);
-	weaponsTab = new WeaponsTab(this);
-	armorsTab = new ArmorsTab(this);
-	commonEventsTab = new CommonEventsTab(this);
-	typesTab = new TypesTab(this);
-	animationTab = new AnimationsTab(this);
-
 	//qDebug().noquote() << db->system()->gameTitle;
 	//qDebug().noquote() << db->system()->terms.messages["levelUp"];
 
 	connect(ui->actionSave_Current_Tab, &QAction::triggered,
 			[this](bool)
 	{
-		switch (ui->tabWidget->currentIndex())
+		/*switch (ui->tabWidget->currentIndex())
 		{
 			//case 1: Database::Get()->save(Database::ITEMS); break;
 			//case 2: Database::Get()->save(Database::WEAPONS); break;
 			case 2: Database::Get()->save(Database::ITEMS); break;
 			default: qDebug() << "Tab " << ui->tabWidget->currentIndex() << " save request";
-		}
+		}*/
 
+		const QString &tabObjectName = ui->tabWidget->currentWidget()->objectName();
+		if (tabObjectName == "mapTab")
+			Database::Get()->saveMap(ui->mapTab->mapId());
+
+		else if (tabObjectName == "mapEventsTab")
+			Database::Get()->saveMap(ui->mapTab->mapId());
+
+		else if (tabObjectName == "itemsTab")
+			Database::Get()->save(Database::ITEMS);
+
+		else if (tabObjectName == "commonEventsTab")
+			Database::Get()->save(Database::EVENTS);
+
+		//qDebug() << tabObjectName;
+		ui->statusBar->showMessage("Saved", 5000);
 		// write to status bar
 	});
 
-	connect(mapTab, &MapTab::mapLoadTime, [this](int msecs)
+	connect(ui->mapTab, &MapTab::mapLoadTime, [this](int msecs)
 	{
 		QString message = QString("Map loaded in %1 milliseconds.").arg(msecs);
 		ui->statusBar->showMessage(message, 5000);
 	});
 
-	mapTabIndex = ui->tabWidget->addTab(mapTab, "Map");
-	mapEventsTabIndex = ui->tabWidget->addTab(mapEventsTab, "Map Events");
-	itemsTabIndex = ui->tabWidget->addTab(itemsTab, "Items");
-	weaponsTabIndex = ui->tabWidget->addTab(weaponsTab, "Weapons");
-	armorsTabIndex = ui->tabWidget->addTab(armorsTab, "Armors");
-	commonEventsTabIndex = ui->tabWidget->addTab(commonEventsTab, "Common Events");
-	typesTabIndex = ui->tabWidget->addTab(typesTab, "Types");
-	animationTabIndex = ui->tabWidget->addTab(animationTab, "Animations");
-	ui->tabWidget->setCurrentIndex(commonEventsTabIndex);
-
 	connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 	connect(ui->actionGamesList, &QAction::triggered, this, &MainWindow::openSettingsDialog);
-	connect(mapTab, &MapTab::mapLoaded, mapEventsTab, &MapEventsTab::init);
-	connect(mapTab, &MapTab::editMapEvent, mapTab, [this](int eventId)
+	connect(ui->mapTab, &MapTab::mapLoaded, ui->mapEventsTab, &MapEventsTab::init);
+	connect(ui->mapTab, &MapTab::addMapEvent, ui->mapEventsTab,  [this](MapEvent event)
 	{
-		ui->tabWidget->setCurrentIndex(mapEventsTabIndex);
-		mapEventsTab->selectEvent(eventId);
+		ui->mapEventsTab->addMapEvent(event);
+		ui->tabWidget->setCurrentIndex(1); // map events index
+		ui->mapEventsTab->selectEvent(event.id);
+	});
+	connect(ui->mapTab, &MapTab::editMapEvent, ui->mapEventsTab, [this](int eventId)
+	{
+		ui->tabWidget->setCurrentIndex(1); // map events index
+		ui->mapEventsTab->selectEvent(eventId);
 	});
 
 	if (Settings::Get()->lastPath.isEmpty())
@@ -87,6 +90,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	{
 		loadGame();
 	}
+
+	ui->tabWidget->setCurrentIndex(Settings::Get()->lastTabIndex);
 }
 
 MainWindow::~MainWindow()
@@ -103,21 +108,31 @@ void MainWindow::loadGame()
 	}
 
 	if (!Images::Get()->load())
+	{
 		qDebug() << "Failed to load Images";
+		return;
+	}
 
 	uint64_t start = QDateTime::currentMSecsSinceEpoch();
 
 	Database::Get()->load(Database::ALL);
 
 	//mapEventsTab->init();
-	itemsTab->init();
-	commonEventsTab->init();
-	typesTab->init();
-	mapTab->init();
-	animationTab->init();
+	ui->itemsTab->init();
+	ui->commonEventsTab->init();
+	ui->typesTab->init();
+	ui->mapTab->init();
+	ui->animationTab->init();
 
 	uint64_t end = QDateTime::currentMSecsSinceEpoch();
 	ui->statusBar->showMessage(QString("Database loaded in %1 msecs.").arg(end - start), 5000);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	Settings::Get()->lastTabIndex = ui->tabWidget->currentIndex();
+	Settings::Get()->save();
+	event->accept();
 }
 
 void MainWindow::openSettingsDialog()

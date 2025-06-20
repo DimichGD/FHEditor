@@ -1,4 +1,5 @@
 #include "map_view.hpp"
+#include "settings.hpp"
 
 #include <QFile>
 #include <QMouseEvent>
@@ -9,7 +10,8 @@ bool EventGraphicsItem::drawFullItem = false;
 
 EventGraphicsItem::EventGraphicsItem(MapEvent *event, QGraphicsItem *parent): QGraphicsItem(parent)
 {
-	this->event = event;
+	//this->event = event;
+	id = event->id;
 	setOpacity(0.5f);
 }
 
@@ -50,9 +52,11 @@ MapView::~MapView()
 void MapView::load(Map *map, TileMap *tileMap)
 {
 	this->tileMap = tileMap;
+	clear();
 
-	eventItemMap.clear();
-	scene->clear();
+	/*eventItemMap.clear();
+	scene->removeItem(cursor);
+	scene->clear();*/
 	scene->setSceneRect(0, 0, tileMap->width() * tileSize, tileMap->height() * tileSize);
 
 	for (auto &eventOptional: map->events)
@@ -63,9 +67,11 @@ void MapView::load(Map *map, TileMap *tileMap)
 		MapEvent &event = eventOptional.value();
 		EventGraphicsItem *item = new EventGraphicsItem(&event);
 		item->setPos(event.x * tileSize, event.y * tileSize);
+		item->setOpacity(EventGraphicsItem::drawFullItem ? 1.0f : 0.5f);
 		scene->addItem(item);
 		eventItemMap[event.y * tileMap->width() + event.x] = item;
 	}
+
 
 	QPen pen(QColorConstants::White);
 	pen.setWidth(2);
@@ -87,6 +93,7 @@ void MapView::clear()
 	//	group.items.clear();
 
 	//tilesets.clear();
+	eventItemMap.clear();
 	scene->clear();
 	resetCachedContent();
 
@@ -115,6 +122,8 @@ void MapView::setCurrentMode(int mode)
 {
 	if (mode == currentMode)
 		return;
+
+	Settings::Get()->mapToolIndex = mode;
 
 	currentMode = Mode(mode);
 	bool flag = (currentMode == EVENTS);
@@ -156,6 +165,15 @@ void MapView::setCurrentTileMultiple(TileSet::Set setIndex, const QRect &rect)
 	currentMultipleTileInfoList = tileInfos;
 	currentOp = PAINT_MULTIPLE;
 	cursor->setRect(0, 0, rect.size().width() * tileSize, rect.size().height() * tileSize);
+}
+
+void MapView::addNewEvent(MapEvent event)
+{
+	EventGraphicsItem *item = new EventGraphicsItem(&event);
+	item->setPos(event.x * tileSize, event.y * tileSize);
+	item->setOpacity(EventGraphicsItem::drawFullItem ? 1.0f : 0.5f);
+	scene->addItem(item);
+	eventItemMap[event.y * tileMap->width() + event.x] = item;
 }
 
 

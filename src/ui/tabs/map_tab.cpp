@@ -111,7 +111,21 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		mapEventsTab->selectEvent(eventId);
 		mapEventsTab->show();*/
 
-		int lastEventId = currentMap->events.back().value().id + 1;
+		bool updateExisting = false;
+		auto it = std::next(currentMap->events.begin());
+		while (it != currentMap->events.end())
+		{
+			if (!it->has_value())
+			{
+				updateExisting = true;
+				break;
+			}
+
+			std::advance(it, 1);
+		}
+
+		//int lastEventId = currentMap->events.back().value().id + 1;
+		int lastEventId = std::prev(it)->value().id + 1;
 		MapEvent event {};
 		event.id = lastEventId;
 		event.name = QString("EV%1").arg(lastEventId, 3, 10, QChar('0'));
@@ -119,9 +133,20 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		event.y = y;
 		event.pages.emplace_back();
 		event.pages.back().list.push_back({ CommandFactory::ZERO, 0, CommandFactory::createCommand2(0) });
-		currentMap->events.push_back(event);
 
-		emit editMapEvent(lastEventId);
+		if (updateExisting)
+		{
+			*it = event;
+			emit editMapEvent(lastEventId);
+		}
+
+		else
+		{
+			//currentMap->events.push_back(event);
+			emit addMapEvent(event);
+		}
+
+		ui->mapView->addNewEvent(event);
 	});
 
 	connect(ui->mapView, &MapView::pickTile, [this](int tileId)
@@ -208,6 +233,7 @@ void MapTab::loadMap(int id)
 	}
 
 	ui->mapView->load(currentMap, &tileMap);
+	ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
 
 	uint64_t end = QDateTime::currentMSecsSinceEpoch();
 	emit mapLoadTime(end - start);

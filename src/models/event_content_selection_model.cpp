@@ -25,9 +25,11 @@ void EventContentSelectionModel::select(const QItemSelection &selection, Selecti
 	enum Strategy { SELECT_UNTIL, SELECT_WHILE };
 	struct Holder { int endCode; Strategy strategy; };
 	static std::map<int, Holder> codesMap = {
-		{ CommandFactory::TEXT,          { CommandFactory::LINE,        SELECT_WHILE } },
-		{ CommandFactory::BEGIN_CHOICES, { CommandFactory::END_CHOICES, SELECT_UNTIL } },
-		{ CommandFactory::IF,            { CommandFactory::END_IF     , SELECT_UNTIL } },
+		{ CommandFactory::TEXT,          { CommandFactory::TEXT_LINE,    SELECT_WHILE } },
+		{ CommandFactory::COMMENT,       { CommandFactory::COMMENT_LINE, SELECT_WHILE } },
+		{ CommandFactory::BEGIN_CHOICES, { CommandFactory::END_CHOICES,  SELECT_UNTIL } },
+		{ CommandFactory::IF,            { CommandFactory::END_IF     ,  SELECT_UNTIL } },
+		{ CommandFactory::LOOP,          { CommandFactory::REPEAT_LOOP,  SELECT_UNTIL } },
 		//{ 402, { 0, SELECT_UNTIL, true } },
 		//{ 411, { 0, SELECT_UNTIL, true } },
 	};

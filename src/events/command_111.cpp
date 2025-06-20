@@ -46,6 +46,9 @@ QString variableCondToString(std::vector<std::variant<int, std::string, bool>> &
 		return QString("%1 %2 %3")
 				.arg(db->variableName(variableId), signToString(signIndex))
 				.arg(numberOrVariableId);
+
+		// return QString("%1 %2 %3").arg(p[1].asVar).arg(p[4].asArr(signArray)).arg(p[3].asInt);
+		// return makeString<_, Var, _, int, Arr<signArray>>("%1 %3 %2");
 	}
 	else
 	{

@@ -1,31 +1,25 @@
 #pragma once
-#include <QObject>
 #include <QString>
-#include <QList>
+#include <list>
 
-class Settings: public QObject
+struct Settings
 {
-	Q_OBJECT
-
-public:
 	struct Game
 	{
 		QString name {};
 		QString path {};
 	};
 
-	QList<Game> gamesList {};
+	std::list<Game> gamesList {};
 	QString lastPath {};
 	QString rpgmPath {};
 
-	Settings(QObject *parent = nullptr): QObject(parent) {}
+	int lastTabIndex = 0;
+	int mapToolIndex = 0;
+
 	static Settings *Get();
 
 	bool load();
 	bool save();
-
-/*signals:
-	void gameEntryAdded(QString name, QString path);
-	void gameEntryRemoved(int index);*/
 };
 

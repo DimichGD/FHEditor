@@ -1,4 +1,5 @@
 #include "command_text_dialog.hpp"
+#include "icon_picker_dialog.hpp"
 #include "images.hpp"
 #include "command_101.hpp"
 #include "command_401.hpp"
@@ -22,9 +23,9 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 		for (int i = 1; i < indices.size(); i++)
 		{
 			std::advance(command, 1);
-			if (command->code != CommandFactory::LINE)
+			if (command->code != CommandFactory::TEXT_LINE)
 			{
-				qDebug() << "CommandTextDialog error. Expected LINE";
+				qDebug() << "CommandTextDialog error. Expected TEXT_LINE";
 				continue;
 			}
 
@@ -37,8 +38,16 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 			ui->faceLabel->setIconMode(ClickableLabel::Mode::FACES,
 							Images::Get()->face(params->faceName));
 			ui->faceLabel->setIconIndex(params->faceIndex);
+
+			faceName = params->faceName;
+			faceIndex = params->faceIndex;
 		}
 	}
+
+	connect(ui->faceLabel, &ClickableLabel::doubleClicked, this, [this]()
+	{
+		openIconPickerDialog(faceName, faceIndex);
+	});
 }
 
 CommandTextDialog::~CommandTextDialog()
@@ -52,15 +61,28 @@ std::list<Command> CommandTextDialog::resultCommands()
 
 	int backgroundIndex = ui->backgroundComboBox->currentIndex();
 	int windowPositionIndex = ui->windowPositionComboBox->currentIndex();
-	auto rootParams = CommandFactory::createCommand<Command_101_Params>("", 0, backgroundIndex, windowPositionIndex);
+	auto rootParams = CommandFactory::createCommand<Command_101_Params>(faceName, faceIndex, backgroundIndex, windowPositionIndex);
 	resultList.push_back({ CommandFactory::TEXT, indent, rootParams });
 
 	QStringList lines = ui->messageLinesEdit->toPlainText().split('\n');
 	for (auto &line: lines)
 	{
 		auto lineParams = CommandFactory::createCommand<Command_401_Params>(line);
-		resultList.push_back({ CommandFactory::LINE, indent, lineParams });
+		resultList.push_back({ CommandFactory::TEXT_LINE, indent, lineParams });
 	}
 
 	return resultList;
+}
+
+void CommandTextDialog::openIconPickerDialog(QString faceName, int faceIndex)
+{
+	IconPickerDialog dialog(this, PickerType::FACE, faceName, faceIndex);
+	if (dialog.exec())
+	{
+		ui->faceLabel->setIconMode(ClickableLabel::FACES, Images::Get()->face(dialog.name()));
+		ui->faceLabel->setIconIndex(dialog.index());
+
+		this->faceName = dialog.name();
+		this->faceIndex = dialog.index();
+	}
 }

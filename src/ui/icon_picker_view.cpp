@@ -8,28 +8,18 @@ IconPickerView::IconPickerView(QWidget *parent): QGraphicsView(parent)
 {
 	scene = new QGraphicsScene(this);
 	setScene(scene);
-}
 
-void IconPickerView::setPixmap(const QPixmap &pixmap)
-{
-	if (scene->items().contains(cursor))
-			scene->removeItem(cursor);
+	QPen whitePen = QPen(QColorConstants::Black);
+	whitePen.setWidth(2);
+	whitePen.setJoinStyle(Qt::MiterJoin);
+	whitePen.setCosmetic(true);
 
-	scene->clear();
-	scene->setSceneRect(0, 0, pixmap.width(), pixmap.height());
-	pixmapItem = scene->addPixmap(pixmap);
-	scene->addItem(cursor);
-}
-
-void IconPickerView::setTileSize(int size)
-{
-	tileSize = size;
-
-	QString filename = QString("frame%1.png").arg(tileSize);
-	cursor = new QGraphicsPixmapItem(QPixmap(filename));
+	cursorItem = new QGraphicsRectItem();
+	cursorItem->setPen(whitePen);
+	scene->addItem(cursorItem);
 
 	effect = new QGraphicsColorizeEffect(this);
-	cursor->setGraphicsEffect(effect);
+	cursorItem->setGraphicsEffect(effect);
 
 	QPropertyAnimation *animation = new QPropertyAnimation(effect, "color", this);
 	animation->setDuration(1000);
@@ -40,13 +30,48 @@ void IconPickerView::setTileSize(int size)
 	animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+void IconPickerView::setPixmap(QPixmap *pixmap, int tileSize)
+{
+	this->tileSize = tileSize;
+	cursorItem->setRect(0, 0, tileSize, tileSize);
+
+	scene->removeItem(cursorItem);
+	scene->clear();
+	scene->addItem(cursorItem);
+
+	if (pixmap)
+	{
+		scene->setSceneRect(0, 0, pixmap->width(), pixmap->height());
+		pixmapItem = scene->addPixmap(*pixmap);
+		index = 0;
+	}
+	else
+	{
+		scene->setSceneRect(0, 0, tileSize, tileSize);
+		index = -1;
+	}
+
+}
+
 void IconPickerView::setPos(int x, int y)
 {
-	cursor->setPos(x * tileSize, y * tileSize);
+	cursorItem->setPos(x * tileSize, y * tileSize);
+}
+
+void IconPickerView::clear()
+{
+	scene->removeItem(cursorItem);
+	scene->clear();
+	index = -1;
+	pixmapItem = nullptr;
 }
 
 void IconPickerView::mousePressEvent(QMouseEvent *event)
 {
+	event->accept();
+	if (!pixmapItem)
+		return;
+
 	if (event->button() == Qt::LeftButton)
 	{
 		QPoint point = mapToScene(event->position().toPoint()).toPoint();
@@ -55,34 +80,35 @@ void IconPickerView::mousePressEvent(QMouseEvent *event)
 		{
 			int x = point.x() / tileSize;
 			int y = point.y() / tileSize;
-			index = y * 16 + x;
+			//index = y * 16 + x;
+			index = y * (pixmapItem->boundingRect().width() / tileSize) + x;
 
 			setPos(x, y);
 			emit tileClicked(x, y);
 		}
 
-		event->accept();
-		return;
+
+		//return;
 	}
 
-	event->ignore();
+	//event->ignore();
 }
 
 void IconPickerView::drawBackground(QPainter *painter, const QRectF &rect)
 {
 	painter->setPen(QColor::fromRgb(220, 220, 220));
-	int mGridSize = 16;
+	int gridSize = tileSize / 2;
 	QRect r = rect.toRect();
 
-	int xmin = r.left() - r.left() % mGridSize - mGridSize;
-	int ymin = r.top() - r.top() % mGridSize - mGridSize;
-	int xmax = r.right() - r.right() % mGridSize + mGridSize;
-	int ymax = r.bottom() - r.bottom() % mGridSize + mGridSize;
+	int xmin = r.left() - r.left() % gridSize - gridSize;
+	int ymin = r.top() - r.top() % gridSize - gridSize;
+	int xmax = r.right() - r.right() % gridSize + gridSize;
+	int ymax = r.bottom() - r.bottom() % gridSize + gridSize;
 
-	for (int x = xmin; x <= xmax; x += mGridSize)
+	for (int x = xmin; x <= xmax; x += gridSize)
 		painter->drawLine(x, r.top(), x, r.bottom());
 
-	for (int y = ymin; y <= ymax; y+= mGridSize)
+	for (int y = ymin; y <= ymax; y+= gridSize)
 		painter->drawLine(r.left(), y, r.right(), y);
 }
 

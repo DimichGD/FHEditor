@@ -73,8 +73,8 @@ void TileMap::loadTileSet(int id)
 		if (name.isEmpty())
 			continue;
 
-		QPixmap pixmap = Images::Get()->tileSet(name);
-		if (pixmap.isNull())
+		QPixmap pixmap = *Images::Get()->tileSet(name);
+		if (!pixmap)
 			continue;
 
 		tileSets[i] = std::move(pixmap);

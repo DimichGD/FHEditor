@@ -21,6 +21,7 @@ public:
 
 	void init();
 	void loadMap(int id);
+	int mapId() { return currentMapId; }
 
 public slots:
 	void mapInfoTableClicked(int row);
@@ -29,6 +30,7 @@ signals:
 	void mapLoadTime(int msecs);
 	void mapLoaded(Map *map);
 	void editMapEvent(int eventId);
+	void addMapEvent(MapEvent event);
 
 private:
 	Ui::MapTab *ui = nullptr;

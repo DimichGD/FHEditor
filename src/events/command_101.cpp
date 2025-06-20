@@ -35,8 +35,11 @@ QString Command_101_Params::windowPositionToString()
 
 QString Command_101_Params::faceToString()
 {
-	QString actualFaceName = faceName.isEmpty() ? "Null" : faceName;
-	return QString("%1(%2)").arg(actualFaceName).arg(faceIndex);
+	if (faceName.isEmpty())
+		return "Null";
+
+	//QString actualFaceName = faceName.isEmpty() ? "Null" : faceName;
+	return QString("%1(%2)").arg(faceName).arg(faceIndex);
 }
 
 void Command_101_Params::read(const std::string &parameters)

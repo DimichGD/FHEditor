@@ -20,6 +20,7 @@ public:
 public slots:
 	void mapEventsTableClicked(int row);
 	void selectEvent(int id);
+	void addMapEvent(MapEvent event);
 
 private:
 	MapEventsModel *model = nullptr;

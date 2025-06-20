@@ -66,3 +66,10 @@ void MapEventsTab::selectEvent(int id)
 	ui->mapEventsTable->selectRow(id);
 }
 
+void MapEventsTab::addMapEvent(MapEvent event)
+{
+	model->insertRows(model->rowCount(), 1);
+	currentMap->events[model->rowCount() - 1] = event;
+	//model->setData(model->index(model->rowCount() - 1, 0), )
+}
+

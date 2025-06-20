@@ -16,12 +16,13 @@ public:
 
 	QRectF boundingRect() const override;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
-	int eventId() const { return event->id; }
+	int eventId() const { return id; }
 
 	static bool drawFullItem;
 
 private:
-	MapEvent *event = nullptr;
+	int id = 0;
+	//MapEvent *event = nullptr;
 };
 
 // ------------------------------------------------------
@@ -49,6 +50,7 @@ public slots:
 	void setCurrentMode(int mode);
 	void setCurrentTileSingle(TileSet::Set setIndex, int x, int y);
 	void setCurrentTileMultiple(TileSet::Set setIndex, const QRect &rect);
+	void addNewEvent(MapEvent event);
 
 signals:
 	//void layerIsEmpty(int index);

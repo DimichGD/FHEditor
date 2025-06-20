@@ -58,7 +58,7 @@ void GamesListDialog::addGameClicked()
 	QString name = systemObject.gameTitle;
 	QString path = QDir::cleanPath(QFileInfo(selectedFile).absolutePath() + "/../");
 
-	Settings::Get()->gamesList.append({ name, path });
+	Settings::Get()->gamesList.emplace_back(name, path);
 	addRow(name, path);
 }
 
@@ -67,7 +67,9 @@ void GamesListDialog::removeGameClicked()
 	if (ui->gameTable->currentRow() < 0)
 		return;
 
-	Settings::Get()->gamesList.removeAt(ui->gameTable->currentRow());
+	//Settings::Get()->gamesList.removeAt(ui->gameTable->currentRow());
+	auto it = Settings::Get()->gamesList.begin();
+	Settings::Get()->gamesList.erase(std::next(it, ui->gameTable->currentRow()));
 	ui->gameTable->removeRow(ui->gameTable->currentRow());
 }
 
@@ -124,5 +126,7 @@ void GamesListDialog::swapRows(int srcRow, int dstRow)
 	ui->gameTable->setItem(srcRow, 1, item4);
 	ui->gameTable->selectRow(dstRow);
 
-	Settings::Get()->gamesList.swapItemsAt(srcRow, dstRow);
+	auto it = Settings::Get()->gamesList.begin();
+	std::iter_swap(std::next(it, srcRow), std::next(it, dstRow));
+	//Settings::Get()->gamesList.swapItemsAt(srcRow, dstRow);
 }

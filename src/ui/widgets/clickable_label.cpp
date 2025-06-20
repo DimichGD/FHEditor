@@ -11,7 +11,7 @@ void ClickableLabel::setIconIndex(int index)
 	update();
 }
 
-void ClickableLabel::setIconMode(Mode mode, QPixmap pixmap)
+void ClickableLabel::setIconMode(Mode mode, QPixmap *pixmap)
 {
 	this->mode = mode;
 	this->pixmap = pixmap;
@@ -25,8 +25,6 @@ void ClickableLabel::setIconMode(Mode mode, QPixmap pixmap)
 
 void ClickableLabel::paintEvent(QPaintEvent *event)
 {
-	Q_UNUSED(event)
-
 	int y = iconIndex / iconSetPitch; // TODO: get icons count from IconSet
 	int x = iconIndex % iconSetPitch;
 
@@ -34,7 +32,11 @@ void ClickableLabel::paintEvent(QPaintEvent *event)
 	QRect rect(x * iconSize, y * iconSize, iconSize, iconSize);
 
 	QPainter painter(this);
-	painter.drawPixmap(QRect(0, 0, iconSize, iconSize), pixmap, rect);
+
+	if (pixmap)
+		painter.drawPixmap(QRect(0, 0, iconSize, iconSize), *pixmap, rect);
+	else
+		QLabel::paintEvent(event);
 }
 
 void ClickableLabel::mousePressEvent(QMouseEvent *event)

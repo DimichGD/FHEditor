@@ -19,6 +19,7 @@ SOURCES += \
     src/events/command_122.cpp \
     src/events/command_353.cpp \
     src/events/command_401.cpp \
+    src/events/command_comment.cpp \
     src/events/command_simple.cpp \
     src/events/command_sound.cpp \
     src/events/command_unknown.cpp \
@@ -57,6 +58,7 @@ SOURCES += \
     src/ui/tabs/weapons_tab.cpp \
     src/ui/widgets/attrib_combo_box.cpp \
     src/ui/widgets/clickable_label.cpp \
+    src/ui/widgets/directory_list_view.cpp \
     src/ui/widgets/selector_button.cpp \
     src/ui/command_factory.cpp \
     src/ui/data_mapper.cpp \
@@ -79,6 +81,7 @@ HEADERS += \
     src/events/command_122.hpp \
     src/events/command_353.hpp \
     src/events/command_401.hpp \
+    src/events/command_comment.hpp \
     src/events/command_simple.hpp \
     src/events/command_sound.hpp \
     src/events/command_unknown.hpp \
@@ -124,6 +127,7 @@ HEADERS += \
     src/ui/events/create_command_dialog.hpp \
     src/ui/dialogs/icon_picker_dialog.hpp \
     src/ui/images.hpp \
+    src/ui/widgets/directory_list_view.hpp \
     src/ui/widgets/selector_button.hpp \
     src/ui/dialogs/simple_chooser_dialog.hpp \
     src/ui/tabs/armors_tab.hpp \

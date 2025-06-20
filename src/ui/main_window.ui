@@ -24,11 +24,36 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
-      <widget class="MapTab" name="tab">
+      <widget class="MapTab" name="mapTab">
        <attribute name="title">
-        <string>Page</string>
+        <string>Map</string>
+       </attribute>
+      </widget>
+      <widget class="MapEventsTab" name="mapEventsTab">
+       <attribute name="title">
+        <string>Map Events</string>
+       </attribute>
+      </widget>
+      <widget class="ItemsTab" name="itemsTab">
+       <attribute name="title">
+        <string>Items</string>
+       </attribute>
+      </widget>
+      <widget class="CommonEventsTab" name="commonEventsTab">
+       <attribute name="title">
+        <string>Common Events</string>
+       </attribute>
+      </widget>
+      <widget class="TypesTab" name="typesTab">
+       <attribute name="title">
+        <string>Types</string>
+       </attribute>
+      </widget>
+      <widget class="AnimationsTab" name="animationTab">
+       <attribute name="title">
+        <string>Animations</string>
        </attribute>
       </widget>
      </widget>
@@ -132,6 +157,36 @@
    <class>MapTab</class>
    <extends>QWidget</extends>
    <header>map_tab.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MapEventsTab</class>
+   <extends>QWidget</extends>
+   <header>map_events_tab.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ItemsTab</class>
+   <extends>QWidget</extends>
+   <header>items_tab.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AnimationsTab</class>
+   <extends>QWidget</extends>
+   <header>animations_tab.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CommonEventsTab</class>
+   <extends>QWidget</extends>
+   <header>common_events_tab.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TypesTab</class>
+   <extends>QWidget</extends>
+   <header>types_tab.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

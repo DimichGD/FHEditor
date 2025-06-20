@@ -1,6 +1,8 @@
 #include "settings.hpp"
+#include "json_qstring.hpp" // IWYU pragma: keep
 
-#include <QSettings>
+#include <QFile>
+#include <QDebug>
 
 Settings *Settings::Get()
 {
@@ -10,78 +12,27 @@ Settings *Settings::Get()
 
 bool Settings::load()
 {
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
-	if (!settings.isWritable())
-	{
-		qDebug() << "settings.ini is not writable";
+	if (!QFile::exists("settings.json"))
 		return false;
-	}
 
-	lastPath = settings.value("lastPath").toString();
-	rpgmPath = settings.value("rpgmPath").toString();
-
-	settings.beginGroup("Games");
-	int arrayLength = settings.beginReadArray("game");
-	gamesList.reserve(arrayLength);
-
-	for (int i = 0; i < arrayLength; i++)
+	glz::error_ctx err = glz::read_file_json(*this, "settings.json", std::string{});
+	if (err)
 	{
-		settings.setArrayIndex(i);
-		QString name = settings.value("name").toString();
-		QString path = settings.value("path").toString();
-
-		if (settings.status() != QSettings::NoError)
-		{
-			qDebug() << "Failed to read settings.ini" << settings.status();
-			return false;
-		}
-
-		gamesList.append({ name, path });
-	}
-
-	settings.endArray();
-	settings.endGroup();
-
-	if (settings.status() != QSettings::NoError)
-	{
-		qDebug() << "Failed to read settings.ini" << settings.status();
+		qDebug() << QString::fromStdString(glz::format_error(err));
 		return false;
 	}
 
 	return true;
 }
 
-bool Settings::save()
+bool Settings::save() // TODO: check behavior if file is read only
 {
-	QSettings settings("settings.ini", QSettings::Format::IniFormat);
-	if (!settings.isWritable())
+	glz::error_ctx err = glz::write_file_json<glz::opts{.prettify = true}>(*this, "settings.json", std::string{});
+	if (err)
 	{
-		qDebug() << "settings.ini is not writable";
+		qDebug() << QString::fromStdString(glz::format_error(err));
 		return false;
 	}
 
-	settings.beginGroup("Games");
-	settings.remove("");
-	settings.beginWriteArray("game");
-	for (int i = 0; i < gamesList.count(); i++)
-	{
-		settings.setArrayIndex(i);
-		settings.setValue("name", gamesList.at(i).name);
-		settings.setValue("path", gamesList.at(i).path);
-	}
-
-	settings.endArray();
-	settings.endGroup();
-
-	settings.setValue("lastPath", lastPath);
-	settings.setValue("rpgmPath", rpgmPath);
-	settings.sync();
-
-	if (settings.status() != QSettings::NoError)
-	{
-		qDebug() << "Failed to write settings.ini" << settings.status();
-		return false;
-	}
-
-	return false;
+	return true;
 }

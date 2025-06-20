@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QBuffer>
 #include <QImageReader>
+#include <QMessageBox>
 
 Images *Images::Get()
 {
@@ -18,19 +19,29 @@ bool Images::load()
 	path = Settings::Get()->lastPath + "/img/";
 	QDir imgDir(path);
 	if (!imgDir.exists())
+	{
+		QMessageBox::critical(nullptr, "Filesystem Error", path + " does not exists.");
 		return false;
+	}
 
-	iconSetPixmap = loadImage("system/IconSet");
+	iconSetPixmap = *loadImage("system/IconSet");
 
 	return true;
 }
 
-QPixmap Images::loadImage(const QString &name)
+QPixmap *Images::loadImage(const QString &name)
 {
+	auto it = cache.find(name);
+	if (it != cache.end())
+		return &it->second;
+
 	QString pngFilename = path + name + ".png";
 	QFile pngFile(pngFilename);
 	if (pngFile.exists())
-		return QPixmap(pngFilename);
+	{
+		cache[name] = QPixmap(pngFilename);
+		return &cache[name];
+	}
 
 	int headerLen = 16;
 	QByteArray pngHeader = QByteArray::fromHex("89504E470D0A1A0A0000000D49484452");
@@ -40,7 +51,7 @@ QPixmap Images::loadImage(const QString &name)
 	if (!encFile.exists())
 	{
 		qDebug() << encFilename << "does not exists";
-		return QPixmap();
+		return nullptr;
 	}
 
 	encFile.open(QIODevice::ReadOnly);
@@ -56,31 +67,38 @@ QPixmap Images::loadImage(const QString &name)
 	QBuffer buffer(&content);
 	QImageReader reader(&buffer);
 	if (!reader.canRead())
-		return QPixmap(); // TODO: make some error strings, maybe use std::expected
+		return nullptr; // TODO: make some error strings, maybe use std::expected
 
-	return QPixmap::fromImageReader(&reader);
-	/*QPixmap *pixmap = new QPixmap();
-	*pixmap = QPixmap::fromImageReader(&reader);
-	return pixmap;*/
+	cache[name] = QPixmap::fromImageReader(&reader);
+	return &cache[name];
 }
 
-QPixmap &Images::iconSet()
+QPixmap *Images::iconSet()
 {
 	//return loadImage("system/IconSet");
-	return iconSetPixmap;
+	return &iconSetPixmap;
 }
 
-QPixmap Images::face(const QString &name)
+QPixmap *Images::face(const QString &name)
 {
+	if (name.isEmpty())
+		return nullptr;
+
 	return loadImage("faces/" + name);
 }
 
-QPixmap Images::tileSet(const QString &name)
+QPixmap *Images::tileSet(const QString &name)
 {
+	if (name.isEmpty())
+		return nullptr;
+
 	return loadImage("tilesets/" + name);
 }
 
-QPixmap Images::animation(const QString &name)
+QPixmap *Images::animation(const QString &name)
 {
+	if (name.isEmpty())
+		return nullptr;
+
 	return loadImage("animations/" + name);
 }

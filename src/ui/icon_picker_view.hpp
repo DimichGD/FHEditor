@@ -8,9 +8,11 @@ class IconPickerView: public QGraphicsView
 
 public:
 	IconPickerView(QWidget *parent = nullptr);
-	void setPixmap(const QPixmap &pixmap);
-	void setTileSize(int size);
+
+	void setPixmap(QPixmap *pixmap, int tileSize);
+	//void setTileSize(int size);
 	void setPos(int x, int y);
+	void clear();
 	int index = -1; // TODO: make private
 
 signals:
@@ -25,6 +27,7 @@ private:
 
 	QGraphicsScene *scene = nullptr;
 	QGraphicsPixmapItem *pixmapItem = nullptr;
-	QGraphicsPixmapItem *cursor = nullptr;
+	//QGraphicsPixmapItem *cursor = nullptr;
+	QGraphicsRectItem *cursorItem = nullptr;
 	QGraphicsColorizeEffect *effect = nullptr;
 };

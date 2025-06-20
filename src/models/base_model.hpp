@@ -1,8 +1,8 @@
 #pragma once
 #include "database.hpp"
-#include <QAbstractItemModel>
+#include <QAbstractTableModel>
 
-class BaseModel: public QAbstractItemModel
+class BaseModel: public QAbstractTableModel //QAbstractItemModel
 {
 	Q_OBJECT
 
@@ -18,7 +18,6 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
 	void clearItem(int row);
-
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 

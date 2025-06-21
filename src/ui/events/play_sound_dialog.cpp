@@ -13,8 +13,8 @@ PlaySoundDialog::PlaySoundDialog(CommandSound::Type type, bool editing, QModelIn
 	ui->setupUi(this);
 	this->type = type;
 
-	//Command::It command = index.data(Qt::UserRole + 1).value<Command::It>();
-	Command::It command = Command::iterFromIndex(index);
+	//Command::Iterator command = index.data(Qt::UserRole + 1).value<Command::Iterator>();
+	Command::Iterator command = Command::iterFromIndex(index);
 	indent = command->indent;
 
 	QString expectedString;

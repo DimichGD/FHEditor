@@ -25,7 +25,7 @@ public:
 		QStyledItemDelegate::paint(painter, option, index);
 
 		painter->save();
-		auto cmd1 = index.data(Qt::UserRole + 1).value<Command::It>();
+		auto cmd1 = index.data(Qt::UserRole + 1).value<Command::Iterator>();
 		cmd1->parameters->draw(painter, option.state & QStyle::State_Selected, rect, cmd1->indent);
 		painter->restore();
 	}
@@ -57,6 +57,12 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 void EventContentList::loadList(std::list<Command> *list)
 {
 	//currentList = list;
+
+	for (auto &command: *list)
+	{
+		command.parameters = CommandFactory::createCommand2(command.code);
+		command.parameters->read(command.jsonValues);
+	}
 
 	model = new EventContentListModel(list, this);
 
@@ -97,7 +103,7 @@ void EventContentList::actionCommandEditTriggered(bool)
 
 	CommandDialog *dialog = nullptr;
 	auto selectedIndices = selectionModel()->selection()[0].indexes();
-	Command::It command = selectedIndices[0].data(Qt::UserRole + 1).value<Command::It>();
+	Command::Iterator command = selectedIndices[0].data(Qt::UserRole + 1).value<Command::Iterator>();
 
 	switch (command->code)
 	{
@@ -137,7 +143,7 @@ void EventContentList::contextMenuRequested(const QPoint &pos)
 	QModelIndex index = indexAt(pos);
 	if (index.isValid())
 	{
-		Command::It command = index.data(Qt::UserRole + 1).value<Command::It>();
+		Command::Iterator command = index.data(Qt::UserRole + 1).value<Command::Iterator>();
 
 		actionCommandNew->setEnabled(command->parameters->flags() & ICommandParams::CAN_ADD);
 		actionCommandEdit->setEnabled(command->parameters->flags() & ICommandParams::CAN_EDIT);

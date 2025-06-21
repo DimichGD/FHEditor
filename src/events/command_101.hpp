@@ -17,6 +17,7 @@ struct Command_101_Params: ICommandParams
 
 	int code() override { return 101; }
 	void read(const std::string &parameters) override;
+	void read(const std::vector<glz::json_t> &parameters) override;
 	auto write() -> std::string override;
 
 	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; };

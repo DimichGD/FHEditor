@@ -17,6 +17,11 @@ void CommandComment::read(const std::string &str)
 	line = std::get<0>(params);
 }
 
+void CommandComment::read(const std::vector<glz::json_t> &parameters)
+{
+	line = QString::fromStdString(parameters[0].as<std::string>());
+}
+
 std::string CommandComment::write()
 {
 	std::tuple<QString> params;
@@ -53,6 +58,11 @@ void CommandCommentLine::read(const std::string &str)
 		qDebug() << QString::fromStdString(glz::format_error(err));
 
 	line = std::get<0>(params);
+}
+
+void CommandCommentLine::read(const std::vector<glz::json_t> &parameters)
+{
+	line = QString::fromStdString(parameters[0].as<std::string>());
 }
 
 std::string CommandCommentLine::write()

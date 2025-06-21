@@ -1,6 +1,5 @@
 #include "command_simple.hpp"
 
-
 void CommandSimple::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	switch (codeVar)

@@ -18,7 +18,7 @@
 #include <QFile>
 #include <QDebug>
 
-template <>
+/*template <>
 struct glz::from<glz::JSON, Command>
 {
 	template <auto Opts>
@@ -93,8 +93,28 @@ struct glz::to<glz::JSON, QSharedPointer<ICommandParams>>
 	{
 		serialize<JSON>::op<glz::opts{.raw = true}>(value->write(), ctx, it, end);
 	}
+};*/
+
+template <>
+struct glz::meta<Command>
+{
+	using T = Command;
+	static constexpr auto value = object("code", &T::code,
+										 "indent", &T::indent,
+										 "parameters", &T::jsonValues);
 };
 
+/*template <>
+struct glz::from<glz::JSON, Command>
+{
+	template <auto Opts>
+	static void op(Command& value, auto&&... args)
+	{
+		parse<JSON>::op<Opts>(value, args...);
+		//value.parameters = CommandFactory::createCommand2(value.code);
+		//value.parameters->read(value.jsonValues);
+	}
+};*/
 
 
 /*template <>

@@ -1,5 +1,6 @@
 #pragma once
-
+#include <cstdint>
+#include "glaze/json/json_t.hpp"
 #include <QString>
 #include <QPainter>
 #include <QSharedPointer>
@@ -15,6 +16,7 @@ struct ICommandParams
 	virtual int code() { return -1; };
 	virtual void drawImpl(QPainter *painter, bool selected, QRect &rect) = 0;
 	virtual void read(const std::string &parameters) = 0;
+	virtual void read(const std::vector<glz::json_t> &parameters) = 0;
 	virtual auto write() -> std::string = 0;
 
 	virtual int flags() = 0;

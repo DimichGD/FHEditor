@@ -1,21 +1,30 @@
 #pragma once
 #include "base_command.hpp"
+#include "glaze/json/json_t.hpp"
 #include <QAbstractItemModel>
 #include <vector>
 #include <list>
 
+/*struct CommandParams
+{
+	std::vector<glz::json_t> jsonValues;
+	QSharedPointer<ICommandParams> parameters;
+};*/
+
 struct Command
 {
-	using It = std::list<Command>::iterator;
+	using Iterator = std::list<Command>::iterator;
 
-	static It iterFromIndex(const QModelIndex &index)
+	static Iterator iterFromIndex(const QModelIndex &index)
 	{
-		return index.data(Qt::UserRole + 1).value<Command::It>();
+		return index.data(Qt::UserRole + 1).value<Command::Iterator>();
 	}
 
 	int code;
 	int indent;
 	QSharedPointer<ICommandParams> parameters;
+	std::vector<glz::json_t> jsonValues;
+	//CommandParams parameters;
 };
 
 struct Event

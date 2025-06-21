@@ -24,6 +24,11 @@ void CommandSound::read(const std::string &parameters)
 	sound = std::get<0>(params);
 }
 
+void CommandSound::read(const std::vector<glz::json_t> &parameters)
+{
+	sound = glz::read_json<Sound>(parameters[0]).value();
+}
+
 std::string CommandSound::write()
 {
 	std::tuple<Sound> params = std::tie(sound);

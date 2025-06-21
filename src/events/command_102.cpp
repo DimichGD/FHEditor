@@ -52,6 +52,15 @@ void Command_102::read(const std::string &parameters)
 	value_3 = std::get<4>(params);
 }
 
+void Command_102::read(const std::vector<glz::json_t> &parameters)
+{
+	choices = { "123", "321" };
+	value_0 = parameters[1].as<int>();
+	value_1 = parameters[2].as<int>();
+	value_2 = parameters[3].as<int>();
+	value_3 = parameters[4].as<int>();
+}
+
 std::string Command_102::write()
 {
 	std::tuple<std::vector<std::string>, int, int, int, int> params;

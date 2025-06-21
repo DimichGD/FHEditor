@@ -46,6 +46,11 @@ void Command_401_Params::read(const std::string &str)
 	line = std::get<0>(params);
 }
 
+void Command_401_Params::read(const std::vector<glz::json_t> &parameters)
+{
+	line = QString::fromStdString(parameters[0].as<std::string>());
+}
+
 std::string Command_401_Params::write()
 {
 	std::tuple<QString> params;

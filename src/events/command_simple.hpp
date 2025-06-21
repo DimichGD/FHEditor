@@ -6,8 +6,9 @@ struct CommandSimple: ICommandParams
 	CommandSimple(int codeVar) { this->codeVar = codeVar;  }
 
 	int codeVar;
-	int code() override { return 404; }
+	int code() override { return codeVar; }
 	void read(const std::string &str) override { (void)str; };
+	void read(const std::vector<glz::json_t> &parameters) override { (void)parameters; }
 	auto write() -> std::string override { return "[]"; };
 
 	int flags() override { return 0; };

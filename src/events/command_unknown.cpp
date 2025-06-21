@@ -18,6 +18,11 @@ void Command_Unknown::read(const std::string &str)
 	parameters = str;
 }
 
+void Command_Unknown::read(const std::vector<glz::json_t> &parameters)
+{
+	this->parameters = ""; //parameters[0].get_string();
+}
+
 std::string Command_Unknown::write()
 {
 	return parameters;

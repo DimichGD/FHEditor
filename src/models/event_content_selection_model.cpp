@@ -38,7 +38,7 @@ void EventContentSelectionModel::select(const QItemSelection &selection, Selecti
 	QModelIndex first = selection[0].indexes()[0];
 	QModelIndex last = selection[0].indexes()[0];
 
-	Command::It command = first.data(Qt::UserRole + 1).value<Command::It>();
+	Command::Iterator command = first.data(Qt::UserRole + 1).value<Command::Iterator>();
 	int startCode = command->code;
 	int startIndent = command->indent;
 	auto it = codesMap.find(startCode);

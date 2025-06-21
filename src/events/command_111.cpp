@@ -24,24 +24,24 @@ QString signToString(int sign)
 	return "?";
 }
 
-QString switchCondToString(std::vector<std::variant<int, std::string, bool>> &condData)
+QString switchCondToString(std::vector<std::variant<double, std::string, bool>> &condData)
 {
-	int switchId = std::get<int>(condData[1]);
-	int toggleIndex = std::get<int>(condData[2]);
+	int switchId = std::get<double>(condData[1]);
+	int toggleIndex = std::get<double>(condData[2]);
 
 	return QString("%1 Switch is %2")
 			.arg(Database::Get()->switchName(switchId),
 				 toggleToString(toggleIndex));
 }
 
-QString variableCondToString(std::vector<std::variant<int, std::string, bool>> &condData)
+QString variableCondToString(std::vector<std::variant<double, std::string, bool>> &condData)
 {
-	int variableId = std::get<int>(condData[1]);
-	int signIndex = std::get<int>(condData[4]);
-	int numberOrVariableId = std::get<int>(condData[3]);
+	int variableId = std::get<double>(condData[1]);
+	int signIndex = std::get<double>(condData[4]);
+	int numberOrVariableId = std::get<double>(condData[3]);
 	Database *db = Database::Get();
 
-	if (std::get<int>(condData[2]) == 0)
+	if (std::get<double>(condData[2]) == 0)
 	{
 		return QString("%1 %2 %3")
 				.arg(db->variableName(variableId), signToString(signIndex))
@@ -59,19 +59,19 @@ QString variableCondToString(std::vector<std::variant<int, std::string, bool>> &
 	}
 }
 
-QString selfSwitchCondToString(std::vector<std::variant<int, std::string, bool>> &condData)
+QString selfSwitchCondToString(std::vector<std::variant<double, std::string, bool>> &condData)
 {
 	QString switchName = QString::fromStdString(std::get<std::string>(condData[1]));
-	int toggleIndex = std::get<int>(condData[2]);
+	int toggleIndex = std::get<double>(condData[2]);
 
 	return QString("Self Switch %1 is %2")
 			.arg(switchName, toggleToString(toggleIndex));
 }
 
-QString timerCondToString(std::vector<std::variant<int, std::string, bool>> &condData)
+QString timerCondToString(std::vector<std::variant<double, std::string, bool>> &condData)
 {
-	int timeInSecs = std::get<int>(condData[1]);
-	int toggleIndex = std::get<int>(condData[2]);
+	int timeInSecs = std::get<double>(condData[1]);
+	int toggleIndex = std::get<double>(condData[2]);
 	int mins = timeInSecs / 60;
 	int secs = timeInSecs % 60;
 
@@ -104,7 +104,24 @@ void Command_111::read(const std::string &parameters)
 	if (err)
 		qDebug() << QString::fromStdString(parameters) << QString::fromStdString(glz::format_error(err));
 
-	type = Type(std::get<int>(condData[0]));
+	type = Type(std::get<double>(condData[0]));
+}
+
+void Command_111::read(const std::vector<glz::json_t> &parameters)
+{
+	for (size_t i = 0; i < parameters.size(); i++)
+	{
+		std::variant<double, std::string, bool> value;
+		condData.push_back(glz::read_json<std::variant<double, std::string, bool>>(parameters[i]).value());
+		/*if (parameters[i].holds<std::string>())
+			qDebug()
+					<< "String!!!"
+					<< QString::fromStdString(parameters[i].as<std::string>())
+					<< QString::fromStdString(std::get<std::string>(condData[i]));*/
+	}
+
+	type = Type(std::get<double>(condData[0]));
+	//qDebug() << "stub";
 }
 
 std::string Command_111::write()

@@ -55,6 +55,14 @@ void Command_101_Params::read(const std::string &parameters)
 	windowPosition = std::get<3>(params);
 }
 
+void Command_101_Params::read(const std::vector<glz::json_t> &parameters)
+{
+	faceName = QString::fromStdString(parameters[0].as<std::string>());
+	faceIndex = parameters[1].as<int>();
+	background = parameters[2].as<int>();
+	windowPosition = parameters[3].as<int>();
+}
+
 std::string Command_101_Params::write()
 {
 	std::tuple<QString, int, int, int> params;

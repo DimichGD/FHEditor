@@ -10,7 +10,7 @@
 #include <QMenu>
 
 //Q_DECLARE_METATYPE(QSharedPointer<ICommandParams>);
-Q_DECLARE_METATYPE(Command::It);
+Q_DECLARE_METATYPE(Command::Iterator);
 
 
 CommonEventsTab::CommonEventsTab(QWidget *parent):

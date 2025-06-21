@@ -17,7 +17,7 @@ struct Command_111: ICommandParams
 	std::array<int, 3> timerCond;
 	std::array<int, 3> actorInPartyCond;*/
 	Type type;
-	std::vector<std::variant<int, std::string, bool>> condData;
+	std::vector<std::variant<double, std::string, bool>> condData;
 
 	int code() override { return 111; }
 
@@ -25,6 +25,7 @@ struct Command_111: ICommandParams
 
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
 	void read(const std::string &parameters) override;
+	void read(const std::vector<glz::json_t> &parameters) override;
 	auto write() -> std::string override;
 
 	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; }

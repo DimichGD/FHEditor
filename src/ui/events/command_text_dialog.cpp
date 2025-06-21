@@ -11,7 +11,7 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 {
 	ui->setupUi(this);
 
-	Command::It command = indices[0].data(Qt::UserRole + 1).value<Command::It>();
+	Command::Iterator command = indices[0].data(Qt::UserRole + 1).value<Command::Iterator>();
 	indent = command->indent;
 
 	if (editing)

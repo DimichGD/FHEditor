@@ -50,3 +50,8 @@ void DirectoryListView::setMode(PickerType type, QString itemName)
 	setCurrentIndex(model->index(selectedRow, 0));
 }
 
+QString DirectoryListView::path()
+{
+	return dir.absolutePath();
+}
+

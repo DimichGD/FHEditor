@@ -2,11 +2,9 @@
 #include "command_sound.hpp"
 #include "command_factory.hpp"
 #include "ui_play_sound_dialog.h"
-#include "settings.hpp"
 #include "event.hpp"
 
-#include <QDir>
-#include <QFile>
+#include <QMediaPlayer>
 #include <QAudioOutput>
 
 PlaySoundDialog::PlaySoundDialog(CommandSound::Type type, bool editing, QModelIndex index, QWidget *parent)
@@ -15,23 +13,10 @@ PlaySoundDialog::PlaySoundDialog(CommandSound::Type type, bool editing, QModelIn
 	ui->setupUi(this);
 	this->type = type;
 
-	switch (type)
-	{
-		case CommandSound::BGM: dir = QDir(Settings::Get()->lastPath + "/audio/bgm"); break;
-		case CommandSound::BGS: dir = QDir(Settings::Get()->lastPath + "/audio/bgs"); break;
-		case CommandSound::ME: dir = QDir(Settings::Get()->lastPath + "/audio/me"); break;
-		case CommandSound::SE: dir = QDir(Settings::Get()->lastPath + "/audio/se"); break;
-	}
-
-	QStringList stringList = dir.entryList({ "*.rpgmvo", "*.ogg" }, QDir::Files | QDir::NoDotAndDotDot);
-	model = new QStandardItemModel(stringList.size() + 1, 1, ui->listView);
-	model->setItem(0, new QStandardItem("None"));
-
-	Command::It command = index.data(Qt::UserRole + 1).value<Command::It>();
+	//Command::It command = index.data(Qt::UserRole + 1).value<Command::It>();
+	Command::It command = Command::iterFromIndex(index);
 	indent = command->indent;
 
-	int row = 1;
-	int selectedRow = -1;
 	QString expectedString;
 	if (editing)
 	{
@@ -45,21 +30,16 @@ PlaySoundDialog::PlaySoundDialog(CommandSound::Type type, bool editing, QModelIn
 		ui->panSpinBox->setValue(params->sound.pan);
 	}
 
-	for (const QString &name: std::as_const(stringList))
-	{
-		QString nameWithoutExt = name.chopped(name.size() - name.lastIndexOf('.'));
-		if (editing && nameWithoutExt == expectedString)
-			selectedRow = row;
-
-		model->setItem(row++, new QStandardItem(nameWithoutExt));
-	}
-
-	ui->listView->setModel(model);
-	if (selectedRow != -1)
-		ui->listView->setCurrentIndex(model->index(selectedRow, 0));
+	ui->listView->setMode(PickerType(type), expectedString);
 
 	connect(ui->playButton, &QPushButton::clicked, this, &PlaySoundDialog::playButtonClicked);
 	connect(ui->stopButton, &QPushButton::clicked, this, &PlaySoundDialog::stopButtonClicked);
+	connect(ui->volumeSlider, &QSlider::sliderMoved, ui->volumeSpinBox, &QSpinBox::setValue);
+	connect(ui->volumeSpinBox, &QSpinBox::valueChanged, ui->volumeSlider, &QSlider::setValue);
+	connect(ui->pitchSlider, &QSlider::sliderMoved, ui->pitchSpinBox, &QSpinBox::setValue);
+	connect(ui->pitchSpinBox, &QSpinBox::valueChanged, ui->pitchSlider, &QSlider::setValue);
+	connect(ui->panSlider, &QSlider::sliderMoved, ui->panSpinBox, &QSpinBox::setValue);
+	connect(ui->panSpinBox, &QSpinBox::valueChanged, ui->panSlider, &QSlider::setValue);
 
 	mediaPlayer = new QMediaPlayer(this);
 	audioOutput = new QAudioOutput(this);
@@ -82,22 +62,10 @@ std::list<Command> PlaySoundDialog::resultCommands()
 	int volume = ui->volumeSlider->value();
 	int pitch = ui->pitchSlider->value();
 	int pan = ui->panSlider->value();
-	auto rootParams = CommandFactory::createCommand<CommandSound>(type, Sound { name, pan, pitch, volume });
-	/*switch (type)
-	{
-		case Command_250::BGM:
-			resultList.push_back({ CommandFactory::PLAY_BGM, indent, rootParams });
-			break;
-		case Command_250::BGS:
-		case Command_250::ME:
-		case Command_250::SE:
-			resultList.push_back({ CommandFactory::PLAY_SE, indent, rootParams });
-			break;
-	}*/
+	Sound sound { name, pan, pitch, volume };
 
+	auto rootParams = CommandFactory::createCommand<CommandSound>(type, sound);
 	resultList.push_back({ CommandFactory::Code(type), indent, rootParams });
-
-	//resultList.push_back({ CommandFactory::PLAY_SE, indent, rootParams });
 
 	return resultList;
 }
@@ -107,11 +75,15 @@ void PlaySoundDialog::playButtonClicked()
 	if (!ui->listView->currentIndex().isValid())
 		return;
 
-	QUrl url = QUrl::fromLocalFile(dir.absolutePath()
-				+ "/" + ui->listView->currentIndex().data().toString() + ".ogg");
+	if (ui->listView->currentIndex().row() == 0)
+		return;
+
+	QUrl url = QUrl::fromLocalFile(ui->listView->path()
+					+ "/" + ui->listView->currentIndex().data().toString() + ".ogg");
 
 	mediaPlayer->setSource(url);
-	audioOutput->setVolume(0.5f);
+	audioOutput->setVolume(ui->volumeSlider->value() * 0.01f);
+	mediaPlayer->setPlaybackRate(ui->pitchSlider->value() * 0.01f);
 	mediaPlayer->play();
 }
 

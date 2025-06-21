@@ -17,7 +17,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,5">
      <item>
-      <widget class="QListView" name="listView"/>
+      <widget class="DirectoryListView" name="listView"/>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -46,11 +46,11 @@
             <property name="maximum">
              <number>100</number>
             </property>
-            <property name="singleStep">
-             <number>5</number>
-            </property>
             <property name="value">
              <number>90</number>
+            </property>
+            <property name="tracking">
+             <bool>true</bool>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -171,6 +171,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DirectoryListView</class>
+   <extends>QListView</extends>
+   <header>directory_list_view.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

@@ -15,8 +15,8 @@ enum PickerType
 	PARALLAX,
 	CHARACTER,
 	TILESET,
-	BGM, BGS, ME, SE,
 	MOVIE,
+	BGM = 241, BGS = 245, ME = 249, SE = 250,
 };
 
 class DirectoryListView: public QListView
@@ -26,6 +26,7 @@ class DirectoryListView: public QListView
 public:
 	DirectoryListView(QWidget *parent = nullptr): QListView(parent) {}
 	void setMode(PickerType type, QString itemName);
+	QString path();
 
 private:
 	QDir dir;

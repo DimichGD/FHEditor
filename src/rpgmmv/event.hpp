@@ -1,11 +1,17 @@
 #pragma once
 #include "base_command.hpp"
+#include <QAbstractItemModel>
 #include <vector>
 #include <list>
 
 struct Command
 {
 	using It = std::list<Command>::iterator;
+
+	static It iterFromIndex(const QModelIndex &index)
+	{
+		return index.data(Qt::UserRole + 1).value<Command::It>();
+	}
 
 	int code;
 	int indent;

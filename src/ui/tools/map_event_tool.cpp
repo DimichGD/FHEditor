@@ -8,12 +8,12 @@
 	cursor = static_cast<QGraphicsRectItem *>(scene->items().at(0)); // TODO: sanity check
 }*/
 
-void MapEventTool::mousePress(int x, int y)
+void MapEventTool::mousePress(QPoint pos)
 {
-	cursor->setPos(x * tileSize, y * tileSize);
+	cursor->setPos(pos.x() * tileSize, pos.y() * tileSize);
 }
 
-void MapEventTool::mouseMove(int x, int y)
+void MapEventTool::mouseMove(QPoint pos)
 {
 	//
 }
@@ -23,9 +23,9 @@ void MapEventTool::mouseRelease()
 	//
 }
 
-void MapEventTool::mouseDoubleClick(int x, int y)
+void MapEventTool::mouseDoubleClick(QPoint pos)
 {
-	auto list = scene->items(QPoint(x * 48, y * 48));
+	auto list = scene->items(QPoint(pos.x() * tileSize, pos.y() * tileSize));
 	list.removeOne(cursor);
 
 	if (list.size() > 0)
@@ -41,10 +41,10 @@ void MapEventTool::mouseDoubleClick(int x, int y)
 	}
 	else
 	{
-		MapEvent *event = tileMap->addNewEvent(x, y);
+		MapEvent *event = tileMap->addNewEvent(pos.x(), pos.y());
 
 		EventGraphicsItem *item = new EventGraphicsItem(event);
-		item->setPos(x * tileSize, y * tileSize);
+		item->setPos(pos.x() * tileSize, pos.y() * tileSize);
 		item->setOpacity(EventGraphicsItem::drawFullItem ? 1.0f : 0.5f);
 		scene->addItem(item);
 

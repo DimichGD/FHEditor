@@ -1,6 +1,6 @@
 #pragma once
-
 #include "map_view_tool.hpp"
+#include "tilemap.hpp"
 
 class TilePaintTool : public MapViewTool
 {
@@ -13,10 +13,10 @@ public:
 
 	void activate() override {}
 	void deactivate() override {}
-	void mousePress(int x, int y) override;
-	void mouseMove(int, int) override;
+	void mousePress(QPoint pos) override;
+	void mouseMove(QPoint pos) override;
 	void mouseRelease() override;
-	void mouseDoubleClick(int, int) override {}
+	//void mouseDoubleClick(const QPoint &) override {}
 
 	void setCurrentLayer(int layer) { currentLayer = layer; }
 	void setCurrentTileSingle(TileSet::Set setIndex, int x, int y);

@@ -1,25 +1,20 @@
 #include "map_event_page.hpp"
 #include "ui_map_event_page.h"
 
-MapEventPage::MapEventPage(MapEventPagesModel *model, int index, Page *page, QWidget *parent): QWidget(parent), ui(new Ui::MapEventPage)
+MapEventPage::MapEventPage(MapEventPagesModel *model, int index, Page *page, QWidget *parent)
+	: QWidget(parent), ui(new Ui::MapEventPage)
 {
 	ui->setupUi(this);
 
-	//Event *event = new Event();
-	//event->list = page->list;
 	ui->eventContentList->loadList(&page->list);
 	ui->switch1Button->setSource(SimpleChooserDialog::SWITCH);
 	ui->switch2Button->setSource(SimpleChooserDialog::SWITCH);
 	ui->variableButton->setSource(SimpleChooserDialog::VARIABLE);
 	ui->itemButton->setSource(SimpleChooserDialog::ITEM);
 
-	Image &image = page->image;
-	if (!image.characterName.isEmpty())
-	{
-		ui->imageLabel->setIconMode(ClickableLabel::CHARACTER, image.characterName);
-		if (image.tileId == 0)
-			ui->imageLabel->setIconIndex((image.direction / 2 - 1) * 3 + image.characterIndex * 3 + image.pattern);
-	}
+	if (!page->image.characterName.isEmpty())
+		if (page->image.tileId == 0)
+			ui->imageLabel->setIconImage(page->image);
 
 	mapper = new DataMapper(this);
 	mapper->setModel(model);
@@ -76,7 +71,7 @@ void MapEventPage::connectCheckBoxToWidget(QCheckBox *checkBox, QWidget *widget)
 			{ widget->setEnabled(state == Qt::Checked); });
 }
 
-void MapEventPage::connectCheckBoxToWidget(QCheckBox *checkBox, QList<QWidget *> widgets)
+/*void MapEventPage::connectCheckBoxToWidget(QCheckBox *checkBox, QList<QWidget *> widgets)
 {
 	connect(checkBox, &QCheckBox::stateChanged, this,
 			[&widgets](int state)
@@ -84,4 +79,4 @@ void MapEventPage::connectCheckBoxToWidget(QCheckBox *checkBox, QList<QWidget *>
 				for (auto &widget: widgets)
 					widget->setEnabled(state == Qt::Checked);
 			});
-}
+}*/

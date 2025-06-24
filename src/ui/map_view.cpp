@@ -250,7 +250,7 @@ void MapView::mousePressEvent(QMouseEvent *event)
 	pos.ry() = pos.y() / tileSize;
 	//lastTilePos = pos; // FIXME: do i need this?
 
-	currentTool->mousePress(pos.x(), pos.y());
+	currentTool->mousePress(pos);
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
@@ -302,7 +302,7 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
 	if (pos == lastTilePos)
 		return;
 
-	currentTool->mouseMove(pos.x(), pos.y());
+	currentTool->mouseMove(pos);
 
 	lastTilePos = pos;
 }
@@ -328,7 +328,7 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 	pos.rx() = pos.x() / tileSize;
 	pos.ry() = pos.y() / tileSize;
 
-	currentTool->mouseDoubleClick(pos.x(), pos.y());
+	currentTool->mouseDoubleClick(pos);
 }
 
 void MapView::startAsyncLoad()
@@ -357,7 +357,7 @@ void MapView::completeAsyncLoad()
 			int width = pixmap->width() / 12;
 			int height = pixmap->height() / 8;
 
-			if (image->characterName[0] == '$')
+			if (image->characterName[0] == '$') // TODO: '!' and '$' can be in the same string
 			{
 				width = pixmap->width() / 3;
 				height = pixmap->height() / 4;

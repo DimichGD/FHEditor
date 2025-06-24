@@ -12,12 +12,21 @@ SelectorButton::SelectorButton(QWidget *parent): QPushButton(parent)
 
 void SelectorButton::changeId(int id)
 {
-	try {
+	//try {
 	// TODO: do not get data from database, it need to be from uncommited copies
 	if (source == SimpleChooserDialog::ANIMATION)
 	{
-		Animation *value = Accessor<Animation>().value(id);
-		setText(value ? value->name : "?");
+		if (id == -1)
+			setText("Normal Attack");
+
+		else if (id == 0)
+			setText("None");
+
+		else
+		{
+			Animation *value = Accessor<Animation>().value(id);
+			setText(value ? value->name : "?");
+		}
 	}
 	else if (source == SimpleChooserDialog::STATE)
 	{
@@ -49,8 +58,8 @@ void SelectorButton::changeId(int id)
 		Event *value = Accessor<Event>().value(id);
 		setText(value ? value->name : "?");
 	}
-	} catch (std::exception &e) // TODO: remove this
-	{ qDebug() << "idChanged(" << id << ") exception with source" << source; }
+	//} catch (std::exception &e) // TODO: remove this
+	//{ qDebug() << "idChanged(" << id << ") exception with source" << source; }
 }
 
 void SelectorButton::buttonClicked(bool)

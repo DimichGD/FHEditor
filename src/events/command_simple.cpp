@@ -1,5 +1,24 @@
 #include "command_simple.hpp"
 
+int CommandSimple::flags()
+{
+	switch (codeVar)
+	{
+		case 112: return CAN_ADD | CAN_DELETE;
+		case 113: return CAN_ADD | CAN_DELETE;
+		case 217: return CAN_ADD | CAN_DELETE;
+		case 251: return CAN_ADD | CAN_DELETE;
+		case 352: return CAN_ADD | CAN_DELETE;
+		case 353: return CAN_ADD | CAN_DELETE;
+		case 404: return 0;
+		case 411: return 0;
+		case 412: return 0;
+		case 413: return 0;
+	}
+
+	return 0;
+}
+
 void CommandSimple::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	switch (codeVar)

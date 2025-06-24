@@ -16,6 +16,7 @@ struct Settings
 
 	int lastTabIndex = 0;
 	int mapToolIndex = 0;
+	int lastMapId = 0;
 
 	static Settings *Get();
 

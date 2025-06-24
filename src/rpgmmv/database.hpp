@@ -17,11 +17,11 @@
 #include <optional>
 #include <map>
 
-template<typename T>
+/*template<typename T>
 concept hasIconIndex = requires(T t)
 {
 	t.iconIndex;
-};
+};*/
 
 class Database
 {
@@ -90,11 +90,12 @@ class IAccessor
 public:
 	virtual ~IAccessor() = default;
 	virtual int size() = 0;
-	virtual bool hasElement(int index) = 0;
+	//virtual bool hasElement(int index) = 0;
 	virtual void clearElement(int index) = 0;
 	virtual void insertToEnd(int count) = 0;
 	virtual void removeFromEnd(int count) = 0;
 };
+
 
 template<typename T>
 class Accessor: public IAccessor
@@ -117,12 +118,6 @@ public:
 
 	const T *value(int id) const
 	{
-		if constexpr (std::is_same<T, Animation>::value)
-		{
-			id += 1; // FIXME: WTF is this?
-			// Handle negative ids via template tags?
-		}
-
 		if (id < 0 || id >= std::ssize(*storage))
 			return nullptr;
 
@@ -137,10 +132,10 @@ public:
 		return storage->size();
 	}
 
-	bool hasElement(int index) override
+	/*bool hasElement(int index) override
 	{
 		return value(index) != nullptr;
-	}
+	}*/
 
 	void clearElement(int index) override
 	{
@@ -152,7 +147,7 @@ public:
 	{
 		int nextId = storage->back().value().id + 1;
 		for (int i = 0; i < count; i++)
-			storage->push_back({{ .id = nextId++ }});
+			storage->emplace_back( T { .id = nextId++ } );
 	}
 
 	void removeFromEnd(int count) override

@@ -1,4 +1,5 @@
 #include "simple_chooser_dialog.hpp"
+#include "base_table.hpp"
 #include "database.hpp"
 #include "ui_simple_chooser_dialog.h"
 
@@ -15,39 +16,23 @@ QStandardItem *newItem(QString name, int id)
 }
 
 template<typename T>
-int readModel(QStandardItemModel *model, int targetId)
+void readModel(QStandardItemModel *model)
 {
-	int currentRow = 0;
-	int counter = 0;
 	for (auto item: Database::Get()->getStorage<T>())
 	{
-		if (item)
-		{
+		if (!item)
+			model->appendRow(newItem("", 0));
+
+		else
 			model->appendRow(newItem(item->name, item->id));
-			if (item->id == targetId)
-				currentRow = counter;
-
-			++counter;
-		}
 	}
-
-	return currentRow;
 }
 
-int readStrings(QStandardItemModel *model, const std::vector<QString> &strings, int targetId)
+void readStrings(QStandardItemModel *model, const std::vector<QString> &strings)
 {
-	int currentRow = 0;
 	int counter = 0;
 	for (auto &item: strings)
-	{
-		model->appendRow(newItem(item, counter));
-		if (counter == targetId)
-			currentRow = counter;
-
-		++counter;
-	}
-
-	return currentRow;
+		model->appendRow(newItem(item, counter++));
 }
 
 SimpleChooserDialog::SimpleChooserDialog(Source source, int targetId, QWidget *parent):
@@ -59,47 +44,49 @@ SimpleChooserDialog::SimpleChooserDialog(Source source, int targetId, QWidget *p
 	model = new QStandardItemModel(ui->listView);
 	model->setColumnCount(1);
 
-	int currentRow = 0;
 	if (source == ANIMATION)
-		currentRow = readModel<Animation>(model, targetId);
+	{
+		model->appendRow(newItem("Normal Attack", -1));
+		model->setData(model->index(1, 0), "None", Qt::DisplayRole);
+		readModel<Animation>(model);
+		++targetId;
+	}
 
 	else if (source == STATE)
-		currentRow = readModel<State>(model, targetId);
+		readModel<State>(model);
 
 	else if (source == SKILL)
-		currentRow = readModel<Skill>(model, targetId);
+		readModel<Skill>(model);
 
-	else if (source == SWITCH) // TODO: again, get from copy
-	{
-		currentRow = readStrings(model, Database::Get()->system()->switches, targetId);
-		ui->listView->setRowHidden(0, true);
-	}
+	else if (source == SWITCH)
+		readStrings(model, Database::Get()->system()->switches);
 
-	else if (source == VARIABLE) // TODO: again, get from copy
-	{
-		currentRow = readStrings(model, Database::Get()->system()->variables, targetId);
-		ui->listView->setRowHidden(0, true);
-	}
+	else if (source == VARIABLE)
+		readStrings(model, Database::Get()->system()->variables);
 
 	else if (source == SKILL)
-		currentRow = readModel<Skill>(model, targetId);
+		readModel<Skill>(model);
 
 	else if (source == ITEM)
-		currentRow = readModel<Item>(model, targetId);
+		readModel<Item>(model);
 
 	else if (source == COMMON_EVENT)
-		currentRow = readModel<Event>(model, targetId);
+		readModel<Event>(model);
 
 	else
 		return;
 
-	filterModel = new QSortFilterProxyModel(this);
+	if (source == ANIMATION)
+		filterModel = new QSortFilterProxyModel(this);
+	else
+		filterModel = new ProxyModel(this);
+
 	filterModel->setSourceModel(model);
 	filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
 	ui->listView->setModel(filterModel);
-	ui->listView->setCurrentIndex(filterModel->index(currentRow, 0));
-	ui->listView->scrollTo(filterModel->index(currentRow, 0));
+	ui->listView->setCurrentIndex(filterModel->mapFromSource(model->index(targetId, 0)));
+	ui->listView->scrollTo(filterModel->mapFromSource(model->index(targetId, 0)));
 
 	connect(ui->filterEdit, &QLineEdit::textChanged,
 			filterModel, &QSortFilterProxyModel::setFilterFixedString);

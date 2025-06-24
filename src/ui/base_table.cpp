@@ -91,5 +91,25 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
 	if (source_row == 0)
 		return false;
 
+	if (customFilter)
+		if (sourceModel()->data(sourceModel()->index(source_row, customFilterColumn), Qt::EditRole) != customFilterValue)
+			return false;
+
 	return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+}
+
+void ProxyModel::setFilterEditRole(int column, QVariant filter)
+{
+	// beginFilterChange(); TODO: Since Qt 6.9
+	customFilter = true;
+	customFilterColumn = column;
+	customFilterValue = filter;
+	invalidateFilter();
+}
+
+void ProxyModel::disableCustomFilter()
+{
+	// beginFilterChange(); TODO: Since Qt 6.9
+	customFilter = false;
+	invalidateFilter();
 }

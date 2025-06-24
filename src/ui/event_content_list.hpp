@@ -19,9 +19,14 @@ public slots:
 	void actionCommandNewTriggered(bool);
 	void actionCommandEditTriggered(bool);
 	void actionCommandDeleteTriggered(bool);
+	void contextMenuRequested(const QPoint &pos);
 
 private:
 	EventContentListModel *model = nullptr;
+	QMenu *contextMenu = nullptr;
+	QAction *actionCommandNew = nullptr;
+	QAction *actionCommandEdit = nullptr;
+	QAction *actionCommandDelete = nullptr;
 };
 
 

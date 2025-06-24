@@ -21,7 +21,7 @@ void ICommandParams::drawText(QPainter *painter, bool selected, QRect &rect, con
 	rect.adjust(textAdvance, 0, 0, 0);
 }
 
-std::string ICommandParams::checkExpected(glz::expected<std::string, glz::error_ctx> result)
+std::string ICommandParams::checkExpected(const glz::expected<std::string, glz::error_ctx> &result)
 {
 	if (!result.has_value())
 	{

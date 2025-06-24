@@ -10,5 +10,8 @@ public:
 	CommandDialog(QWidget *parent = nullptr): QDialog(parent) {}
 
 	virtual std::list<Command> resultCommands() = 0;
+
+protected:
+	int indent = 0;
 };
 

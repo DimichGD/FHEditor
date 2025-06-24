@@ -60,6 +60,7 @@ QSharedPointer<ICommandParams> CommandFactory::createCommand2(int code)
 		case LOOP:             command = createCommand<CommandSimple>(code); break;
 		case BREAK_LOOP:       command = createCommand<CommandSimple>(code); break;
 		case GATHER_FOLLOWERS: command = createCommand<CommandSimple>(code); break;
+		case WAIT:             command = createCommand<Command_230>(); break;
 		case PLAY_BGM:         command = createCommand<CommandSound>(CommandSound::BGM); break;
 		case PLAY_BGS:         command = createCommand<CommandSound>(CommandSound::BGS); break;
 		case PLAY_ME:          command = createCommand<CommandSound>(CommandSound::ME); break;

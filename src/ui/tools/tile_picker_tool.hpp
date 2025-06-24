@@ -7,18 +7,17 @@ class TilePickerTool: public MapViewTool
 	Q_OBJECT
 
 public:
-	//TilePickerTool(QGraphicsScene *scene, QObject *parent = nullptr);
 	using MapViewTool::MapViewTool;
 
 	void activate() override {}
 	void deactivate() override {}
-	void mousePress(int x, int y) override;
-	void mouseMove(int, int) override {}
+	void mousePress(QPoint pos) override;
+	//void mouseMove(const QPoint &) override {}
 	void mouseRelease() override {}
-	void mouseDoubleClick(int, int) override {}
+	//void mouseDoubleClick(const QPoint &) override {}
 
 signals:
-	void pickTile(int tileId, int buttonIndex);
+	void pickTile(int tileId, int buttonIndex); // TODO: better naming
 
 private:
 	int buttonGroupIndex(int tileId);

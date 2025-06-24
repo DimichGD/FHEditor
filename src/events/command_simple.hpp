@@ -10,7 +10,7 @@ struct CommandSimple: ICommandParams
 	void read(JsonValue &parameters) override { (void)parameters; }
 	auto write() -> std::string override { return "[]"; };
 
-	int flags() override { return 0; };
+	int flags() override;
 
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
 };

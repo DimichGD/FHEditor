@@ -26,6 +26,20 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="autorunButton">
+         <property name="text">
+          <string>Autorun</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="parallelButton">
+         <property name="text">
+          <string>Parallel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLineEdit" name="eventsNameFilter">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -213,11 +227,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>EventContentList</class>
-   <extends>QListView</extends>
-   <header>event_content_list.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>BaseTable</class>
    <extends>QTableView</extends>
    <header>base_table.hpp</header>
@@ -226,6 +235,11 @@
    <class>SelectorButton</class>
    <extends>QPushButton</extends>
    <header>selector_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>EventContentList</class>
+   <extends>QListView</extends>
+   <header>event_content_list.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

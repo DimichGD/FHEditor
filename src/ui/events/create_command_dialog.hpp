@@ -18,11 +18,23 @@ public:
 
 protected:
 	void openShowTextDialog();
+	void openWaitDialog();
+	void openPlayBGMDialog();
+	void openPlayBGSDialog();
+	void openPlayMEDialog();
 	void openPlaySEDialog();
+	void makeGatherFollowersCommand();
+	void makeStopSECommand();
+	void makeLoopCommand();
+	void makeBreakLoopCommand();
+	void makeOpenSaveCommand();
+	void makeGameOverCommand();
 
 private:
 	Ui::CreateCommandDialog *ui = nullptr;
 	CommandDialog *dialog = nullptr;
-	QModelIndex currentIndex;
+	int indent = 0;
+	QModelIndex currentIndex {};
+	std::list<Command> commands {};
 };
 

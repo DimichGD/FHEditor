@@ -1,39 +1,40 @@
 #include "tile_paint_tool.hpp"
 #include <QGraphicsRectItem>
+#include <QGraphicsScene>
 
-/*TilePaintTool::TilePaintTool(QGraphicsScene *scene, QGraphicsRectItem *cursor, QObject *parent): MapViewTool(parent)
+void TilePaintTool::mousePress(QPoint pos)
 {
-	this->scene = scene;
-	cursor = static_cast<QGraphicsRectItem *>(scene->items().at(0)); // TODO: sanity check
-	//qDebug() << scene->items().at(0)->data(0).toString();
-}*/
-
-void TilePaintTool::mousePress(int x, int y)
-{
-	QPoint pos(x, y); // rename... something
-	int index = 0;
-	for (int y = pos.y(); y < pos.y() + currentMultipleTileSize.height(); y++)
+	if (currentMultipleTileSize.width() * currentMultipleTileSize.height() == 1)
 	{
-		for (int x = pos.x(); x < pos.x() + currentMultipleTileSize.width(); x++)
-		{
-			tileMap->putTile(x, y, currentLayer, currentMultipleTileInfoList[index].id);
-			// FIXME: clamp x and y by map size
-			++index;
-		}
+		tileMap->putTile(pos.x(), pos.y(), currentLayer, currentMultipleTileInfoList[0].id);
+		QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize);
+		scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
 	}
+	else
+	{
+		int index = 0;
+		for (int y = pos.y(); y < pos.y() + currentMultipleTileSize.height(); y++)
+		{
+			for (int x = pos.x(); x < pos.x() + currentMultipleTileSize.width(); x++)
+			{
+				tileMap->putTile(x, y, currentLayer, currentMultipleTileInfoList[index].id);
+				// FIXME: clamp x and y by map size
+				++index;
+			}
+		}
 
-	QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize,
-		currentMultipleTileSize.width() * tileSize, currentMultipleTileSize.height() * tileSize);
-	scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
+		QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize,
+			currentMultipleTileSize.width() * tileSize,
+			currentMultipleTileSize.height() * tileSize);
+		scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
+	}
 
 	isPainting = true;
 	paintingStart = pos;
 }
 
-void TilePaintTool::mouseMove(int x, int y)
+void TilePaintTool::mouseMove(QPoint pos)
 {
-	QPoint pos(x, y); // rename... something
-
 	pos.rx() = std::min(tileMap->width() - 1, std::max(0, pos.x()));
 	pos.ry() = std::min(tileMap->height() - 1, std::max(0, pos.y()));
 
@@ -49,24 +50,33 @@ void TilePaintTool::mouseMove(int x, int y)
 
 	if (isPainting)
 	{
-		int w = currentMultipleTileSize.width();
-		int h = currentMultipleTileSize.height();
-		for (int y = pos.y(); y < pos.y() + h; y++)
+		if (currentMultipleTileSize.width() * currentMultipleTileSize.height() == 1)
 		{
-			for (int x = pos.x(); x < pos.x() + w; x++)
-			{
-				int index = (std::abs(y - paintingStart.y()) % h) * w
-						+ (std::abs(x - paintingStart.x()) % w);
-				tileMap->putTile(x, y, currentLayer, currentMultipleTileInfoList[index].id);
-				// FIXME: handle zero tile in any set
-				++index;
-			}
+			tileMap->putTile(pos.x(), pos.y(), currentLayer, currentMultipleTileInfoList[0].id);
+			QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize);
+			scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
 		}
+		else
+		{
+			int w = currentMultipleTileSize.width();
+			int h = currentMultipleTileSize.height();
+			for (int y = pos.y(); y < pos.y() + h; y++)
+			{
+				for (int x = pos.x(); x < pos.x() + w; x++)
+				{
+					int index = (std::abs(y - paintingStart.y()) % h) * w
+							+ (std::abs(x - paintingStart.x()) % w);
+					tileMap->putTile(x, y, currentLayer, currentMultipleTileInfoList[index].id);
+					// FIXME: handle zero tile in any set
+					++index;
+				}
+			}
 
-		QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize,
-			currentMultipleTileSize.width() * tileSize,
-			currentMultipleTileSize.height() * tileSize);
-		scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
+			QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize,
+				currentMultipleTileSize.width() * tileSize,
+				currentMultipleTileSize.height() * tileSize);
+			scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
+		}
 	}
 }
 

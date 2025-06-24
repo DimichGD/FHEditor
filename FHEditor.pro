@@ -5,7 +5,7 @@ CONFIG -= debug_and_release debug_and_release_target qml_debug
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 INCLUDEPATH += src src/rpgmmv src/events src/models \
-                src/ui src/ui/tabs src/ui/events src/ui/map_view src/ui/dialogs src/ui/widgets
+                src/ui src/ui/tabs src/ui/events src/ui/tools src/ui/dialogs src/ui/widgets
 OBJECTS_DIR = obj
 MOC_DIR = moc
 UI_DIR = ui
@@ -24,6 +24,7 @@ SOURCES += \
     src/events/command_simple.cpp \
     src/events/command_sound.cpp \
     src/events/command_unknown.cpp \
+    src/events/parameters_strings.cpp \
     src/main.cpp \
     src/models/animations_model.cpp \
     src/models/base_model.cpp \
@@ -39,19 +40,20 @@ SOURCES += \
     src/rpgmmv/effect.cpp \
     src/rpgmmv/json_stuff.cpp \
     src/rpgmmz/system_mz.cpp \
-    src/ui/dialogs/games_list_dialog.cpp \
     src/ui/events/command_dialog.cpp \
     src/ui/events/create_command_dialog.cpp \
     src/ui/events/command_text_dialog.cpp \
+    src/ui/events/play_sound_dialog.cpp \
+    src/ui/events/wait_dialog.cpp \
     src/ui/dialogs/change_maximum_dialog.cpp \
+    src/ui/dialogs/games_list_dialog.cpp \
     src/ui/dialogs/icon_picker_dialog.cpp \
     src/ui/dialogs/item_effect_dialog.cpp \
     src/ui/dialogs/simple_chooser_dialog.cpp \
-    src/ui/events/play_sound_dialog.cpp \
-    src/ui/map_view/map_event_tool.cpp \
-    src/ui/map_view/map_view_tool.cpp \
-    src/ui/map_view/tile_paint_tool.cpp \
-    src/ui/map_view/tile_picker_tool.cpp \
+    src/ui/menu.cpp \
+    src/ui/tools/map_event_tool.cpp \
+    src/ui/tools/tile_paint_tool.cpp \
+    src/ui/tools/tile_picker_tool.cpp \
     src/ui/settings.cpp \
     src/ui/tabs/animations_tab.cpp \
     src/ui/tabs/armors_tab.cpp \
@@ -92,6 +94,7 @@ HEADERS += \
     src/events/command_sound.hpp \
     src/events/command_unknown.hpp \
     src/events/json_value.hpp \
+    src/events/parameters_strings.hpp \
     src/models/animations_model.hpp \
     src/models/base_model.hpp \
     src/models/common_events_model.hpp \
@@ -108,6 +111,7 @@ HEADERS += \
     src/rpgmmv/database.hpp \
     src/rpgmmv/effect.hpp \
     src/rpgmmv/event.hpp \
+    src/rpgmmv/image.hpp \
     src/rpgmmv/item.hpp \
     src/rpgmmv/json_qstring.hpp \
     src/rpgmmv/json_stuff.hpp \
@@ -123,40 +127,42 @@ HEADERS += \
     src/rpgmmv/weapon.hpp \
     src/rpgmmz/system_mz.hpp \
     src/ui/dialogs/games_list_dialog.hpp \
+    src/ui/dialogs/change_maximum_dialog.hpp \
+    src/ui/dialogs/icon_picker_dialog.hpp \
+    src/ui/dialogs/simple_chooser_dialog.hpp \
+    src/ui/dialogs/item_effect_dialog.hpp \
     src/ui/events/command_dialog.hpp \
     src/ui/events/play_sound_dialog.hpp \
-    src/ui/map_view/map_event_tool.hpp \
-    src/ui/map_view/map_view_tool.hpp \
-    src/ui/map_view/tile_paint_tool.hpp \
-    src/ui/map_view/tile_picker_tool.hpp \
-    src/ui/settings.hpp \
-    src/ui/tabs/animations_tab.hpp \
-    src/ui/widgets/attrib_combo_box.hpp \
-    src/ui/dialogs/change_maximum_dialog.hpp \
-    src/ui/widgets/clickable_label.hpp \
-    src/ui/command_factory.hpp \
-    src/ui/data_mapper.hpp \
-    src/ui/event_content_list.hpp \
     src/ui/events/create_command_dialog.hpp \
-    src/ui/dialogs/icon_picker_dialog.hpp \
-    src/ui/images.hpp \
-    src/ui/widgets/directory_list_view.hpp \
-    src/ui/widgets/selector_button.hpp \
-    src/ui/dialogs/simple_chooser_dialog.hpp \
-    src/ui/tabs/armors_tab.hpp \
-    src/ui/base_table.hpp \
-    src/ui/tabs/common_events_tab.hpp \
     src/ui/events/command_text_dialog.hpp \
-    src/ui/icon_picker_view.hpp \
-    src/ui/dialogs/item_effect_dialog.hpp \
+    src/ui/events/wait_dialog.hpp \
+    src/ui/menu.hpp \
+    src/ui/tabs/animations_tab.hpp \
+    src/ui/tabs/armors_tab.hpp \
+    src/ui/tabs/common_events_tab.hpp \
     src/ui/tabs/items_tab.hpp \
-    src/ui/main_window.hpp \
-    src/ui/map_view.hpp \
     src/ui/tabs/map_event_page.hpp \
     src/ui/tabs/map_events_tab.hpp \
     src/ui/tabs/map_tab.hpp \
     src/ui/tabs/types_tab.hpp \
     src/ui/tabs/weapons_tab.hpp \
+    src/ui/tools/map_event_tool.hpp \
+    src/ui/tools/map_view_tool.hpp \
+    src/ui/tools/tile_paint_tool.hpp \
+    src/ui/tools/tile_picker_tool.hpp \
+    src/ui/widgets/attrib_combo_box.hpp \
+    src/ui/widgets/directory_list_view.hpp \
+    src/ui/widgets/selector_button.hpp \
+    src/ui/widgets/clickable_label.hpp \
+    src/ui/command_factory.hpp \
+    src/ui/data_mapper.hpp \
+    src/ui/event_content_list.hpp \
+    src/ui/images.hpp \
+    src/ui/base_table.hpp \
+    src/ui/icon_picker_view.hpp \
+    src/ui/main_window.hpp \
+    src/ui/map_view.hpp \
+    src/ui/settings.hpp \
     src/ui/tile_picker_view.hpp \
     src/ui/tilemap.hpp
 
@@ -169,6 +175,7 @@ FORMS += \
     src/ui/events/command_text_dialog.ui \
     src/ui/events/create_command_dialog.ui \
     src/ui/events/play_sound_dialog.ui \
+    src/ui/events/wait_dialog.ui \
     src/ui/main_window.ui \
     src/ui/tabs/animations_tab.ui \
     src/ui/tabs/armors_tab.ui \

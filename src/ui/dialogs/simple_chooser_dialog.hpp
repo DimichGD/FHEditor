@@ -1,13 +1,12 @@
 #pragma once
 #include <QDialog>
 
-namespace Ui {
-class SimpleChooserDialog;
-}
+namespace Ui { class SimpleChooserDialog; }
 
 class QStandardItem;
 class QStandardItemModel;
 class QSortFilterProxyModel;
+
 
 class SimpleChooserDialog: public QDialog
 {

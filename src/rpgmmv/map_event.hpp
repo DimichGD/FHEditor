@@ -1,5 +1,6 @@
 #pragma once
 #include "event.hpp"
+#include "image.hpp"
 
 struct Condition
 {
@@ -18,19 +19,14 @@ struct Condition
 	int variableValue = 0;
 };
 
-struct Image
-{
-	int tileId = 0;
-	QString characterName {};
-	int characterIndex = 0;
-	int direction = 0;
-	int pattern = 0;
-};
-
 
 struct Route
 {
-	JsonValue list; // deafult {"list":[{"code":0,"parameters":[]}],"repeat":true,...
+	// "list":[{"code":0,"parameters":[]}], ...
+	JsonValue list { JsonValue::array_t { { JsonValue::object_t {
+					{ "code", JsonValue { 0.0 } },
+					{ "parameters", { JsonValue::array_t {} } }
+				} } } };
 	bool repeat = true;
 	bool skippable = false;
 	bool wait = false;
@@ -55,7 +51,7 @@ struct Page
 	Condition conditions {};
 	bool directionFix = false;
 	Image image {};
-	std::list<Command> list {};
+	std::list<Command> list { Command::makeZeroCommand(0) };
 	int moveFrequency = 2;
 	Route moveRoute {};
 	int moveSpeed = 2;
@@ -64,7 +60,7 @@ struct Page
 	bool stepAnime = false;
 	bool through = false;
 	int trigger = 1;
-	bool walkAnime = false;
+	bool walkAnime = true;
 };
 
 struct MapEvent
@@ -72,7 +68,25 @@ struct MapEvent
 	int id;
 	QString name {};
 	QString note {};
-	std::vector<Page> pages {};
+	std::vector<Page> pages { {} };
 	int x = 0;
 	int y = 0;
+
+	static QString makeName(int eventId)
+	{
+		return QString("EV%1").arg(eventId, 3, 10, QChar('0'));
+	}
+
+	static MapEvent makeDefault(int eventId, int x, int y)
+	{
+		MapEvent event
+		{
+			.id = eventId,
+			.name = makeName(eventId),
+			.x = x,
+			.y = y,
+		};
+
+		return event;
+	}
 };

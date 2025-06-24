@@ -11,10 +11,6 @@ struct Command_101_Params: ICommandParams
 	Command_101_Params() = default;
 	Command_101_Params(QString faceName, int faceIndex, int background, int windowPosition);
 
-	QString backgroundToString();
-	QString windowPositionToString();
-	QString faceToString();
-
 	int code() override { return 101; }
 	void read(JsonValue &parameters) override;
 	auto write() -> std::string override;

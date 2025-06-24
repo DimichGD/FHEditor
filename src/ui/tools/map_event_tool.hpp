@@ -11,10 +11,10 @@ public:
 
 	void activate() override {}
 	void deactivate() override {}
-	void mousePress(int x, int y) override;
-	void mouseMove(int x, int y) override;
+	void mousePress(QPoint pos) override;
+	void mouseMove(QPoint pos) override;
 	void mouseRelease() override;
-	void mouseDoubleClick(int x, int y) override;
+	void mouseDoubleClick(QPoint pos) override;
 
 signals:
 	void selectEvent(int eventId);

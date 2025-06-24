@@ -13,9 +13,6 @@ struct Command_102: ICommandParams
 	Command_102(QStringList choices, int value_0,
 				int value_1, int value_2, int value_3);
 
-	QString backgroundToString();
-	QString windowPositionToString();
-
 	int code() override { return 102; }
 	void read(JsonValue &parameters) override;
 	auto write() -> std::string override;

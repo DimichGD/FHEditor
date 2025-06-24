@@ -1,4 +1,5 @@
 #pragma once
+#include "image.hpp"
 #include <QLabel>
 
 class QMouseEvent;
@@ -16,7 +17,7 @@ public:
 	ClickableLabel(QWidget *parent = nullptr): QLabel(parent) {}
 	void setIconIndex(int index);
 	void setIconMode(Mode mode, QPixmap *pixmap);
-	void setIconMode(Mode mode, const QString &filename);
+	void setIconImage(const Image &image);
 	void paintEvent(QPaintEvent *event) override;
 
 signals:

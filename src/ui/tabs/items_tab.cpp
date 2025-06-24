@@ -8,27 +8,13 @@
 #include "item_effect_dialog.hpp"
 #include "data_mapper.hpp"
 #include "items_model.hpp"
+#include "menu.hpp"
 #include "ui_items_tab.h"
 
-#include <QMenu>
+//#include <QMenu>
 #include <QDataWidgetMapper>
 #include <QListWidgetItem>
 #include <QItemSelectionModel>
-
-QMenu *createMenu(QWidget *parent, std::initializer_list<QAction *> actions)
-{
-	QMenu *menu = new QMenu(parent);
-
-	for (QAction *action: actions)
-	{
-		if (action)
-			menu->addAction(action);
-		else
-			menu->addSeparator();
-	}
-
-	return menu;
-}
 
 ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 {

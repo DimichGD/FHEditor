@@ -172,9 +172,9 @@ bool loadJson<Animation>(const QString &filename, std::vector<std::optional<Anim
 		return false;
 	}
 
-	Animation normalAttack { .id = -1, .name = "Normal Attack" };
+	/*Animation normalAttack { .id = -1, .name = "Normal Attack" };
 	vector.insert(vector.begin(), normalAttack);
-	vector[1] = { .id = 0, .name = "None" };
+	vector[1] = { .id = 0, .name = "None" };*/
 
 	return true;
 }

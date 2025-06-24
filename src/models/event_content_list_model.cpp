@@ -2,8 +2,15 @@
 #include "event.hpp"
 
 
-EventContentListModel::EventContentListModel(std::list<Command> *list, QObject *parent)
-	: QAbstractListModel(parent), commandList(list) {}
+EventContentListModel::EventContentListModel(QObject *parent)
+	: QAbstractListModel(parent) {}
+
+void EventContentListModel::load(std::list<Command> *list)
+{
+	beginResetModel();
+	commandList = list;
+	endResetModel();
+}
 
 int EventContentListModel::rowCount(const QModelIndex &parent) const
 {
@@ -13,6 +20,9 @@ int EventContentListModel::rowCount(const QModelIndex &parent) const
 
 QVariant EventContentListModel::data(const QModelIndex &index, int role) const
 {
+	if (!commandList)
+		return QVariant();
+
 	if (!index.isValid())
 		return QVariant();
 
@@ -28,6 +38,9 @@ QVariant EventContentListModel::data(const QModelIndex &index, int role) const
 
 void EventContentListModel::removeCommands(int row, int count)
 {
+	if (!commandList)
+		return;
+
 	QAbstractListModel::beginRemoveRows(QModelIndex(), row, row + count);
 
 	std::list<Command>::iterator begin = std::next(commandList->begin(), row);
@@ -39,6 +52,9 @@ void EventContentListModel::removeCommands(int row, int count)
 
 void EventContentListModel::insertCommands(int row, std::list<Command> &&otherList)
 {
+	if (!commandList)
+		return;
+
 	QAbstractListModel::beginInsertRows(QModelIndex(), row, row + otherList.size() - 1);
 
 	std::list<Command>::iterator begin = std::next(commandList->begin(), row);

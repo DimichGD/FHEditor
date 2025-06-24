@@ -14,6 +14,13 @@ class ProxyModel: public QSortFilterProxyModel
 public:
 	ProxyModel(QObject *parent = nullptr): QSortFilterProxyModel(parent) {}
 	bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+	void setFilterEditRole(int column, QVariant filter);
+	void disableCustomFilter();
+
+private:
+	bool customFilter = false;
+	int customFilterColumn = 0;
+	QVariant customFilterValue {};
 };
 
 
@@ -37,6 +44,11 @@ public:
 		painter->drawPixmap(rect, *pixmap, { x * 32, y * 32, 32, 32 });
 	}
 
+	/*QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override
+	{
+		return QSize(40, 40);
+	}*/
+
 private:
 	QPixmap *pixmap = nullptr;
 };
@@ -59,6 +71,11 @@ public:
 	//void removeRows(int rowIndex, int count);
 	void setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap = nullptr);
 
+	void setCustomFilter(int column, QVariant filter)
+		{ filterModel->setFilterEditRole(column, filter); }
+	void disableCustomFilter()
+		{ filterModel->disableCustomFilter(); }
+
 public slots:
 	void setFilterText(const QString &text);
 	void selectRow(int row);
@@ -76,7 +93,7 @@ signals:
 	void rowSelected(int row);
 
 private:
-	QSortFilterProxyModel *filterModel = nullptr;
+	ProxyModel *filterModel = nullptr;
 	QAbstractItemModel *model = nullptr;
 	int currentRow = -1;
 };

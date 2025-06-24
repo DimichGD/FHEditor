@@ -10,7 +10,10 @@ struct ICommandParams
 {
 	enum Flags
 	{
-		CAN_ADD = 1, CAN_EDIT = 2, CAN_DELETE = 4,
+		CAN_ADD = 1,
+		CAN_EDIT = 2,
+		CAN_DELETE = 4,
+		ALL = CAN_ADD | CAN_EDIT | CAN_DELETE
 	};
 
 	virtual ~ICommandParams() = default;
@@ -25,7 +28,7 @@ struct ICommandParams
 	virtual void calculateWidth(QFontMetrics &metrics, int indent) { (void)metrics; (void)indent; }
 	void draw(QPainter *painter, bool selected, QRect rect, int indent);
 	void drawText(QPainter *painter, bool selected, QRect &rect, const QString &text, QColor color);
-	std::string checkExpected(glz::expected<std::string, glz::error_ctx> result);
+	std::string checkExpected(const glz::expected<std::string, glz::error_ctx> &result);
 
 	int totalWidth = 0;
 };

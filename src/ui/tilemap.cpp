@@ -170,19 +170,22 @@ MapEvent *TileMap::addNewEvent(int x, int y)
 		updateExisting = false;
 	}
 
-	model->insertRows(model->rowCount(), 1);
 
-	MapEvent event { .id = lastEventId };
+	/*MapEvent event { .id = lastEventId };
 	event.name = QString("EV%1").arg(event.id, 3, 10, QChar('0'));
 	event.x = x;
 	event.y = y;
 	event.pages.emplace_back();
-	event.pages.back().list.push_back(Command::makeZeroCommand(0));
+	event.pages.back().list.push_back(Command::makeZeroCommand(0));*/
 
 	if (updateExisting)
-		map->events[lastEventId] = event;
+		map->events[lastEventId] = MapEvent::makeDefault(lastEventId, x, y);
+
 	else
-		map->events.back() = event;
+	{
+		model->insertRows(model->rowCount(), 1);
+		map->events.back() = MapEvent::makeDefault(lastEventId, x, y);
+	}
 
 	return &(*map->events.back());
 }

@@ -1,14 +1,9 @@
 #include "tile_picker_tool.hpp"
+#include "tilemap.hpp"
 
-/*TilePickerTool::TilePickerTool(QGraphicsScene *scene, QObject *parent)
-	: MapViewTool(parent)
+void TilePickerTool::mousePress(QPoint pos)
 {
-	this->scene = scene; // TODO: get cursor to every tool, maybe make factory in map_view.cpp
-}*/
-
-void TilePickerTool::mousePress(int x, int y)
-{
-	if (QPoint(x, y) == lastPos)
+	if (pos == lastPos)
 	{
 		--lastLayer;
 
@@ -18,12 +13,12 @@ void TilePickerTool::mousePress(int x, int y)
 	else
 	{
 		lastLayer = 4;
-		lastPos = QPoint(x, y);
+		lastPos = pos;
 	}
 
 	for (int i = lastLayer; i >= 0; i--)
 	{
-		int tileId = tileMap->tileId(x, y, i);
+		int tileId = tileMap->tileId(pos.x(), pos.y(), i);
 		if (tileId == 0)
 			continue;
 

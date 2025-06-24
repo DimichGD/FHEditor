@@ -27,6 +27,7 @@ public:
 		LOOP = 112,
 		BREAK_LOOP = 113,
 		GATHER_FOLLOWERS = 217,
+		WAIT = 230,
 		PLAY_BGM = 241,
 		PLAY_BGS = 245,
 		PLAY_ME = 249,

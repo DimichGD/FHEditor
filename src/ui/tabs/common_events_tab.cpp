@@ -19,7 +19,7 @@ CommonEventsTab::CommonEventsTab(QWidget *parent):
 	ui->setupUi(this);
 	ui->eventSwitchButton->setSource(SimpleChooserDialog::SWITCH);
 
-	contextMenu = new QMenu(this);
+	/*contextMenu = new QMenu(this);
 	contextMenu->addAction(ui->actionCommandNew);
 	contextMenu->addAction(ui->actionCommandEdit);
 	contextMenu->addSeparator();
@@ -28,13 +28,27 @@ CommonEventsTab::CommonEventsTab(QWidget *parent):
 	connect(ui->actionCommandNew, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandNewTriggered);
 	connect(ui->actionCommandEdit, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandEditTriggered);
 	connect(ui->actionCommandDelete, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandDeleteTriggered);
-	connect(ui->eventContentList, &EventContentList::customContextMenuRequested, this, &CommonEventsTab::contextMenuRequested);
+	connect(ui->eventContentList, &EventContentList::customContextMenuRequested, this, &CommonEventsTab::contextMenuRequested);*/
 
 	connect(ui->eventsTable, &BaseTable::rowSelected, this, &CommonEventsTab::eventRowSelected);
 	connect(ui->eventsNameFilter, &QLineEdit::textChanged, ui->eventsTable, &BaseTable::setFilterText);
 
 	connect(ui->eventTriggerComboBox, &QComboBox::currentIndexChanged, this, [this](int index)
 		{ ui->eventSwitchButton->setEnabled(index != 0); });
+
+	connect(ui->autorunButton, &QPushButton::clicked, [this]()
+	{
+		ui->eventsTable->setCustomFilter(Event::TRIGGER, 1);
+		//ui->eventsTable->selectRow(0);
+		ui->eventContentList->clear();
+	});
+
+	connect(ui->parallelButton, &QPushButton::clicked, [this]()
+	{
+		ui->eventsTable->setCustomFilter(Event::TRIGGER, 2);
+		//ui->eventsTable->selectRow(0);
+		ui->eventContentList->clear();
+	});
 }
 
 CommonEventsTab::~CommonEventsTab()
@@ -57,9 +71,9 @@ void CommonEventsTab::init()
 		{ ui->eventTriggerComboBox, Event::TRIGGER },
 		{ ui->eventSwitchButton, Event::SWITCH_ID },
 	});
-	ui->eventsTable->selectRow(0);
 
-	ui->eventContentList->clear();
+	ui->eventsTable->selectRow(0);
+	//ui->eventContentList->clear();
 }
 
 void CommonEventsTab::eventRowSelected(int row)

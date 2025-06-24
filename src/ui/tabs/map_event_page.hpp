@@ -1,5 +1,5 @@
 #pragma once
-#include "event.hpp"
+#include "map_event.hpp"
 #include "data_mapper.hpp"
 #include "map_event_pages_model.hpp"
 
@@ -17,7 +17,7 @@ public:
 	~MapEventPage();
 
 	void connectCheckBoxToWidget(QCheckBox *checkBox, QWidget *widget);
-	void connectCheckBoxToWidget(QCheckBox *checkBox, QList<QWidget *> widgets);
+	//void connectCheckBoxToWidget(QCheckBox *checkBox, QList<QWidget *> widgets);
 
 private:
 	DataMapper *mapper = nullptr;

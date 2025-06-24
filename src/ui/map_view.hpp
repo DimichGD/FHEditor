@@ -14,7 +14,6 @@ class EventGraphicsItem: public QGraphicsItem
 {
 public:
 	EventGraphicsItem(MapEvent *event, QGraphicsItem *parent = nullptr);
-	//EventGraphicsItem(int eventId, QGraphicsItem *parent = nullptr);
 
 	QRectF boundingRect() const override;
 	QPainterPath shape() const override;
@@ -32,7 +31,6 @@ public:
 	static bool drawFullItem;
 
 private:
-	//int id = 0;
 	QRect bounds { 0, 0, 48, 48 };
 	QPixmap *pixmap = nullptr;
 	QRect pixmapRect {};
@@ -60,7 +58,7 @@ public:
 	void clear();
 
 	template<typename T>
-	T *makeTool() { return new T(tileMap, scene, cursor, this); }
+	T *makeTool() { return new T(scene, cursor, this); }
 
 public slots:
 	void setCurrentTool(MapViewTool *tool) { currentTool = tool; }

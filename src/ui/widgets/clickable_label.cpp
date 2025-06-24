@@ -23,25 +23,29 @@ void ClickableLabel::setIconMode(Mode mode, QPixmap *pixmap)
 	}
 }
 
-void ClickableLabel::setIconMode(Mode mode, const QString &filename)
+void ClickableLabel::setIconImage(const Image &image)
 {
-	this->mode = mode;
-	if (mode == CHARACTER)
+	pixmap = Images::Get()->loadImage("characters/" + image.characterName);
+	if (image.characterName[0] == '$')
 	{
-		pixmap = Images::Get()->loadImage("characters/" + filename);
-		if (filename[0] == '$')
-		{
-			iconSize.setWidth(pixmap->width() / 3);
-			iconSize.setHeight(pixmap->height() / 4);
-			iconSetPitch = 3;
-		}
-		else
-		{
-			iconSize.setWidth(pixmap->width() / 12);
-			iconSize.setHeight(pixmap->height() / 8);
-			iconSetPitch = 12;
-		}
+		iconSize.setWidth(pixmap->width() / 3);
+		iconSize.setHeight(pixmap->height() / 4);
+		iconSetPitch = 3;
 	}
+	else
+	{
+		iconSize.setWidth(pixmap->width() / 12);
+		iconSize.setHeight(pixmap->height() / 8);
+		iconSetPitch = 12;
+	}
+
+	int blockX = image.characterIndex * 3 % 12;
+	int blockY = (image.characterIndex / 4) * 4;
+	int iconX = blockX + image.pattern;
+	int iconY = blockY + image.direction / 2 - 1;
+	iconIndex = iconY * iconSetPitch + iconX;
+
+	// TODO: center image
 }
 
 void ClickableLabel::paintEvent(QPaintEvent *event)
@@ -49,7 +53,6 @@ void ClickableLabel::paintEvent(QPaintEvent *event)
 	int y = iconIndex / iconSetPitch; // TODO: get icons count from IconSet
 	int x = iconIndex % iconSetPitch;
 
-	//QRect rect(x * width(), y * height(), width(), height());
 	QRect rect(x * iconSize.width(), y * iconSize.height(), iconSize.width(), iconSize.height());
 
 	QPainter painter(this);

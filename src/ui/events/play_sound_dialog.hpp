@@ -7,7 +7,7 @@ namespace Ui { class PlaySoundDialog; }
 class QMediaPlayer;
 class QAudioOutput;
 
-class PlaySoundDialog : public CommandDialog
+class PlaySoundDialog: public CommandDialog
 {
 	Q_OBJECT
 

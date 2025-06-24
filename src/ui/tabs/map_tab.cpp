@@ -61,39 +61,6 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	});
 
 
-	//connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentLayer);
-
-	/*connect(ui->tilesTabWidget, &QTabWidget::currentChanged, ui->tilesTabWidget, [this](int index)
-	{
-		if (index == 0)
-		{
-			ui->mapView->setCurrentLayer(0);
-			ui->layerButton_1->setEnabled(false);
-			ui->layerButton_2->setEnabled(false);
-		}
-		else
-		{
-			ui->mapView->setCurrentLayer(ui->paintLayerButtonGroup->checkedId());
-			ui->layerButton_1->setEnabled(true);
-			ui->layerButton_2->setEnabled(true);
-		}
-	});*/
-
-	/*connect(ui->tilePicker_A, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
-	connect(ui->tilePicker_B, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
-	connect(ui->tilePicker_C, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
-	connect(ui->tilePicker_D, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
-	connect(ui->tilePicker_E, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
-
-	connect(ui->tilePicker_A, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
-	connect(ui->tilePicker_B, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
-	connect(ui->tilePicker_C, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
-	connect(ui->tilePicker_D, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
-	connect(ui->tilePicker_E, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);*/
-
-	//connect(ui->tilePickerView, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
-	//connect(ui->tilePickerView, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
-
 	connect(ui->runButton, &QPushButton::clicked, [this]()
 	{
 		if (Settings::Get()->rpgmPath.isEmpty())
@@ -106,46 +73,6 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		process->start(Settings::Get()->rpgmPath + "/nwjs-lnx-test/Game", arguments);
 	});
 
-	/*connect(ui->mapView, &MapView::newEvent, [this](int x, int y)
-	{
-		bool updateExisting = false;
-		auto it = std::next(currentMap->events.begin());
-		while (it != currentMap->events.end())
-		{
-			if (!it->has_value())
-			{
-				updateExisting = true;
-				break;
-			}
-
-			std::advance(it, 1);
-		}
-
-		//int lastEventId = currentMap->events.back().value().id + 1;
-		int lastEventId = std::prev(it)->value().id + 1; // FIXME: this is wrong. some ids can be same
-		MapEvent event {};
-		event.id = lastEventId;
-		event.name = QString("EV%1").arg(lastEventId, 3, 10, QChar('0'));
-		event.x = x;
-		event.y = y;
-		event.pages.emplace_back();
-		event.pages.back().list.push_back(Command::makeZeroCommand(0));
-		//event.pages.back().list.push_back({ CommandFactory::ZERO, 0, CommandFactory::createCommand2(0) });
-
-		if (updateExisting)
-		{
-			*it = event;
-			emit editMapEvent(lastEventId);
-		}
-
-		else
-		{
-			//currentMap->events.push_back(event);
-			emit addMapEvent(event);
-		}
-
-		ui->mapView->addNewEvent(event);
-	});*/
 
 	// TODO: remember last selection
 	connect(ui->tilePickerButtonGroup, &QButtonGroup::idClicked, [this](int id)
@@ -213,6 +140,13 @@ void MapTab::init()
 	model = new MapInfoModel(ui->mapInfoTable);
 	ui->mapInfoTable->setModel2(model);
 	ui->mapView->clear();
+	ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
+
+	if (Settings::Get()->lastMapId != 0)
+	{
+		ui->mapInfoTable->selectRow(Settings::Get()->lastMapId); // FIXME: filter null maps
+		//mapInfoTableClicked(Settings::Get()->lastMapId);
+	}
 }
 
 void MapTab::loadMap(int id)
@@ -261,7 +195,7 @@ void MapTab::loadMap(int id)
 
 
 	ui->mapView->load(&tileMap);
-	ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
+	//ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
 
 	// Set first existing tileset for tile picker
 	for (int i = 0; i < 5; i++)
@@ -274,6 +208,7 @@ void MapTab::loadMap(int id)
 	}
 
 	ui->tilePickerView->selectPoint(QPoint(0, 0));
+	Settings::Get()->lastMapId = id;
 }
 
 void MapTab::mapInfoTableClicked(int row)

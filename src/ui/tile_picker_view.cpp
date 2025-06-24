@@ -120,7 +120,10 @@ void TilePickerView::selectTile(int tileId)
 	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
 	cursorSetIndex = setIndex;
 	cursorItem->show();
+	centerOn(cursorItem);
 	scene->update();
+
+	emit tileSelected(setIndex, x, y);
 }
 
 void TilePickerView::drawBackground(QPainter *painter, const QRectF &rect)

@@ -1,39 +1,62 @@
 #include "map_view.hpp"
 #include "settings.hpp"
+#include "images.hpp"
 
 #include <QFile>
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QGraphicsPixmapItem>
+#include <QApplication>
+#include <QtConcurrentRun>
 
 bool EventGraphicsItem::drawFullItem = false;
 
 EventGraphicsItem::EventGraphicsItem(MapEvent *event, QGraphicsItem *parent): QGraphicsItem(parent)
 {
-	//this->event = event;
-	id = event->id;
+	this->event = event;
+	//id = eventId;
 	setOpacity(0.5f);
 }
 
 QRectF EventGraphicsItem::boundingRect() const
 {
-	return { 0, 0, 48, 48 };
+	return bounds;
+}
+
+QPainterPath EventGraphicsItem::shape() const
+{
+	QPainterPath path;
+	path.addRect({ 0, 0, 48, 48 });
+	return path;
 }
 
 void EventGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
 	//QBrush brush(QColorConstants::White);
-	QPen pen(QColorConstants::White);
-	pen.setCosmetic(true);
-	painter->setPen(pen);
-	painter->drawRect(2, 2, 44, 44);
-
-	if (drawFullItem)
+	//if (!pixmap)
 	{
-		QBrush brush(QColor::fromRgb(0, 0, 0, 128));
-		painter->fillRect(QRect(3, 3, 43, 43), brush);
-		//painter->setFont(QFont("Noto Sans Mono", 8));
-		//painter->drawText(QPoint(5, 15), event->name);
+		QPen pen(QColorConstants::White);
+		pen.setCosmetic(true);
+		painter->setPen(pen);
+		painter->drawRect(2, 2, 44, 44);
+
+		if (drawFullItem)
+		{
+			QBrush brush(QColor::fromRgb(0, 0, 0, 128));
+			painter->fillRect(QRect(3, 3, 43, 43), brush);
+			//painter->setFont(QFont("Noto Sans Mono", 8));
+			//painter->drawText(QPoint(5, 15), event->name);
+		}
+	}
+
+	if (pixmap)
+	{
+		painter->drawPixmap(bounds, *pixmap, pixmapRect);
+
+		/*QPen pen(QColorConstants::White);
+		pen.setCosmetic(true);
+		painter->setPen(pen);
+		painter->drawRect(bounds.adjusted(1, 1, -2, -2));*/
 	}
 }
 
@@ -42,6 +65,17 @@ MapView::MapView(QWidget *parent): QGraphicsView(parent)
 {
 	scene = new QGraphicsScene(this);
 	setScene(scene);
+
+	QPen pen(QColorConstants::White);
+	pen.setWidth(2);
+	pen.setCosmetic(true);
+	pen.setJoinStyle(Qt::MiterJoin);
+	cursor = new QGraphicsRectItem(QRect(2, 2, tileSize - 3, tileSize - 3));
+	cursor->setPen(pen);
+	cursor->setData(0, "cursor");
+	cursor->setAcceptedMouseButtons(Qt::NoButton);
+	cursor->setZValue(100.0f);
+	scene->addItem(cursor);
 }
 
 MapView::~MapView()
@@ -49,14 +83,14 @@ MapView::~MapView()
 	//
 }
 
-void MapView::load(Map *map, TileMap *tileMap)
+void MapView::load(TileMap *tileMap)
 {
-	this->tileMap = tileMap;
 	clear();
+	this->tileMap = tileMap;
 
 	scene->setSceneRect(0, 0, tileMap->width() * tileSize, tileMap->height() * tileSize);
 
-	for (auto &eventOptional: map->events)
+	for (auto &eventOptional: *tileMap->events())
 	{
 		if (!eventOptional.has_value())
 			continue;
@@ -66,32 +100,31 @@ void MapView::load(Map *map, TileMap *tileMap)
 		item->setPos(event.x * tileSize, event.y * tileSize);
 		item->setOpacity(EventGraphicsItem::drawFullItem ? 1.0f : 0.5f);
 		scene->addItem(item);
-		eventItemMap[event.y * tileMap->width() + event.x] = item;
+		eventItemMap[event.id] = item;
 	}
 
-
-	QPen pen(QColorConstants::White);
-	pen.setWidth(2);
-	pen.setCosmetic(true);
-	pen.setJoinStyle(Qt::MiterJoin);
-	cursor = new QGraphicsRectItem(QRect(0, 0, tileSize + 1, tileSize + 1));
-	cursor->setPen(pen);
-	scene->addItem(cursor);
 
 	setEnabled(true);
 	centerOn(scene->sceneRect().center());
 	repaint();
 	//currentMap = map;
+
+	auto promise = QtConcurrent::run(&MapView::startAsyncLoad, this);
+	promise.then(this, [this](){ completeAsyncLoad(); });
 }
 
 void MapView::clear()
 {
 	//for (auto &group: groups)
 	//	group.items.clear();
+	tileMap = nullptr;
+
+	for (auto it: eventItemMap)
+		delete it.second;
 
 	//tilesets.clear();
 	eventItemMap.clear();
-	scene->clear();
+	//scene->clear();
 	resetCachedContent();
 
 	//tiles.clear();
@@ -101,13 +134,9 @@ void MapView::clear()
 
 void MapView::setCurrentMode(int mode)
 {
-	if (mode == currentMode)
-		return;
-
 	Settings::Get()->mapToolIndex = mode;
 
-	currentMode = Mode(mode);
-	bool flag = (currentMode == EVENTS);
+	bool flag = (mode == 1);
 	EventGraphicsItem::drawFullItem = flag;
 
 	for (auto [_, value]: eventItemMap)
@@ -116,46 +145,19 @@ void MapView::setCurrentMode(int mode)
 		value->update();
 	}
 
-	currentOp = PAINT_SINGLE;
-	cursor->setRect(0, 0, tileSize, tileSize);
+	//cursor->setRect(0, 0, tileSize, tileSize);
+	cursor->setRect(QRect(2, 2, tileSize - 3, tileSize - 3));
 }
 
 
-void MapView::setCurrentTileSingle(TileSet::Set setIndex, int x, int y)
+/*void MapView::addNewEvent(MapEvent event)
 {
-	currentTileInfo = tileMap->tileItemInfo(x, y, setIndex);
-	currentOp = PAINT_SINGLE;
-	cursor->setRect(0, 0, tileSize, tileSize);
-	if (setIndex >= TileSet::B && setIndex <= TileSet::E && x == 0 && y == 0)
-		currentTileInfo.pixmap = nullptr;
-}
-
-void MapView::setCurrentTileMultiple(TileSet::Set setIndex, const QRect &rect)
-{
-	QList<TileItemInfo> tileInfos;
-	tileInfos.reserve(rect.width() * rect.height());
-	for (int y = rect.top(); y <= rect.bottom(); y++)
-	{
-		for (int x = rect.left(); x <= rect.right(); x++)
-		{
-			tileInfos.append(tileMap->tileItemInfo(x, y, setIndex));
-		}
-	}
-
-	currentMultipleTileSize = rect.size();
-	currentMultipleTileInfoList = tileInfos;
-	currentOp = PAINT_MULTIPLE;
-	cursor->setRect(0, 0, rect.size().width() * tileSize, rect.size().height() * tileSize);
-}
-
-void MapView::addNewEvent(MapEvent event)
-{
-	EventGraphicsItem *item = new EventGraphicsItem(&event);
+	EventGraphicsItem *item = new EventGraphicsItem(event.id);
 	item->setPos(event.x * tileSize, event.y * tileSize);
 	item->setOpacity(EventGraphicsItem::drawFullItem ? 1.0f : 0.5f);
 	scene->addItem(item);
-	eventItemMap[event.y * tileMap->width() + event.x] = item;
-}
+	eventItemMap[event.id] = item;
+}*/
 
 
 void MapView::drawBackground(QPainter *painter, const QRectF &rect)
@@ -186,19 +188,41 @@ void MapView::drawBackground(QPainter *painter, const QRectF &rect)
 					continue;
 
 				TileItemInfo info = tileMap->tileItemInfo(tileId);
-				QRect dstRect(x * tileSize, y * tileSize, tileSize, tileSize);
-				painter->drawPixmap(dstRect, *info.pixmap, info.rect);
+				if (info.pixmap)
+				{
+					QRect dstRect(x * tileSize, y * tileSize, tileSize, tileSize);
+					painter->drawPixmap(dstRect, *info.pixmap, info.rect);
+				}
+				else
+				{
+					// FIXME: pixmap is null sometimes
+				}
 			}
 		}
 	}
 }
 
+void MapView::drawForeground(QPainter *painter, const QRectF &rect)
+{
+	painter->setPen(QColorConstants::Black);
+	int gridSize = tileSize;
+	QRect r = rect.toRect();
+
+	int xmin = r.left() - r.left() % gridSize - gridSize;
+	int ymin = r.top() - r.top() % gridSize - gridSize;
+	int xmax = r.right() - r.right() % gridSize + gridSize;
+	int ymax = r.bottom() - r.bottom() % gridSize + gridSize;
+
+	for (int x = xmin; x <= xmax; x += gridSize)
+		painter->drawLine(x, r.top(), x, r.bottom());
+
+	for (int y = ymin; y <= ymax; y+= gridSize)
+		painter->drawLine(r.left(), y, r.right(), y);
+}
+
 
 void MapView::wheelEvent(QWheelEvent *event)
 {
-	if (scene->items().isEmpty())
-		return;
-
 	scaleValue *= (event->angleDelta().y() > 0.0f) ? 1.125f : 0.875f;
 	setTransform(QTransform::fromScale(scaleValue, scaleValue));
 	event->accept();
@@ -210,72 +234,23 @@ void MapView::mousePressEvent(QMouseEvent *event)
 
 	if (event->button() == Qt::RightButton)
 	{
-		scrollStart = event->position().toPoint();
+		scrollStart = mapToGlobal(event->position().toPoint());
 		isScrolling = true;
 		return;
 	}
 
-	QPoint pos = mapToScene(event->position().toPoint()).toPoint();
-	pos.rx() = pos.x() / tileSize;
-	pos.ry() = pos.y() / tileSize;
-
 	if (event->button() != Qt::LeftButton)
 		return;
 
-	if (currentMode == EVENTS)
-	{
-		//
-
+	QPoint pos = mapToScene(event->position().toPoint()).toPoint();
+	if (!scene->sceneRect().contains(pos))
 		return;
-	}
 
-	if (currentMode == TILES && currentOp == PAINT_SINGLE)
-	{
-		if (currentTileInfo.id < 0)
-			return;
+	pos.rx() = pos.x() / tileSize;
+	pos.ry() = pos.y() / tileSize;
+	//lastTilePos = pos; // FIXME: do i need this?
 
-		tileMap->putTile(pos.x(), pos.y(), currentLayer, currentTileInfo.id);
-		QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize);
-		scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
-
-		isPainting = true;
-		paintingStart = pos;
-	}
-
-	if (currentMode == TILES && currentOp == PAINT_MULTIPLE)
-	{
-		int index = 0;
-		for (int y = pos.y(); y < pos.y() + currentMultipleTileSize.height(); y++)
-		{
-			for (int x = pos.x(); x < pos.x() + currentMultipleTileSize.width(); x++)
-			{
-				tileMap->putTile(x, y, currentLayer, currentMultipleTileInfoList[index].id);
-				++index;
-			}
-		}
-
-		QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize,
-			currentMultipleTileSize.width() * tileSize, currentMultipleTileSize.height() * tileSize);
-		scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
-
-		isPainting = true;
-		paintingStart = pos;
-	}
-
-	if (currentMode == PICKER)
-	{
-		for (int i = 5; i >= 0; i--)
-		{
-			int tileId = tileMap->tileId(pos.x(), pos.y(), i);
-			if (tileId != 0)
-			{
-				emit pickTile(tileId);
-				break;
-			}
-		}
-	}
-
-	//lastTilePos = pos;
+	currentTool->mousePress(pos.x(), pos.y());
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
@@ -284,60 +259,50 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
 
 	if (isScrolling)
 	{
-		QPoint pos = event->position().toPoint();
+		QPoint pos = mapToGlobal(event->position().toPoint());
 		horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (pos.x() - scrollStart.x()));
 		verticalScrollBar()->setValue(verticalScrollBar()->value() - (pos.y() - scrollStart.y()));
 		scrollStart = pos;
 
-		if (cursor)
-			cursor->update();
+		cursor->update();
+
+		QRect resolution = QApplication::primaryScreen()->geometry();
+		if (pos.y() >= resolution.bottom() - 1)
+		{
+			QCursor::setPos(pos.x(), resolution.top() + 10);
+			scrollStart.ry() -= (resolution.height() - 10);
+		}
+		else if (pos.y() <= resolution.top() + 1)
+		{
+			QCursor::setPos(pos.x(), resolution.bottom() - 10);
+			scrollStart.ry() += (resolution.height() - 10);
+		}
+
+		if (pos.x() == resolution.right() - 1)
+		{
+			QCursor::setPos(resolution.left() + 10, pos.y());
+			scrollStart.rx() -= (resolution.width() - 10);
+		}
+		else if (pos.x() <= resolution.left() + 1)
+		{
+			QCursor::setPos(resolution.right() - 10, pos.y());
+			scrollStart.rx() += (resolution.width() - 10);
+		}
 
 		return;
 	}
 
 	QPoint pos = mapToScene(event->position().toPoint()).toPoint();
+	if (!scene->sceneRect().contains(pos))
+		return;
+
 	pos.rx() = pos.x() / tileSize;
 	pos.ry() = pos.y() / tileSize;
 
 	if (pos == lastTilePos)
 		return;
 
-	if (cursor)
-	{
-		pos.rx() = std::min(tileMap->width() - 1, std::max(0, pos.x()));
-		pos.ry() = std::min(tileMap->height() - 1, std::max(0, pos.y()));
-
-		cursor->setPos(pos.x() * tileSize, pos.y() * tileSize);
-		cursor->update();
-	}
-
-	if (isPainting && currentOp == PAINT_SINGLE)
-	{
-		tileMap->putTile(pos.x(), pos.y(), currentLayer, currentTileInfo.id);
-		QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize, tileSize, tileSize);
-		scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
-	}
-
-	if (isPainting && currentOp == PAINT_MULTIPLE)
-	{
-		int w = currentMultipleTileSize.width();
-		int h = currentMultipleTileSize.height();
-		for (int y = pos.y(); y < pos.y() + h; y++)
-		{
-			for (int x = pos.x(); x < pos.x() + w; x++)
-			{
-				int index = (std::abs(y - paintingStart.y()) % h) * w
-						+ (std::abs(x - paintingStart.x()) % w);
-				tileMap->putTile(x, y, currentLayer, currentMultipleTileInfoList[index].id);
-				++index;
-			}
-		}
-
-		QRect invalidateRect = QRect(pos.x() * tileSize, pos.y() * tileSize,
-			currentMultipleTileSize.width() * tileSize,
-			currentMultipleTileSize.height() * tileSize);
-		scene->invalidate(invalidateRect, QGraphicsScene::BackgroundLayer);
-	}
+	currentTool->mouseMove(pos.x(), pos.y());
 
 	lastTilePos = pos;
 }
@@ -347,7 +312,8 @@ void MapView::mouseReleaseEvent(QMouseEvent *event)
 {
 	event->accept();
 
-	isPainting = false;
+	currentTool->mouseRelease();
+
 	isScrolling = false;
 }
 
@@ -355,18 +321,77 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	event->accept();
 
-	if (currentMode != EVENTS)
+	QPoint pos = mapToScene(event->position().toPoint()).toPoint();
+	if (!scene->sceneRect().contains(pos))
 		return;
 
-	int index = lastTilePos.y() * tileMap->width() + lastTilePos.x();
-	auto it = eventItemMap.find(index);
-	if (it != eventItemMap.end())
+	pos.rx() = pos.x() / tileSize;
+	pos.ry() = pos.y() / tileSize;
+
+	currentTool->mouseDoubleClick(pos.x(), pos.y());
+}
+
+void MapView::startAsyncLoad()
+{
+	for (auto &eventOptional: *tileMap->events())
 	{
-		emit editEvent(it->second->eventId());
+		if (!eventOptional.has_value())
+			continue;
+
+		MapEvent &event = eventOptional.value();
+		Image *image = &event.pages[0].image;
+		if (!image->characterName.isEmpty())
+			Images::Get()->loadImage("characters/" + image->characterName);
 	}
-	else
+}
+
+void MapView::completeAsyncLoad()
+{
+	for (auto it: eventItemMap)
 	{
-		emit newEvent(lastTilePos.x(), lastTilePos.y());
+		MapEvent &event = tileMap->events()->at(it.first).value();
+		Image *image = &event.pages[0].image;
+		if (!image->characterName.isEmpty())
+		{
+			QPixmap *pixmap = Images::Get()->loadImage("characters/" + image->characterName);
+			int width = pixmap->width() / 12;
+			int height = pixmap->height() / 8;
+
+			if (image->characterName[0] == '$')
+			{
+				width = pixmap->width() / 3;
+				height = pixmap->height() / 4;
+			}
+
+			int x = width * (image->characterIndex * 3 + image->pattern);
+			int y = height * (image->direction / 2 - 1);
+
+			if (x >= pixmap->width())
+			{
+				x -= pixmap->width();
+				y += height * 4;
+			}
+
+			int cX = (width - 48) / 2;
+			int cY = (height - 48);
+
+			if (image->characterName[0] != '!')
+				cY += 6;
+
+			QRect bounds = { -cX, -cY, width, height };
+			QRect pixmapRect = { x, y, width, height };
+
+			it.second->updatePixmap(bounds, pixmap, pixmapRect);
+		}
+
+		if (event.pages[0].image.tileId)
+		{
+			TileItemInfo info = tileMap->tileItemInfo(event.pages[0].image.tileId);
+			it.second->updatePixmap({ 0, 0, 48, 48 }, info.pixmap, info.rect);
+		}
+
 	}
+
+	scene->invalidate();
 }
 

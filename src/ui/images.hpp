@@ -17,7 +17,7 @@ public:
 
 private:
 	QString path {};
-	QPixmap iconSetPixmap;
+	QPixmap *iconSetPixmap = nullptr;
 	std::map<QString, QPixmap> cache;
 };
 

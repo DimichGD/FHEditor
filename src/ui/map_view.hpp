@@ -1,5 +1,6 @@
 #pragma once
 #include "map.hpp"
+#include "map_view_tool.hpp"
 #include "tilemap.hpp"
 
 #include <QGraphicsView>
@@ -13,86 +14,90 @@ class EventGraphicsItem: public QGraphicsItem
 {
 public:
 	EventGraphicsItem(MapEvent *event, QGraphicsItem *parent = nullptr);
+	//EventGraphicsItem(int eventId, QGraphicsItem *parent = nullptr);
 
 	QRectF boundingRect() const override;
+	QPainterPath shape() const override;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
-	int eventId() const { return id; }
+	int eventId() const { return event->id; }
+	void updatePixmap(QRect bounds, QPixmap *pixmap, QRect rect)
+	{
+		prepareGeometryChange();
+		this->bounds = bounds;
+		this->pixmap = pixmap;
+		this->pixmapRect = rect;
+		update();
+	}
 
 	static bool drawFullItem;
 
 private:
-	int id = 0;
-	//MapEvent *event = nullptr;
+	//int id = 0;
+	QRect bounds { 0, 0, 48, 48 };
+	QPixmap *pixmap = nullptr;
+	QRect pixmapRect {};
+	MapEvent *event = nullptr;
 };
 
-// ------------------------------------------------------
 
+// ------------------------------------------------------
 
 class MapView: public QGraphicsView
 {
 	Q_OBJECT
 
 public:
-	enum Mode
+	/*enum Mode
 	{
 		TILES, EVENTS, PICKER,
-	};
+	};*/
 
 	MapView(QWidget *parent = nullptr);
 	~MapView();
 
-	void load(Map *map, TileMap *tileMap);
+	QGraphicsScene *currentScene() { return scene; }
+	void load(TileMap *tileMap);
 	void clear();
 
+	template<typename T>
+	T *makeTool() { return new T(tileMap, scene, cursor, this); }
+
 public slots:
-	void setCurrentLayer(int layer) { currentLayer = layer; }
+	void setCurrentTool(MapViewTool *tool) { currentTool = tool; }
+	//void setCurrentLayer(int layer) { currentLayer = layer; }
 	void setCurrentMode(int mode);
-	void setCurrentTileSingle(TileSet::Set setIndex, int x, int y);
-	void setCurrentTileMultiple(TileSet::Set setIndex, const QRect &rect);
-	void addNewEvent(MapEvent event);
+	//void addNewEvent(MapEvent event);
 
 signals:
 	//void layerIsEmpty(int index);
 	//void tileSelected(int x, int y, int tilesetIndex);
-	void newEvent(int x, int y);
-	void editEvent(int eventId);
-	void pickTile(int tileId);
+	//void newEvent(int x, int y);
+	//void editEvent(int eventId);
+	//void pickTile(int tileId);
 
 protected:
 	void drawBackground(QPainter *painter, const QRectF &rect) override;
+	void drawForeground(QPainter *painter, const QRectF &rect) override;
 	void wheelEvent(QWheelEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
 	void mouseMoveEvent(QMouseEvent *event) override;
 	void mouseReleaseEvent(QMouseEvent *event) override;
 	void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-	enum Operation
-	{
-		PAINT_SINGLE,
-		PAINT_MULTIPLE,
-	};
+private:
+	void startAsyncLoad();
+	void completeAsyncLoad();
 
 private:
-	Operation currentOp = PAINT_SINGLE;
-	Mode currentMode = TILES;
+	MapViewTool *currentTool = nullptr;
 
 	bool isScrolling = false;
 	QPoint scrollStart {};
-	float scaleValue = 1.0f;
-
-	bool isPainting = false;
-	QPoint paintingStart {};
 	QPoint lastTilePos {};
-
-	int currentLayer = 0;
-	TileItemInfo currentTileInfo {};
-	QSize currentMultipleTileSize {};
-	QList<TileItemInfo> currentMultipleTileInfoList {};
-
-	QGraphicsRectItem *cursor = nullptr;
-
+	float scaleValue = 1.0f;
 	int tileSize = 48;
 
+	QGraphicsRectItem *cursor = nullptr;
 	QGraphicsScene *scene = nullptr;
 	TileMap *tileMap = nullptr;
 	std::map<int, EventGraphicsItem *> eventItemMap;

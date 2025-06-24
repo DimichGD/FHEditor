@@ -2,6 +2,7 @@
 #include "map.hpp"
 #include "map_event_pages_model.hpp"
 #include "map_events_model.hpp"
+#include "tilemap.hpp"
 
 #include <QWidget>
 
@@ -15,7 +16,7 @@ public:
 	explicit MapEventsTab(QWidget *parent = nullptr);
 	~MapEventsTab();
 
-	void init(Map *map);
+	void init(TileMap *tileMap);
 
 public slots:
 	void mapEventsTableClicked(int row);
@@ -25,7 +26,8 @@ public slots:
 private:
 	MapEventsModel *model = nullptr;
 	MapEventPagesModel *pagesModel = nullptr;
-	Map *currentMap = nullptr;
+	//Map *currentMap = nullptr;
+	TileMap *currentMap = nullptr;
 	Ui::MapEventsTab *ui = nullptr;
 };
 

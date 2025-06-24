@@ -215,22 +215,16 @@
            <number>4</number>
           </property>
           <item>
-           <widget class="QFrame" name="frame">
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
+           <widget class="ClickableLabel" name="imageLabel">
+            <property name="minimumSize">
+             <size>
+              <width>64</width>
+              <height>0</height>
+             </size>
             </property>
-            <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
+            <property name="text">
+             <string notr="true"/>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <item>
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string notr="true">TextLabel</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
          </layout>
@@ -578,7 +572,7 @@
          </font>
         </property>
         <property name="contextMenuPolicy">
-         <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+         <enum>Qt::CustomContextMenu</enum>
         </property>
         <property name="alternatingRowColors">
          <bool>true</bool>
@@ -592,14 +586,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>EventContentList</class>
-   <extends>QListView</extends>
-   <header>event_content_list.hpp</header>
+   <class>ClickableLabel</class>
+   <extends>QLabel</extends>
+   <header>clickable_label.hpp</header>
   </customwidget>
   <customwidget>
    <class>SelectorButton</class>
    <extends>QPushButton</extends>
    <header>selector_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>EventContentList</class>
+   <extends>QListView</extends>
+   <header>event_content_list.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

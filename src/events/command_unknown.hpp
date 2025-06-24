@@ -6,11 +6,11 @@ struct Command_Unknown: ICommandParams
 	Command_Unknown(int codeId);
 
 	int codeId;
-	std::string parameters;
+	//std::string parameters;
+	JsonValue parameters;
 
 	int code() override { return codeId; }
-	void read(const std::string &str) override;
-	void read(const std::vector<glz::json_t> &parameters) override;
+	void read(JsonValue &parameters) override;
 	std::string write() override;
 
 	int flags() override { return 0; };

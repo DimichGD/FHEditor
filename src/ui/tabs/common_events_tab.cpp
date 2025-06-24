@@ -19,24 +19,21 @@ CommonEventsTab::CommonEventsTab(QWidget *parent):
 	ui->setupUi(this);
 	ui->eventSwitchButton->setSource(SimpleChooserDialog::SWITCH);
 
-	/*contextMenu = new QMenu(this);
+	contextMenu = new QMenu(this);
 	contextMenu->addAction(ui->actionCommandNew);
 	contextMenu->addAction(ui->actionCommandEdit);
-	contextMenu->addSeparator();
-	contextMenu->addAction(ui->actionCommandCollapseAll);
-	contextMenu->addAction(ui->actionCommandExpandAll);
 	contextMenu->addSeparator();
 	contextMenu->addAction(ui->actionCommandDelete);
 
 	connect(ui->actionCommandNew, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandNewTriggered);
 	connect(ui->actionCommandEdit, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandEditTriggered);
 	connect(ui->actionCommandDelete, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandDeleteTriggered);
-	connect(ui->eventContentList, &EventContentList::customContextMenuRequested, this, &CommonEventsTab::contextMenuRequested);*/
+	connect(ui->eventContentList, &EventContentList::customContextMenuRequested, this, &CommonEventsTab::contextMenuRequested);
 
 	connect(ui->eventsTable, &BaseTable::rowSelected, this, &CommonEventsTab::eventRowSelected);
 	connect(ui->eventsNameFilter, &QLineEdit::textChanged, ui->eventsTable, &BaseTable::setFilterText);
 
-	connect(ui->eventTriggerComboBox, &QComboBox::currentIndexChanged, [this](int index)
+	connect(ui->eventTriggerComboBox, &QComboBox::currentIndexChanged, this, [this](int index)
 		{ ui->eventSwitchButton->setEnabled(index != 0); });
 }
 
@@ -70,7 +67,7 @@ void CommonEventsTab::eventRowSelected(int row)
 	currentEvent = model->eventFromRow(row);
 	if (!currentEvent)
 	{
-		//ui->eventContentList->clear();
+		ui->eventContentList->clear();
 		mapper->toFirst();
 		//enableGroupBoxes(false);
 		return;
@@ -87,16 +84,17 @@ void CommonEventsTab::eventRowSelected(int row)
 
 }
 
-/*void CommonEventsTab::contextMenuRequested(const QPoint &pos)
+void CommonEventsTab::contextMenuRequested(const QPoint &pos)
 {
 	QModelIndex index = ui->eventContentList->indexAt(pos);
 	if (index.isValid())
 	{
-		Command::It command = index.data(Qt::UserRole + 1).value<Command::It>();
+		//Command::Iterator command = Command::iteratorFromIndex(index);
+		auto parameters = Command::iteratorFromIndex(index)->parameters;
 
-		ui->actionCommandNew->setEnabled(command->parameters->canAdd());
-		ui->actionCommandEdit->setEnabled(command->parameters->canEdit());
-		ui->actionCommandDelete->setEnabled(command->parameters->canDelete());
+		ui->actionCommandNew->setEnabled(parameters->flags() & ICommandParams::CAN_ADD);
+		ui->actionCommandEdit->setEnabled(parameters->flags() & ICommandParams::CAN_EDIT);
+		ui->actionCommandDelete->setEnabled(parameters->flags() & ICommandParams::CAN_DELETE);
 	}
 	else
 	{
@@ -106,7 +104,7 @@ void CommonEventsTab::eventRowSelected(int row)
 	}
 
 	contextMenu->exec(ui->eventContentList->viewport()->mapToGlobal(pos));
-}*/
+}
 
 void CommonEventsTab::applyButtonClicked()
 {

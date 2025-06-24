@@ -537,13 +537,13 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="paintLayerButtonGroup"/>
+  <buttongroup name="tilePickerButtonGroup"/>
+  <buttongroup name="modeButtonGroup"/>
   <buttongroup name="visibleLayersButtonGroup">
    <property name="exclusive">
     <bool>false</bool>
    </property>
   </buttongroup>
-  <buttongroup name="paintLayerButtonGroup"/>
-  <buttongroup name="modeButtonGroup"/>
-  <buttongroup name="tilePickerButtonGroup"/>
  </buttongroups>
 </ui>

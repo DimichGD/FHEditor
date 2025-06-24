@@ -7,19 +7,9 @@ CommandComment::CommandComment(QString line)
 	this->line = line;
 }
 
-void CommandComment::read(const std::string &str)
+void CommandComment::read(JsonValue &parameters)
 {
-	std::tuple<QString> params;
-	glz::error_ctx err = glz::read_json(params, str);
-	if (err)
-		qDebug() << QString::fromStdString(glz::format_error(err));
-
-	line = std::get<0>(params);
-}
-
-void CommandComment::read(const std::vector<glz::json_t> &parameters)
-{
-	line = QString::fromStdString(parameters[0].as<std::string>());
+	line = parameters[0].toQString();
 }
 
 std::string CommandComment::write()
@@ -50,19 +40,10 @@ CommandCommentLine::CommandCommentLine(QString line)
 	this->line = line;
 }
 
-void CommandCommentLine::read(const std::string &str)
-{
-	std::tuple<QString> params;
-	glz::error_ctx err = glz::read_json(params, str);
-	if (err)
-		qDebug() << QString::fromStdString(glz::format_error(err));
 
-	line = std::get<0>(params);
-}
-
-void CommandCommentLine::read(const std::vector<glz::json_t> &parameters)
+void CommandCommentLine::read(JsonValue &parameters)
 {
-	line = QString::fromStdString(parameters[0].as<std::string>());
+	line = parameters[0].toQString();
 }
 
 std::string CommandCommentLine::write()

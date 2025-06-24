@@ -23,42 +23,11 @@ concept hasIconIndex = requires(T t)
 	t.iconIndex;
 };
 
-template<typename ValueType>
-struct Storage
-{
-	std::vector<std::optional<ValueType>> vector;
-
-	ValueType *value(int id)
-	{
-		if (id < 0 || id >= std::ssize(vector))
-			return nullptr;
-
-		if (!vector[id].has_value())
-			return nullptr;
-
-		return &vector[id].value();
-	}
-
-	const ValueType *value(int id) const
-	{
-		if (id < 0 || id >= std::ssize(vector))
-			return nullptr;
-
-		if (!vector[id].has_value())
-			return nullptr;
-
-		return &vector[id].value();
-	}
-};
-
-
 class Database
 {
 public:
-	enum Version
-	{
-		MV, MZ,
-	};
+	template<typename T>
+	using Storage = std::vector<std::optional<T>>;
 
 	enum Type
 	{
@@ -96,35 +65,9 @@ public:
 	Skill *skill(int id);
 	State *state(int id);
 	System *system();
+
 	QString switchName(int id);
 	QString variableName(int id);
-
-
-	template<typename ValueType>
-	ValueType *value(int id)
-	{
-		auto &vector = getVector<ValueType>();
-
-		if constexpr (std::is_same<ValueType, Animation>::value)
-		{
-			id += 1;
-		}
-
-		if (id < 0 || id >= std::ssize(vector))
-			return nullptr;
-
-		if (!vector[id].has_value())
-			return nullptr;
-
-		return &vector[id].value();
-	}
-
-	template<typename ValueType,
-			 typename VectorType = std::vector<std::optional<ValueType>>>
-	VectorType &getVector()
-	{
-		return std::get<Storage<ValueType>>(storage).vector;
-	}
 
 	template<typename ValueType>
 	Storage<ValueType> &getStorage()
@@ -146,9 +89,8 @@ class IAccessor
 {
 public:
 	virtual ~IAccessor() = default;
-	//virtual void load() = 0;
-	virtual int  size() = 0;
-	//virtual void element(int index) = 0;
+	virtual int size() = 0;
+	virtual bool hasElement(int index) = 0;
 	virtual void clearElement(int index) = 0;
 	virtual void insertToEnd(int count) = 0;
 	virtual void removeFromEnd(int count) = 0;
@@ -160,7 +102,7 @@ class Accessor: public IAccessor
 public:
 	Accessor()
 	{
-		this->storage = &Database::Get()->getStorage<T>().vector;
+		this->storage = &Database::Get()->getStorage<T>();
 	}
 
 	Accessor(std::vector<std::optional<T>> *storage)
@@ -170,17 +112,17 @@ public:
 
 	T *value(int id)
 	{
-		if (id < 0 || id >= std::ssize(*storage))
-			return nullptr;
-
-		if (!storage->at(id).has_value())
-			return nullptr;
-
-		return &storage->at(id).value();
+		return const_cast<T *>(std::as_const(*this).value(id));
 	}
 
 	const T *value(int id) const
 	{
+		if constexpr (std::is_same<T, Animation>::value)
+		{
+			id += 1; // FIXME: WTF is this?
+			// Handle negative ids via template tags?
+		}
+
 		if (id < 0 || id >= std::ssize(*storage))
 			return nullptr;
 
@@ -195,15 +137,10 @@ public:
 		return storage->size();
 	}
 
-	/*T *value(int index)
+	bool hasElement(int index) override
 	{
-		return value(index);
+		return value(index) != nullptr;
 	}
-
-	const T *value(int index) const
-	{
-		return value(index);
-	}*/
 
 	void clearElement(int index) override
 	{
@@ -224,6 +161,5 @@ public:
 	}
 
 private:
-	//Storage<T> *storage;
 	std::vector<std::optional<T>> *storage;
 };

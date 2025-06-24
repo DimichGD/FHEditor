@@ -1,5 +1,5 @@
 #pragma once
-#include "event.hpp"
+#include "map_event.hpp"
 #include <QAbstractTableModel>
 
 class MapEventPagesModel: public QAbstractTableModel

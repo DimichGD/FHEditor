@@ -15,8 +15,7 @@ struct CommandSound: ICommandParams
 	CommandSound(Type type);
 	CommandSound(Type type, Sound sound);
 
-	void read(const std::string &parameters) override;
-	void read(const std::vector<glz::json_t> &parameters) override;
+	void read(JsonValue &parameters) override;
 	std::string write() override;
 
 	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; };

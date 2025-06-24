@@ -10,12 +10,13 @@ class ClickableLabel: public QLabel
 public:
 	enum Mode
 	{
-		ICON_SET, FACES,
+		ICON_SET, FACES, CHARACTER,
 	};
 
 	ClickableLabel(QWidget *parent = nullptr): QLabel(parent) {}
 	void setIconIndex(int index);
 	void setIconMode(Mode mode, QPixmap *pixmap);
+	void setIconMode(Mode mode, const QString &filename);
 	void paintEvent(QPaintEvent *event) override;
 
 signals:
@@ -32,7 +33,8 @@ private:
 
 	QPixmap *pixmap = nullptr;
 	Mode mode;
-	int iconSize = 32;
+	//int iconSize = 32;
+	QSize iconSize { 32, 32 };
 	int iconSetPitch = 16;
 };
 

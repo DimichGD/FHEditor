@@ -9,8 +9,7 @@ struct Command_401_Params: ICommandParams
 	Command_401_Params(QString line);
 
 	int code() override { return 401; }
-	void read(const std::string &str) override;
-	void read(const std::vector<glz::json_t> &parameters) override;
+	void read(JsonValue &parameters) override;
 	auto write() -> std::string override;
 
 	int flags() override { return 0; };

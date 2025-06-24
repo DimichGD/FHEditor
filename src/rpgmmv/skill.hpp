@@ -7,7 +7,7 @@ struct Skill
 	int id;
 	int animationId = 0;
 	Damage damage {};
-	QString description;
+	QString description {};
 	std::vector<Effect> effects {};
 	int hitType = 0;
 	int iconIndex = 0;

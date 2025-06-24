@@ -13,18 +13,20 @@ Images *Images::Get()
 
 bool Images::load()
 {
+	iconSetPixmap = nullptr;
+	cache.clear();
+
 	if (Settings::Get()->lastPath.isEmpty())
 		return false;
 
 	path = Settings::Get()->lastPath + "/img/";
-	QDir imgDir(path);
-	if (!imgDir.exists())
+	if (!QDir(path).exists())
 	{
 		QMessageBox::critical(nullptr, "Filesystem Error", path + " does not exists.");
 		return false;
 	}
 
-	iconSetPixmap = *loadImage("system/IconSet");
+	iconSetPixmap = loadImage("system/IconSet");
 
 	return true;
 }
@@ -36,8 +38,7 @@ QPixmap *Images::loadImage(const QString &name)
 		return &it->second;
 
 	QString pngFilename = path + name + ".png";
-	QFile pngFile(pngFilename);
-	if (pngFile.exists())
+	if (QFile::exists(pngFilename))
 	{
 		cache[name] = QPixmap(pngFilename);
 		return &cache[name];
@@ -47,13 +48,13 @@ QPixmap *Images::loadImage(const QString &name)
 	QByteArray pngHeader = QByteArray::fromHex("89504E470D0A1A0A0000000D49484452");
 	//QString key = settings.value("key").toString();
 	QString encFilename = path + name + ".rpgmvp";
-	QFile encFile(encFilename);
-	if (!encFile.exists())
+	if (!QFile::exists(encFilename))
 	{
 		qDebug() << encFilename << "does not exists";
 		return nullptr;
 	}
 
+	QFile encFile(encFilename);
 	encFile.open(QIODevice::ReadOnly);
 	encFile.skip(headerLen);
 	QByteArray content = encFile.read(encFile.size() - headerLen);
@@ -75,8 +76,7 @@ QPixmap *Images::loadImage(const QString &name)
 
 QPixmap *Images::iconSet()
 {
-	//return loadImage("system/IconSet");
-	return &iconSetPixmap;
+	return iconSetPixmap;
 }
 
 QPixmap *Images::face(const QString &name)

@@ -1,16 +1,5 @@
 #pragma once
-#include <QObject>
-#include <QStandardItemModel>
 #include <QDataWidgetMapper>
-
-class QLineEdit;
-class QSpinBox;
-class QPushButton;
-class QComboBox;
-class QLabel;
-class QPlainTextEdit;
-class QDataWidgetMapper;
-class QAbstractItemDelegate;
 
 class DataMapper: public QDataWidgetMapper
 {

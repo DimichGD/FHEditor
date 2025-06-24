@@ -9,8 +9,7 @@ struct CommandComment: ICommandParams
 	CommandComment(QString line);
 
 	int code() override { return 108; }
-	void read(const std::string &str) override;
-	void read(const std::vector<glz::json_t> &parameters) override;
+	void read(JsonValue &parameters) override;
 	auto write() -> std::string override;
 
 	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; };
@@ -26,8 +25,7 @@ struct CommandCommentLine: ICommandParams
 	CommandCommentLine(QString line);
 
 	int code() override { return 408; }
-	void read(const std::string &str) override;
-	void read(const std::vector<glz::json_t> &parameters) override;
+	void read(JsonValue &parameters) override;
 	auto write() -> std::string override;
 
 	int flags() override { return 0; };

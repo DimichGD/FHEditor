@@ -1,30 +1,42 @@
 #pragma once
 #include "base_command.hpp"
-#include "glaze/json/json_t.hpp"
+#include "command_factory.hpp"
+#include "json_value.hpp"
 #include <QAbstractItemModel>
 #include <vector>
 #include <list>
-
-/*struct CommandParams
-{
-	std::vector<glz::json_t> jsonValues;
-	QSharedPointer<ICommandParams> parameters;
-};*/
 
 struct Command
 {
 	using Iterator = std::list<Command>::iterator;
 
-	static Iterator iterFromIndex(const QModelIndex &index)
+	static Iterator iteratorFromIndex(const QModelIndex &index)
 	{
 		return index.data(Qt::UserRole + 1).value<Command::Iterator>();
+	}
+
+	static Command makeZeroCommand(int indent)
+	{
+		return { CommandFactory::ZERO, indent, CommandFactory::createCommand2(0) };
 	}
 
 	int code;
 	int indent;
 	QSharedPointer<ICommandParams> parameters;
-	std::vector<glz::json_t> jsonValues;
+	//std::vector<glz::json_t> jsonValues;
+	//JsonValue jsonValues;
 	//CommandParams parameters;
+
+	void readParams(JsonValue &&jsonValues)
+	{
+		parameters = CommandFactory::createCommand2(code);
+		parameters->read(jsonValues);
+	}
+
+	/*JsonValue &writeParams()
+	{
+		return jsonValues;
+	}*/
 };
 
 struct Event
@@ -39,95 +51,4 @@ struct Event
 	QString name {};
 	int switchId = 0;
 	int trigger = 0;
-};
-
-struct Condition
-{
-	int actorId = 1;
-	bool actorValid = false;
-	int itemId = 1;
-	bool itemValid = false;
-	QString selfSwitchCh { 'A' };
-	bool selfSwitchValid = false;
-	int switch1Id = 1;
-	bool switch1Valid = false;
-	int switch2Id = 1;
-	bool switch2Valid = false;
-	int variableId = 1;
-	bool variableValid = false;
-	int variableValue = 0;
-};
-
-struct Image
-{
-	int tileId = 0;
-	std::string characterName {};
-	int characterIndex = 0;
-	int direction = 0;
-	int pattern = 0;
-};
-
-/*struct RouteEntry1
-{
-	int code;
-	std::vector<int> parameters;
-};
-
-struct RouteEntry2
-{
-	int code;
-	std::optional<int> indent;
-};
-
-struct RouteEntry3
-{
-	int code;
-	std::vector<int> parameters;
-	std::optional<int> indent;
-};*/
-
-struct Route
-{
-	std::string parseLater { R"({"list":[{"code":0,"parameters":[]}],"repeat":true,"skippable":false,"wait":false})" };
-};
-
-
-struct Page
-{
-	enum Type
-	{
-		COND_ACTOR_ID, COND_ACTOR_VALID,
-		COND_ITEM_ID, COND_ITEM_VALID,
-		COND_SELF_SWITCH_CHAR, COND_SELF_SWITCH_VALID,
-		COND_SWITCH_1_ID, COND_SWITCH_1_VALID,
-		COND_SWITCH_2_ID, COND_SWITCH_2_VALID,
-		COND_VARIABLE_ID, COND_VARIABLE_VALID, COND_VARIABLE_VALUE,
-		DIRECTION_FIX, /* IMAGE */
-		MOVE_FREQ, MOVE_SPEED, MOVE_TYPE, PRIORITY_TYPE, STEP_ANIME,
-		THROUGH, TRIGGER, WALK_ANIME, COUNT,
-	};
-
-	Condition conditions {};
-	bool directionFix = false;
-	Image image {};
-	std::list<Command> list {};
-	int moveFrequency = 2;
-	Route moveRoute {};
-	int moveSpeed = 2;
-	int moveType = 0;
-	int priorityType = 0;
-	bool stepAnime = false;
-	bool through = false;
-	int trigger = 1;
-	bool walkAnime = false;
-};
-
-struct MapEvent
-{
-	int id;
-	QString name {};
-	QString note {};
-	std::vector<Page> pages {};
-	int x = 0;
-	int y = 0;
 };

@@ -70,15 +70,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 	connect(ui->actionGamesList, &QAction::triggered, this, &MainWindow::openSettingsDialog);
 	connect(ui->mapTab, &MapTab::mapLoaded, ui->mapEventsTab, &MapEventsTab::init);
-	connect(ui->mapTab, &MapTab::addMapEvent, ui->mapEventsTab,  [this](MapEvent event)
-	{
-		ui->mapEventsTab->addMapEvent(event);
-		ui->tabWidget->setCurrentIndex(1); // map events index
-		ui->mapEventsTab->selectEvent(event.id);
-	});
 	connect(ui->mapTab, &MapTab::editMapEvent, ui->mapEventsTab, [this](int eventId)
 	{
-		ui->tabWidget->setCurrentIndex(1); // map events index
+		ui->tabWidget->setCurrentIndex(1); // map events tab index
 		ui->mapEventsTab->selectEvent(eventId);
 	});
 
@@ -101,6 +95,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadGame()
 {
+	uint64_t start = QDateTime::currentMSecsSinceEpoch();
+
 	if (Settings::Get()->lastPath.isEmpty())
 	{
 		qDebug() << "lastPath is empty";
@@ -112,8 +108,6 @@ void MainWindow::loadGame()
 		qDebug() << "Failed to load Images";
 		return;
 	}
-
-	uint64_t start = QDateTime::currentMSecsSinceEpoch();
 
 	Database::Get()->load(Database::ALL);
 

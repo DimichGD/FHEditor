@@ -1,10 +1,6 @@
 #include "event_content_selection_model.hpp"
 #include "command_factory.hpp"
-
-/*void EventContentSelectionModel::select(const QModelIndex &index, SelectionFlags command)
-{
-	QItemSelectionModel::select(index, command);
-}*/
+#include "event.hpp"
 
 void EventContentSelectionModel::select(const QItemSelection &selection, SelectionFlags flags)
 {
@@ -13,8 +9,6 @@ void EventContentSelectionModel::select(const QItemSelection &selection, Selecti
 		QItemSelectionModel::select(selection, flags);
 		return;
 	}
-
-	//QItemSelectionModel::select(selection, flags);
 
 	if (selection.empty())
 		return;
@@ -38,9 +32,10 @@ void EventContentSelectionModel::select(const QItemSelection &selection, Selecti
 	QModelIndex first = selection[0].indexes()[0];
 	QModelIndex last = selection[0].indexes()[0];
 
-	Command::Iterator command = first.data(Qt::UserRole + 1).value<Command::Iterator>();
+	Command::Iterator command = Command::iteratorFromIndex(first);
 	int startCode = command->code;
 	int startIndent = command->indent;
+
 	auto it = codesMap.find(startCode);
 	if (it == codesMap.end())
 	{
@@ -51,51 +46,21 @@ void EventContentSelectionModel::select(const QItemSelection &selection, Selecti
 	int endCode = it->second.endCode;
 	Strategy strategy = it->second.strategy;
 
-	//if (strategy == SELECT_WHILE)
+	std::advance(command, 1);
+	while (true)
 	{
-		std::advance(command, 1);
-		while (true)
-		{
-			last = model()->index(last.row() + 1, 0);
-			if (strategy == SELECT_WHILE && std::next(command)->code != endCode)
-				break;
-
-			if (strategy == SELECT_UNTIL && command->code == endCode && command->indent == startIndent)
-				break;
-			//if (std::next(command)->code != endCode)
-			//	break;
-
-			std::advance(command, 1);
-		}
-	}
-
-	/*if (strategy == SELECT_UNTIL)
-	{
-		std::advance(command, 1);
-		while (true)
-		{
-			last = model()->index(last.row() + 1, 0);
-			if (command->code == endCode && command->indent == startIndent)
-				break;
-
-			std::advance(command, 1);
-		}
-	}*/
-
-	/*do
-	{
-		std::advance(command, 1);
 		last = model()->index(last.row() + 1, 0);
-	}
-	while ((strategy == SELECT_WHILE)
-		   ? (command->code == endCode)
-		   : (command->code != endCode));*/
+		if (strategy == SELECT_WHILE
+			&& std::next(command)->code != endCode)
+			break;
 
-	/*if (!it->second.consumeLast)
-	{
-		std::advance(command, -1);
-		last = model()->index(last.row() - 1, 0);
-	}*/
+		if (strategy == SELECT_UNTIL
+			&& command->code == endCode
+			&& command->indent == startIndent)
+			break;
+
+		std::advance(command, 1);
+	}
 
 	rowSelection.select(first, last);
 	QItemSelectionModel::select(rowSelection, flags);

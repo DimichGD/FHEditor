@@ -4,6 +4,7 @@
 #include "database.hpp"
 //#include "iconset.hpp"
 #include "images.hpp"
+#include "item_effects_model.hpp"
 #include "item_effect_dialog.hpp"
 #include "data_mapper.hpp"
 #include "items_model.hpp"
@@ -14,23 +15,37 @@
 #include <QListWidgetItem>
 #include <QItemSelectionModel>
 
+QMenu *createMenu(QWidget *parent, std::initializer_list<QAction *> actions)
+{
+	QMenu *menu = new QMenu(parent);
+
+	for (QAction *action: actions)
+	{
+		if (action)
+			menu->addAction(action);
+		else
+			menu->addSeparator();
+	}
+
+	return menu;
+}
+
 ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 {
 	ui->setupUi(this);
 	ui->itemAnimationButton->setSource(SimpleChooserDialog::ANIMATION);
-	itemEffectsListMenu = new QMenu(this);
-	itemEffectsListMenu->addAction(ui->actionEffectNew);
-	itemEffectsListMenu->addAction(ui->actionEffectEdit);
-	itemEffectsListMenu->addAction(ui->actionEffectGoTo);
-	itemEffectsListMenu->addSeparator();
-	itemEffectsListMenu->addAction(ui->actionEffectDelete);
+	itemEffectsListMenu = createMenu(this,
+	{
+		ui->actionEffectNew, ui->actionEffectEdit,
+		ui->actionEffectGoTo, nullptr, ui->actionEffectDelete
+	});
 
 	connect(ui->actionEffectNew, &QAction::triggered, this, &ItemsTab::actionEffectNewTriggered);
 	connect(ui->actionEffectEdit, &QAction::triggered, this, &ItemsTab::actionEffectEditTriggered);
 	connect(ui->actionEffectDelete, &QAction::triggered, this, &ItemsTab::actionEffectDeleteTriggered);
 
-	connect(ui->itemEffectsList, &QTableWidget::customContextMenuRequested, this, &ItemsTab::contextMenuRequested);
-	connect(ui->itemEffectsList, &QTableWidget::doubleClicked, ui->itemEffectsList, [this](const QModelIndex &) { actionEffectEditTriggered(true); });
+	connect(ui->itemEffectsList, &QTableView::customContextMenuRequested, this, &ItemsTab::contextMenuRequested);
+	connect(ui->itemEffectsList, &QTableView::doubleClicked, ui->itemEffectsList, [this](const QModelIndex &) { actionEffectEditTriggered(true); });
 
 	connect(ui->itemsTable, &BaseTable::rowSelected, this, &ItemsTab::itemRowSelected);
 	connect(ui->itemNameFilter, &QLineEdit::textChanged, ui->itemsTable, &BaseTable::setFilterText);
@@ -49,38 +64,16 @@ ItemsTab::~ItemsTab()
 	delete ui;
 }
 
-void ItemsTab::changeIcon(int index)
-{
-	if (!currentItem)
-		return;
-
-	currentItem->iconIndex = index;
-	ui->itemIconIndexLabel->setText(QString::number(index));
-	ui->itemIconLabel->setIconIndex(index);
-	emit model->dataChanged(model->index(currentItem->id, 1), model->index(currentItem->id, 1));
-	// TODO: make an update(row, column) method?
-}
-
 
 
 void ItemsTab::init()
 {
-	/*if (mapper)
-		delete mapper;
-
-	if (model)
-		delete model;*/
-
 	delete mapper;
 	delete model;
-
-	//mapper->deleteLater();
-	//model->deleteLater();
 
 	ui->itemIconLabel->setIconMode(ClickableLabel::Mode::ICON_SET, Images::Get()->iconSet());
 
 	model = new ItemsModel(this);
-	//iconSetPixmap = Images::Get()->iconSet();
 	ui->itemsTable->setModel2(model, Images::Get()->iconSet());
 
 	ui->itemApplyButton->setEnabled(false);
@@ -130,7 +123,7 @@ void ItemsTab::itemRowSelected(int row)
 	currentItem = model->item(row);
 	if (!currentItem)
 	{
-		ui->itemEffectsList->setRowCount(0);
+		delete effectsModel;
 		mapper->toFirst();
 		enableGroupBoxes(false);
 		return;
@@ -142,18 +135,9 @@ void ItemsTab::itemRowSelected(int row)
 	mapper->setCurrentIndex(row);
 	ui->itemIconLabel->setIconIndex(currentItem->iconIndex);
 
-	ui->itemEffectsList->setRowCount(0);
-	for (auto effect: currentItem->effects)
-	{
-		int lastRow = ui->itemEffectsList->rowCount();
-		ui->itemEffectsList->insertRow(lastRow);
-
-		auto stringList = effectToStringList(&effect);
-		QTableWidgetItem *item = new QTableWidgetItem(stringList.at(0));
-		//item->setData(Qt::UserRole, lastRow);
-		ui->itemEffectsList->setItem(lastRow, 0, item);
-		ui->itemEffectsList->setItem(lastRow, 1, new QTableWidgetItem(stringList.at(1)));
-	}
+	delete effectsModel;
+	effectsModel = new ItemEffectsModel(&currentItem->effects, ui->itemEffectsList);
+	ui->itemEffectsList->setModel(effectsModel);
 }
 
 void ItemsTab::itemDamageTypeChanged(int index)
@@ -168,81 +152,59 @@ void ItemsTab::itemDamageTypeChanged(int index)
 
 void ItemsTab::itemIconClicked()
 {
-	if (!currentItem)
-		return;
-
 	IconPickerDialog dialog(this, PickerType::ICON_SET, "", currentItem->iconIndex);
 	if (dialog.exec())
-		changeIcon(dialog.index());
+	{
+		int index = dialog.index();
+		model->setData(model->index(currentItem->id, Item::ICON_INDEX), index, Qt::EditRole);
+		ui->itemIconLabel->setIconIndex(index);
+	}
 }
 
 void ItemsTab::contextMenuRequested(const QPoint &pos)
 {
-	bool enabled = (ui->itemEffectsList->itemAt(pos) != nullptr);
+	if (!currentItem)
+		return;
+
+	QModelIndex index = ui->itemEffectsList->indexAt(pos);
+	bool enabled = index.isValid();
 
 	ui->actionEffectEdit->setEnabled(enabled);
-	ui->actionEffectGoTo->setEnabled(enabled);
 	ui->actionEffectDelete->setEnabled(enabled);
+
+	bool flag = enabled && index.data(ItemEffectsModel::CODE).toInt() == Effect::COMMON_EVENT;
+	ui->actionEffectGoTo->setEnabled(flag);
 
 	itemEffectsListMenu->exec(ui->itemEffectsList->viewport()->mapToGlobal(pos));
 }
 
 void ItemsTab::actionEffectNewTriggered(bool)
 {
-	if (!currentItem)
-		return;
-
-	Effect effect {};
-	currentItem->effects.push_back(effect);
-
-	int lastRow = ui->itemEffectsList->rowCount();
-	ui->itemEffectsList->insertRow(lastRow);
-
-	auto stringList = effectToStringList(&effect);
-	QTableWidgetItem *item = new QTableWidgetItem(stringList[0]);
-	item->setData(Qt::UserRole, lastRow);
-	ui->itemEffectsList->setItem(lastRow, 0, item);
-	ui->itemEffectsList->setItem(lastRow, 1, new QTableWidgetItem(stringList[1]));
-	ui->itemEffectsList->selectRow(lastRow);
+	effectsModel->addEffect();
+	ui->itemEffectsList->selectRow(effectsModel->rowCount() - 1);
 }
 
 void ItemsTab::actionEffectEditTriggered(bool)
 {
-	auto list = ui->itemEffectsList->selectedItems();
-	if (list.empty() || !currentItem)
-		return;
-
-	int effectIndex = list[0]->row();
+	int effectIndex = ui->itemEffectsList->currentIndex().row();
 	ItemEffectDialog dialog(currentItem->effects.at(effectIndex), this);
 	if (dialog.exec())
 	{
-		Effect effect = dialog.value();
-		auto stringList = effectToStringList(&effect);
-		ui->itemEffectsList->item(list[0]->row(), 0)->setData(Qt::DisplayRole, stringList[0]);
-		ui->itemEffectsList->item(list[0]->row(), 1)->setData(Qt::DisplayRole, stringList[1]);
-		currentItem->effects[effectIndex] = effect;
+		effectsModel->setEffect(effectIndex, dialog.value());
+		ui->itemEffectsList->selectRow(effectIndex);
 	}
 }
 
 void ItemsTab::actionEffectDeleteTriggered(bool)
 {
-	auto list = ui->itemEffectsList->selectedItems();
-	if (list.empty() || !currentItem)
-		return;
-
-	ui->itemEffectsList->removeRow(list[0]->row());
+	int effectIndex = ui->itemEffectsList->currentIndex().row();
+	effectsModel->removeEffect(effectIndex);
 }
 
 void ItemsTab::actionEffectGotToTriggered(bool)
 {
-	/*	QTabWidget *tabWidget = dynamic_cast<QTabWidget *>(parent()->parent()); // FIXME: hack?
-	int code = itemEffectsList->model()->index(row, 0).data(Qt::UserRole).toInt();
-	int dataId = itemEffectsList->model()->index(row, 1).data(Qt::UserRole).toInt();
-	if (code == 44)
-	{
-		tabWidget->setCurrentIndex(4);
-		tabWidget->findChild<EventsTable *>("eventsTable")->selectRow(dataId);
-	}*/
+	QModelIndex index = ui->itemEffectsList->currentIndex();
+	emit selectCommonEvent(index.data(ItemEffectsModel::DATA).toInt());
 }
 
 
@@ -265,9 +227,8 @@ void ItemsTab::enableGroupBoxes(bool enabled)
 
 void ItemsTab::itemNewClicked()
 {
-	int rowCount = model->rowCount();
-	model->insertRows(rowCount, 1);
-	ui->itemsTable->selectRow(rowCount - 1);
+	model->insertRows(model->rowCount(), 1);
+	ui->itemsTable->selectRow(model->rowCount() - 1);
 }
 
 void ItemsTab::itemChangeMaximumClicked()
@@ -278,7 +239,7 @@ void ItemsTab::itemChangeMaximumClicked()
 
 void ItemsTab::itemClearClicked()
 {
-	model->clearItem(ui->itemsTable->selectedRow());
-	ui->itemEffectsList->setRowCount(0);
+	model->clearElement(ui->itemsTable->selectedRow());
+	delete effectsModel;
 }
 

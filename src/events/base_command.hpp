@@ -1,9 +1,10 @@
 #pragma once
-#include <cstdint>
-#include "glaze/json/json_t.hpp"
+#include "glaze/core/context.hpp"
+#include "glaze/util/expected.hpp"
+#include "json_value.hpp"
 #include <QString>
 #include <QPainter>
-#include <QSharedPointer>
+//#include <QSharedPointer>
 
 struct ICommandParams
 {
@@ -15,34 +16,18 @@ struct ICommandParams
 	virtual ~ICommandParams() = default;
 	virtual int code() { return -1; };
 	virtual void drawImpl(QPainter *painter, bool selected, QRect &rect) = 0;
-	virtual void read(const std::string &parameters) = 0;
-	virtual void read(const std::vector<glz::json_t> &parameters) = 0;
+	virtual void read(JsonValue &parameters) = 0;
 	virtual auto write() -> std::string = 0;
 
 	virtual int flags() = 0;
 
-	/*virtual bool canAdd() = 0;
-	virtual bool canEdit() = 0;
-	virtual bool canDelete() = 0;*/
+	// TODO: implement for other classes
+	virtual void calculateWidth(QFontMetrics &metrics, int indent) { (void)metrics; (void)indent; }
+	void draw(QPainter *painter, bool selected, QRect rect, int indent);
+	void drawText(QPainter *painter, bool selected, QRect &rect, const QString &text, QColor color);
+	std::string checkExpected(glz::expected<std::string, glz::error_ctx> result);
 
-	void draw(QPainter *painter, bool selected, QRect rect, int indent)
-	{
-		int textAdvance = 8 + indent * 32;
-		rect.adjust(textAdvance, 0, 0, 0);
-		drawImpl(painter, selected, rect);
-	}
-
-	void drawText(QPainter *painter, bool selected, QRect &rect, const QString &text, QColor color)
-	{
-		QPen pen = painter->pen();
-		pen.setColor(selected ? QColorConstants::White : color);
-
-		painter->setPen(pen);
-		painter->drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, text);
-
-		int textAdvance = painter->fontMetrics().horizontalAdvance(text);
-		rect.adjust(textAdvance, 0, 0, 0);
-	}
+	int totalWidth = 0;
 };
 
 struct ConstantColors

@@ -19,7 +19,7 @@ int readModel(QStandardItemModel *model, int targetId)
 {
 	int currentRow = 0;
 	int counter = 0;
-	for (auto item: Database::Get()->getVector<T>())
+	for (auto item: Database::Get()->getStorage<T>())
 	{
 		if (item)
 		{

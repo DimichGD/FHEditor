@@ -8,8 +8,8 @@ class MapEventsModel: public BaseModel
 	Q_OBJECT
 
 public:
-	explicit MapEventsModel(Map *map, QObject *parent = nullptr)
-		: BaseModel(&accessor, 2, parent), accessor(&map->events)
+	explicit MapEventsModel(std::vector<std::optional<MapEvent>> *events, QObject *parent = nullptr)
+		: BaseModel(&accessor, 2, parent), accessor(events)
 	{
 		//accessor = Accessor<MapEvent>(&map->events);
 	}

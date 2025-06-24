@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QStringList>
 
-Command_102::Command_102(std::vector<std::string> choices, int value_0,
+Command_102::Command_102(QStringList choices, int value_0,
 						 int value_1, int value_2, int value_3)
 {
 	this->choices = choices;
@@ -38,33 +38,24 @@ QString Command_102::windowPositionToString()
 	return "Unknown";
 }
 
-void Command_102::read(const std::string &parameters)
-{
-	std::tuple<std::vector<std::string>, int, int, int, int> params;
-	glz::error_ctx err = glz::read_json(params, parameters);
-	if (err)
-		qDebug() << QString::fromStdString(glz::format_error(err));
 
-	choices = std::get<0>(params);
-	value_0 = std::get<1>(params);
-	value_1 = std::get<2>(params);
-	value_2 = std::get<3>(params);
-	value_3 = std::get<4>(params);
-}
-
-void Command_102::read(const std::vector<glz::json_t> &parameters)
+void Command_102::read(JsonValue &parameters)
 {
-	choices = { "123", "321" };
-	value_0 = parameters[1].as<int>();
-	value_1 = parameters[2].as<int>();
-	value_2 = parameters[3].as<int>();
-	value_3 = parameters[4].as<int>();
+	choices = parameters[0].toStringList();
+	value_0 = std::get<double>(parameters[1].data);
+	value_1 = std::get<double>(parameters[2].data);
+	value_2 = std::get<double>(parameters[3].data);
+	value_3 = std::get<double>(parameters[4].data);
 }
 
 std::string Command_102::write()
 {
+	std::vector<std::string> temp;
+	for (auto &s: choices)
+		temp.push_back(s.toStdString());
+
 	std::tuple<std::vector<std::string>, int, int, int, int> params;
-	params = std::tie(choices, value_0, value_1, value_2, value_3);
+	params = std::tie(temp, value_0, value_1, value_2, value_3);
 	glz::expected<std::string, glz::error_ctx> result = glz::write_json(params);
 	if (!result.has_value())
 	{
@@ -79,11 +70,11 @@ void Command_102::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	drawText(painter, selected, rect, "Show Choices: ", ConstantColors::purple);
 
-	QStringList stringList;
+	/*QStringList stringList;
 	for (auto &s: choices)
-		stringList.append(QString::fromStdString(s));
+		stringList.append(QString::fromStdString(s));*/
 
-	drawText(painter, selected, rect, stringList.join(", "), ConstantColors::blue);
+	drawText(painter, selected, rect, choices.join(", "), ConstantColors::blue);
 
 	QString str = QString(" (%1, %2, #%3, #%4)")
 			.arg(backgroundToString(), windowPositionToString())

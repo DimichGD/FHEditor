@@ -3,8 +3,8 @@
 
 struct Sound
 {
-	QString name;
-	int pan;
-	int pitch;
-	int volume;
+	QString name { "Null" };
+	int pan = 0;
+	int pitch = 100;
+	int volume = 90;
 };

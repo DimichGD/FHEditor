@@ -27,7 +27,7 @@ bool Database::load(Type type)
 	if (type & Type::ITEMS)
 	{
 		QString filename = path + "/data/Items.json";
-		if (!loadJson(filename, getVector<Item>()))
+		if (!loadJson(filename, getStorage<Item>()))
 			errorMessage += "Failed to load 'Items.json'\n";
 	}
 
@@ -35,7 +35,7 @@ bool Database::load(Type type)
 	if (type & Type::WEAPONS)
 	{
 		QString filename = path + "/data/Weapons.json";
-		if (!loadJson(filename, getVector<Weapon>()))
+		if (!loadJson(filename, getStorage<Weapon>()))
 			errorMessage += "Failed to load 'Weapons.json'\n";
 	}
 
@@ -43,7 +43,7 @@ bool Database::load(Type type)
 	if (type & Type::ARMORS)
 	{
 		QString filename = path + "/data/Armors.json";
-		if (!loadJson(filename, getVector<Armor>()))
+		if (!loadJson(filename, getStorage<Armor>()))
 			errorMessage += "Failed to load 'Armors.json'\n";
 	}
 
@@ -51,7 +51,7 @@ bool Database::load(Type type)
 	if (type & Type::EVENTS)
 	{
 		QString filename = path + "/data/CommonEvents.json";
-		if (!loadJson(filename, getVector<Event>()))
+		if (!loadJson(filename, getStorage<Event>()))
 			errorMessage += "Failed to load 'CommonEvents.json'\n";
 	}
 
@@ -83,15 +83,17 @@ bool Database::load(Type type)
 	if (type & Type::MAP_INFO)
 	{
 		QString filename = path + "/data/MapInfos.json";
-		if (!loadJson(filename, getVector<MapInfo>()))
+		if (!loadJson(filename, getStorage<MapInfo>()))
 			errorMessage += "Failed to load 'MapInfos.json'\n";
+
+		maps.clear();
 	}
 
 	// ---------- Tile Sets ----------
 	if (type & Type::TILE_SETS)
 	{
 		QString filename = path + "/data/Tilesets.json";
-		if (!loadJson(filename, getVector<TileSet>()))
+		if (!loadJson(filename, getStorage<TileSet>()))
 			errorMessage += "Failed to load 'Tilesets.json'\n";
 	}
 
@@ -99,7 +101,7 @@ bool Database::load(Type type)
 	if (type & Type::ANIMATION)
 	{
 		QString filename = path + "/data/Animations.json";
-		if (!loadJson(filename, getVector<Animation>()))
+		if (!loadJson(filename, getStorage<Animation>()))
 			errorMessage += "Failed to load 'Animations.json'\n";
 	}
 
@@ -107,7 +109,7 @@ bool Database::load(Type type)
 	if (type & Type::SKILLS)
 	{
 		QString filename = path + "/data/Skills.json";
-		if (!loadJson(filename, getVector<Skill>()))
+		if (!loadJson(filename, getStorage<Skill>()))
 			errorMessage += "Failed to load 'Skills.json'\n";
 	}
 
@@ -115,7 +117,7 @@ bool Database::load(Type type)
 	if (type & Type::STATE)
 	{
 		QString filename = path + "/data/States.json";
-		if (!loadJson(filename, getVector<State>()))
+		if (!loadJson(filename, getStorage<State>()))
 			errorMessage += "Failed to load 'States.json'\n";
 	}
 
@@ -143,7 +145,7 @@ bool Database::save(Type type)
 	if (type & Type::ITEMS)
 	{
 		QString filename = path + "/data/Items.json";
-		if (!saveJson<Item>(filename, getVector<Item>()))
+		if (!saveJson<Item>(filename, getStorage<Item>()))
 			qDebug() << "Error while saving Items.json";
 	}
 
@@ -151,7 +153,7 @@ bool Database::save(Type type)
 	if (type & Type::WEAPONS)
 	{
 		QString filename = path + "/data/Weapons.json";
-		if (!saveJson<Weapon>(filename, getVector<Weapon>()))
+		if (!saveJson<Weapon>(filename, getStorage<Weapon>()))
 			qDebug() << "Error while saving Weapons.json";
 	}
 
@@ -159,7 +161,7 @@ bool Database::save(Type type)
 	if (type & Type::EVENTS)
 	{
 		QString filename = path + "/data/CommonEvents.json";
-		if (!saveJson<Event>(filename, getVector<Event>()))
+		if (!saveJson<Event>(filename, getStorage<Event>()))
 			qDebug() << "Error while saving CommonEvents.json";
 	}
 
@@ -197,27 +199,27 @@ T *vectorValue(std::vector<std::optional<T>> &vector, int id)
 
 /*Item *Database::item(int id)
 {
-	return vectorValue(getVector<Item>(), id);
+	return vectorValue(getStorage<Item>(), id);
 }
 
 Weapon *Database::weapon(int id)
 {
-	return vectorValue(getVector<Weapon>(), id);
+	return vectorValue(getStorage<Weapon>(), id);
 }
 
 Armor *Database::armor(int id)
 {
-	return vectorValue(getVector<Armor>(), id);
+	return vectorValue(getStorage<Armor>(), id);
 }*/
 
 Event *Database::event(int id)
 {
-	return vectorValue(getVector<Event>(), id);
+	return vectorValue(getStorage<Event>(), id);
 }
 
 /*MapInfo *Database::mapInfo(int id)
 {
-	return vectorValue(getVector<MapInfo>(), id);
+	return vectorValue(getStorage<MapInfo>(), id);
 }*/
 
 Map *Database::map(int id)
@@ -245,22 +247,22 @@ Map *Database::map(int id)
 
 TileSet *Database::tileSet(int id)
 {
-	return vectorValue(getVector<TileSet>(), id);
+	return vectorValue(getStorage<TileSet>(), id);
 }
 
 Animation *Database::animation(int id)
 {
-	return vectorValue(getVector<Animation>(), id);
+	return vectorValue(getStorage<Animation>(), id);
 }
 
 Skill *Database::skill(int id)
 {
-	return vectorValue(getVector<Skill>(), id);
+	return vectorValue(getStorage<Skill>(), id);
 }
 
 State *Database::state(int id)
 {
-	return vectorValue(getVector<State>(), id);
+	return vectorValue(getStorage<State>(), id);
 }
 
 System *Database::system()

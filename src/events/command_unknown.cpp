@@ -1,38 +1,28 @@
 #include "command_unknown.hpp"
+#include "glaze/json/write.hpp"
 
 #include <QDebug>
-
-/*Command_Unknown::Command_Unknown(int codeId)
-{
-	this->codeId = codeId;
-}*/
 
 Command_Unknown::Command_Unknown(int codeId)
 {
 	this->codeId = codeId;
-	//this->parameters = parameters;
 }
 
-void Command_Unknown::read(const std::string &str)
+void Command_Unknown::read(JsonValue &parameters)
 {
-	parameters = str;
-}
-
-void Command_Unknown::read(const std::vector<glz::json_t> &parameters)
-{
-	this->parameters = ""; //parameters[0].get_string();
+	this->parameters = parameters; //parameters[0].get_string();
 }
 
 std::string Command_Unknown::write()
 {
-	return parameters;
+	return glz::write_json(parameters).value();
 }
 
 void Command_Unknown::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	QString str = QString("Unknown Command %1: %2")
 			.arg(codeId)
-			.arg(QString::fromStdString(parameters));
+			.arg(QString::fromStdString(write()));
 	drawText(painter, selected, rect, str, ConstantColors::grey);
 }
 

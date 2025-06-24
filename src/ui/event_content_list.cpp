@@ -11,6 +11,10 @@
 #include <QStyledItemDelegate>
 #include <QMenu>
 
+#include <QLineEdit>
+#include <QCompleter>
+#include <QStringListModel>
+
 class EventItemDelegate: public QStyledItemDelegate
 {
 public:
@@ -25,44 +29,35 @@ public:
 		QStyledItemDelegate::paint(painter, option, index);
 
 		painter->save();
-		auto cmd1 = index.data(Qt::UserRole + 1).value<Command::Iterator>();
-		cmd1->parameters->draw(painter, option.state & QStyle::State_Selected, rect, cmd1->indent);
+		Command::Iterator command = Command::iteratorFromIndex(index);
+		command->parameters->draw(painter, option.state & QStyle::State_Selected, rect, command->indent);
 		painter->restore();
+	}
+
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override
+	{
+		Command::Iterator command = Command::iteratorFromIndex(index);
+
+		QSize size = QStyledItemDelegate::sizeHint(option, index);
+		if (command->parameters->totalWidth)
+			size.setWidth(command->parameters->totalWidth);
+
+		return size;
 	}
 };
 
 EventContentList::EventContentList(QWidget *parent): QListView(parent)
 {
 	this->setItemDelegateForColumn(0, new EventItemDelegate(this));
-
-	/*model = new EventContentListModel(this);
-	setModel(model);
-	setSelectionModel(new EventContentSelectionModel(model, this));*/
-
-	actionCommandNew = new QAction("New", this);
-	actionCommandEdit = new QAction("Edit", this);
-	actionCommandDelete = new QAction("Delete", this);
-	contextMenu = new QMenu(this);
-	contextMenu->addAction(actionCommandNew);
-	contextMenu->addAction(actionCommandEdit);
-	contextMenu->addSeparator();
-	contextMenu->addAction(actionCommandDelete);
-
-	connect(actionCommandNew, &QAction::triggered, this, &EventContentList::actionCommandNewTriggered);
-	connect(actionCommandEdit, &QAction::triggered, this, &EventContentList::actionCommandEditTriggered);
-	connect(actionCommandDelete, &QAction::triggered, this, &EventContentList::actionCommandDeleteTriggered);
-	connect(this, &EventContentList::customContextMenuRequested, this, &EventContentList::contextMenuRequested);
 }
 
 void EventContentList::loadList(std::list<Command> *list)
 {
-	//currentList = list;
+	clear();
 
+	QFontMetrics metrics = fontMetrics();
 	for (auto &command: *list)
-	{
-		command.parameters = CommandFactory::createCommand2(command.code);
-		command.parameters->read(command.jsonValues);
-	}
+		command.parameters->calculateWidth(metrics, command.indent);
 
 	model = new EventContentListModel(list, this);
 
@@ -72,10 +67,11 @@ void EventContentList::loadList(std::list<Command> *list)
 
 void EventContentList::clear()
 {
-	setModel(nullptr);
+	/*setModel(nullptr);
 
 	if (model)
-		delete model;
+		delete model;*/
+	delete model;
 }
 
 void EventContentList::actionCommandNewTriggered(bool)
@@ -103,7 +99,7 @@ void EventContentList::actionCommandEditTriggered(bool)
 
 	CommandDialog *dialog = nullptr;
 	auto selectedIndices = selectionModel()->selection()[0].indexes();
-	Command::Iterator command = selectedIndices[0].data(Qt::UserRole + 1).value<Command::Iterator>();
+	Command::Iterator command = Command::iteratorFromIndex(selectedIndices[0]);
 
 	switch (command->code)
 	{
@@ -136,28 +132,4 @@ void EventContentList::actionCommandDeleteTriggered(bool)
 
 	int firstRow = selectedIndices[0].row();
 	model->removeCommands(firstRow, selectedIndices.size());
-}
-
-void EventContentList::contextMenuRequested(const QPoint &pos)
-{
-	QModelIndex index = indexAt(pos);
-	if (index.isValid())
-	{
-		Command::Iterator command = index.data(Qt::UserRole + 1).value<Command::Iterator>();
-
-		actionCommandNew->setEnabled(command->parameters->flags() & ICommandParams::CAN_ADD);
-		actionCommandEdit->setEnabled(command->parameters->flags() & ICommandParams::CAN_EDIT);
-		actionCommandDelete->setEnabled(command->parameters->flags() & ICommandParams::CAN_DELETE);
-
-		selectionModel()->clearSelection();
-		setCurrentIndex(index);
-	}
-	else
-	{
-		actionCommandNew->setEnabled(false);
-		actionCommandEdit->setEnabled(false);
-		actionCommandDelete->setEnabled(false);
-	}
-
-	contextMenu->exec(viewport()->mapToGlobal(pos));
 }

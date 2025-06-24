@@ -15,12 +15,13 @@ MapEventsTab::~MapEventsTab()
 	delete ui;
 }
 
-void MapEventsTab::init(Map *map)
+//void MapEventsTab::init(Map *map)
+void MapEventsTab::init(TileMap *tileMap)
 {
 	if (model)
 		delete model;
 
-	currentMap = map;
+	currentMap = tileMap;
 
 	/*if (newEvent)
 	{
@@ -33,7 +34,8 @@ void MapEventsTab::init(Map *map)
 		map->events.push_back(event);
 	}*/
 
-	model = new MapEventsModel(map, ui->mapEventsTable);
+	//model = new MapEventsModel(tileMap->events(), ui->mapEventsTable);
+	model = tileMap->eventsModel();
 	ui->mapEventsTable->setModel2(model);
 
 	//connect(ui->mapEventsTable->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &MapEventsTab::mapEventsTableClicked);
@@ -45,8 +47,8 @@ void MapEventsTab::mapEventsTableClicked(int row)
 {
 	//int id = ui->mapEventsTable->selectedId();
 	MapEvent *event = nullptr;
-	if (currentMap->events[row].has_value())
-		event = &currentMap->events[row].value();
+	if (currentMap->events()->at(row).has_value())
+		event = &currentMap->events()->at(row).value();
 
 	if (!event)
 		return;
@@ -69,7 +71,7 @@ void MapEventsTab::selectEvent(int id)
 void MapEventsTab::addMapEvent(MapEvent event)
 {
 	model->insertRows(model->rowCount(), 1);
-	currentMap->events[model->rowCount() - 1] = event;
+	currentMap->events()->at(model->rowCount() - 1) = event;
 	//model->setData(model->index(model->rowCount() - 1, 0), )
 }
 

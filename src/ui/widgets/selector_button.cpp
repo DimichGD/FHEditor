@@ -16,17 +16,17 @@ void SelectorButton::changeId(int id)
 	// TODO: do not get data from database, it need to be from uncommited copies
 	if (source == SimpleChooserDialog::ANIMATION)
 	{
-		Animation *value = Database::Get()->value<Animation>(id);
+		Animation *value = Accessor<Animation>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::STATE)
 	{
-		State *value = Database::Get()->value<State>(id);
+		State *value = Accessor<State>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::SKILL)
 	{
-		Skill *value = Database::Get()->value<Skill>(id);
+		Skill *value = Accessor<Skill>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::SWITCH)
@@ -41,15 +41,15 @@ void SelectorButton::changeId(int id)
 	}
 	else if (source == SimpleChooserDialog::ITEM)
 	{
-		Item *value = Database::Get()->value<Item>(id);
+		Item *value = Accessor<Item>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::COMMON_EVENT)
 	{
-		Event *value = Database::Get()->value<Event>(id);
+		Event *value = Accessor<Event>().value(id);
 		setText(value ? value->name : "?");
 	}
-	} catch (std::exception &e) // TODO: remove this?
+	} catch (std::exception &e) // TODO: remove this
 	{ qDebug() << "idChanged(" << id << ") exception with source" << source; }
 }
 

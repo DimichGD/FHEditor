@@ -38,29 +38,19 @@ QString Command_101_Params::faceToString()
 	if (faceName.isEmpty())
 		return "Null";
 
-	//QString actualFaceName = faceName.isEmpty() ? "Null" : faceName;
 	return QString("%1(%2)").arg(faceName).arg(faceIndex);
 }
 
-void Command_101_Params::read(const std::string &parameters)
+void Command_101_Params::read(JsonValue &parameters)
 {
-	std::tuple<QString, int, int, int> params;
-	glz::error_ctx err = glz::read_json(params, parameters);
-	if (err)
-		qDebug() << QString::fromStdString(glz::format_error(err));
-
-	faceName = std::get<0>(params);
-	faceIndex = std::get<1>(params);
-	background = std::get<2>(params);
-	windowPosition = std::get<3>(params);
-}
-
-void Command_101_Params::read(const std::vector<glz::json_t> &parameters)
-{
-	faceName = QString::fromStdString(parameters[0].as<std::string>());
-	faceIndex = parameters[1].as<int>();
-	background = parameters[2].as<int>();
-	windowPosition = parameters[3].as<int>();
+	/*faceName = std::get<QString>(parameters[0].data);
+	faceIndex = std::get<double>(parameters[1].data);
+	background = std::get<double>(parameters[2].data);
+	windowPosition = std::get<double>(parameters[3].data);*/
+	faceName = parameters[0].toQString();
+	faceIndex = parameters[1].toInt();
+	background = parameters[2].toInt();
+	windowPosition = parameters[3].toInt();
 }
 
 std::string Command_101_Params::write()

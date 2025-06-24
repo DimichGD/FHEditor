@@ -4,10 +4,9 @@
 namespace Ui { class ItemsTab; }
 
 class QMenu;
-class QStandardItem;
-class QDataWidgetMapper;
 class DataMapper;
 class ItemsModel;
+class ItemEffectsModel;
 struct Item;
 
 class ItemsTab: public QWidget
@@ -18,21 +17,22 @@ public:
 	explicit ItemsTab(QWidget *parent = nullptr);
 	~ItemsTab();
 
-	void changeIcon(int index);
 	void init();
 
 signals:
-	void itemChanged(int id);
+	void selectCommonEvent(int eventId);
 
 private slots:
 	void itemRowSelected(int row);
 	void itemDamageTypeChanged(int index);
 	void itemIconClicked();
+
 	void contextMenuRequested(const QPoint &pos);
 	void actionEffectNewTriggered(bool);
 	void actionEffectEditTriggered(bool);
 	void actionEffectDeleteTriggered(bool);
 	void actionEffectGotToTriggered(bool);
+
 	void applyButtonClicked();
 	void enableGroupBoxes(bool enabled);
 
@@ -45,7 +45,7 @@ private:
 	QMenu *itemEffectsListMenu = nullptr;
 	Item *currentItem = nullptr;
 	ItemsModel *model = nullptr;
+	ItemEffectsModel *effectsModel = nullptr;
 	DataMapper *mapper = nullptr;
-	//QPixmap iconSetPixmap;
 };
 

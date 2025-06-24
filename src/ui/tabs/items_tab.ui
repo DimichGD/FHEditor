@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1028</width>
+    <width>1034</width>
     <height>560</height>
    </rect>
   </property>
@@ -727,7 +727,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_21">
           <item>
-           <widget class="QTableWidget" name="itemEffectsList">
+           <widget class="QTableView" name="itemEffectsList">
             <property name="contextMenuPolicy">
              <enum>Qt::CustomContextMenu</enum>
             </property>
@@ -747,9 +747,12 @@
              <bool>false</bool>
             </property>
             <attribute name="horizontalHeaderDefaultSectionSize">
-             <number>128</number>
+             <number>144</number>
             </attribute>
             <attribute name="horizontalHeaderHighlightSections">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
              <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderStretchLastSection">
@@ -758,16 +761,6 @@
             <attribute name="verticalHeaderVisible">
              <bool>false</bool>
             </attribute>
-            <column>
-             <property name="text">
-              <string>Type</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Data</string>
-             </property>
-            </column>
            </widget>
           </item>
          </layout>

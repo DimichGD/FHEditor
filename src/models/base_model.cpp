@@ -55,11 +55,12 @@ bool BaseModel::setData(const QModelIndex &index, const QVariant &value, int rol
 	if (!index.isValid())
 		return false;
 
+
 	if (role != Qt::EditRole)
 		return false;
 
 	setDataFromMapper(index.row(), index.column(), value);
-	//emit dataChanged(createIndex(index.row(), 0), createIndex(index.row(), 2), { Qt::DisplayRole });
+	emit dataChanged(index, index, { Qt::EditRole });
 	emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 2), { Qt::DisplayRole });
 
 	return true;
@@ -73,12 +74,16 @@ QVariant BaseModel::headerData(int section, Qt::Orientation orientation, int rol
 	return headerTitle[section];
 }
 
+/*bool BaseModel::hasElement(int row)
+{
+	return accessor->hasElement(row);
+}*/
 
-void BaseModel::clearItem(int row)
+
+void BaseModel::clearElement(int row)
 {
 	accessor->clearElement(row);
-	//emit dataChanged(createIndex(row, 1), createIndex(row, 2), { Qt::DisplayRole });
-	//emit dataChanged(createIndex(row, 1), createIndex(row, Item::COUNT - 1), { Qt::EditRole });
+
 	emit dataChanged(index(row, 1), index(row, 2), { Qt::DisplayRole });
 	emit dataChanged(index(row, 1), index(row, Item::COUNT - 1), { Qt::EditRole });
 }

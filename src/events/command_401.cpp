@@ -36,19 +36,9 @@ Command_401_Params::Command_401_Params(QString line)
 	this->line = line;
 }
 
-void Command_401_Params::read(const std::string &str)
+void Command_401_Params::read(JsonValue &parameters)
 {
-	std::tuple<QString> params;
-	glz::error_ctx err = glz::read_json(params, str);
-	if (err)
-		qDebug() << QString::fromStdString(glz::format_error(err));
-
-	line = std::get<0>(params);
-}
-
-void Command_401_Params::read(const std::vector<glz::json_t> &parameters)
-{
-	line = QString::fromStdString(parameters[0].as<std::string>());
+	line = parameters[0].toQString();
 }
 
 std::string Command_401_Params::write()

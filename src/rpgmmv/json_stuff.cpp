@@ -14,75 +14,8 @@
 #include "command_factory.hpp"
 #include "json_qstring.hpp"
 
-
 #include <QFile>
 #include <QDebug>
-
-/*template <>
-struct glz::from<glz::JSON, Command>
-{
-	template <auto Opts>
-	static bool read_k(std::string_view sv, is_context auto&& ctx, auto&& it, auto&& end)
-	{
-		static std::string_view buffer = "XXXXXXXXXXXXXXXXXXXX";
-		skip_ws<Opts>(ctx, it, end);
-		parse<JSON>::op<Opts>(buffer, ctx, it, end);
-		if (buffer != sv)
-		{
-			ctx.error = error_code::unknown_key;
-			return true;
-		}
-
-		skip_ws<Opts>(ctx, it, end);
-		if (match<':'>(ctx, it))
-			return true;
-
-		return false;
-	}
-
-	template <auto Opts>
-	static bool read_kv(std::string_view sv, int &value, is_context auto&& ctx, auto&& it, auto&& end)
-	{
-		if (read_k<Opts>(sv, ctx, it, end))
-			return true;
-
-		skip_ws<Opts>(ctx, it, end);
-		parse<JSON>::op<Opts>(value, ctx, it, end);
-
-		skip_ws<Opts>(ctx, it, end);
-		if (match<','>(ctx, it))
-			return true;
-
-		return false;
-	}
-
-	template <auto Opts>
-	static void op(Command& value, is_context auto&& ctx, auto&& it, auto&& end)
-	{
-		skip_ws<Opts>(ctx, it, end);
-		if (match<'{'>(ctx, it))
-			return;
-
-		if (read_kv<Opts>("code", value.code, ctx, it, end))
-			return;
-
-		if (read_kv<Opts>("indent", value.indent, ctx, it, end))
-			return;
-
-		if (read_k<Opts>("parameters", ctx, it, end))
-			return;
-
-		skip_ws<Opts>(ctx, it, end);
-		const auto start = it++;
-		skip_until_closed<Opts, '[', ']'>(ctx, it, end);
-		value.parameters = CommandFactory::createCommand2(value.code);
-		value.parameters->read({ start, size_t(it - start) });
-
-		skip_ws<Opts>(ctx, it, end);
-		if (match<'}'>(ctx, it))
-			return;
-	}
-};
 
 
 template <>
@@ -93,7 +26,7 @@ struct glz::to<glz::JSON, QSharedPointer<ICommandParams>>
 	{
 		serialize<JSON>::op<glz::opts{.raw = true}>(value->write(), ctx, it, end);
 	}
-};*/
+};
 
 template <>
 struct glz::meta<Command>
@@ -101,39 +34,11 @@ struct glz::meta<Command>
 	using T = Command;
 	static constexpr auto value = object("code", &T::code,
 										 "indent", &T::indent,
-										 "parameters", &T::jsonValues);
+										 "parameters", custom<&T::readParams, &T::parameters>);
 };
 
-/*template <>
-struct glz::from<glz::JSON, Command>
-{
-	template <auto Opts>
-	static void op(Command& value, auto&&... args)
-	{
-		parse<JSON>::op<Opts>(value, args...);
-		//value.parameters = CommandFactory::createCommand2(value.code);
-		//value.parameters->read(value.jsonValues);
-	}
-};*/
-
 
 /*template <>
-struct glz::to<glz::JSON, Command>
-{
-	template <auto Opts>
-	static void op(Command& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
-	{
-		serialize<JSON>::op<Opts>("{code:", ctx, it, end);
-		serialize<JSON>::op<Opts>(value.code, ctx, it, end);
-		serialize<JSON>::op<Opts>(",indent:", ctx, it, end);
-		serialize<JSON>::op<Opts>(value.indent, ctx, it, end);
-		serialize<JSON>::op<Opts>(",parameters:", ctx, it, end);
-		serialize<JSON>::op<Opts>(value.parameters, ctx, it, end);
-		serialize<JSON>::op<Opts>("}", ctx, it, end);
-	}
-};*/
-
-template <>
 struct glz::from<glz::JSON, Route>
 {
 	template <auto Opts>
@@ -153,7 +58,7 @@ struct glz::to<glz::JSON, Route>
 	{
 		serialize<JSON>::op<glz::opts{.raw = true}>(value.parseLater, ctx, it, end);
 	}
-};
+};*/
 
 template <>
 struct glz::from<glz::JSON>

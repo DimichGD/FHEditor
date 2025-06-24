@@ -11,7 +11,7 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 {
 	ui->setupUi(this);
 
-	Command::Iterator command = indices[0].data(Qt::UserRole + 1).value<Command::Iterator>();
+	Command::Iterator command = Command::iteratorFromIndex(indices[0]);
 	indent = command->indent;
 
 	if (editing)
@@ -23,12 +23,6 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 		for (int i = 1; i < indices.size(); i++)
 		{
 			std::advance(command, 1);
-			if (command->code != CommandFactory::TEXT_LINE)
-			{
-				qDebug() << "CommandTextDialog error. Expected TEXT_LINE";
-				continue;
-			}
-
 			auto params = command->parameters.staticCast<Command_401_Params>();
 			ui->messageLinesEdit->appendPlainText(params->line);
 		}
@@ -44,10 +38,7 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 		}
 	}
 
-	connect(ui->faceLabel, &ClickableLabel::doubleClicked, this, [this]()
-	{
-		openIconPickerDialog(faceName, faceIndex);
-	});
+	connect(ui->faceLabel, &ClickableLabel::doubleClicked, this, &CommandTextDialog::openIconPickerDialog);
 }
 
 CommandTextDialog::~CommandTextDialog()
@@ -74,7 +65,7 @@ std::list<Command> CommandTextDialog::resultCommands()
 	return resultList;
 }
 
-void CommandTextDialog::openIconPickerDialog(QString faceName, int faceIndex)
+void CommandTextDialog::openIconPickerDialog()
 {
 	IconPickerDialog dialog(this, PickerType::FACE, faceName, faceIndex);
 	if (dialog.exec())
@@ -82,7 +73,7 @@ void CommandTextDialog::openIconPickerDialog(QString faceName, int faceIndex)
 		ui->faceLabel->setIconMode(ClickableLabel::FACES, Images::Get()->face(dialog.name()));
 		ui->faceLabel->setIconIndex(dialog.index());
 
-		this->faceName = dialog.name();
-		this->faceIndex = dialog.index();
+		faceName = dialog.name();
+		faceIndex = dialog.index();
 	}
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "event.hpp"
+#include "map_event.hpp"
 #include "sound.hpp"
 
 struct Map

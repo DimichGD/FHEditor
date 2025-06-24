@@ -5,13 +5,6 @@
 EventContentListModel::EventContentListModel(std::list<Command> *list, QObject *parent)
 	: QAbstractListModel(parent), commandList(list) {}
 
-/*void EventContentListModel::load(std::list<Command> *list)
-{
-	//currentEvent = event;
-	commandList = list;
-	emit dataChanged(index(0), index(rowCount()));
-}*/
-
 int EventContentListModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
@@ -25,24 +18,20 @@ QVariant EventContentListModel::data(const QModelIndex &index, int role) const
 
 	if (role == Qt::UserRole + 1)
 	{
-		Command::Iterator it = commandList->begin();
-		std::advance(it, index.row());
+		Command::Iterator it = std::next(commandList->begin(), index.row());
 		return QVariant::fromValue(it);
 	}
 
 	return QVariant();
 }
 
+
 void EventContentListModel::removeCommands(int row, int count)
 {
 	QAbstractListModel::beginRemoveRows(QModelIndex(), row, row + count);
 
-	std::list<Command>::iterator begin = commandList->begin();
-	std::advance(begin, row);
-
-	std::list<Command>::iterator end = begin;
-	std::advance(end, count);
-
+	std::list<Command>::iterator begin = std::next(commandList->begin(), row);
+	std::list<Command>::iterator end = std::next(begin, count);
 	commandList->erase(begin, end);
 
 	QAbstractListModel::endRemoveRows();
@@ -52,9 +41,7 @@ void EventContentListModel::insertCommands(int row, std::list<Command> &&otherLi
 {
 	QAbstractListModel::beginInsertRows(QModelIndex(), row, row + otherList.size() - 1);
 
-	std::list<Command>::iterator begin = commandList->begin();
-	std::advance(begin, row);
-
+	std::list<Command>::iterator begin = std::next(commandList->begin(), row);
 	commandList->splice(begin, otherList);
 
 	QAbstractListModel::endInsertRows();

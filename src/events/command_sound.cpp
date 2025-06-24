@@ -14,19 +14,13 @@ CommandSound::CommandSound(Type type, Sound sound)
 	this->sound = sound;
 }
 
-void CommandSound::read(const std::string &parameters)
+void CommandSound::read(JsonValue &parameters)
 {
-	std::tuple<Sound> params;
-	glz::error_ctx err = glz::read_json(params, parameters);
-	if (err)
-		qDebug() << QString::fromStdString(glz::format_error(err));
-
-	sound = std::get<0>(params);
-}
-
-void CommandSound::read(const std::vector<glz::json_t> &parameters)
-{
-	sound = glz::read_json<Sound>(parameters[0]).value();
+	//sound = std::get<Sound>(parameters[0].data);
+	sound.name = parameters[0]["name"].toQString();
+	sound.pan = parameters[0]["pan"].toInt();
+	sound.pitch = parameters[0]["pitch"].toInt();
+	sound.volume = parameters[0]["volume"].toInt();
 }
 
 std::string CommandSound::write()

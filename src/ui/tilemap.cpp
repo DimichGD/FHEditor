@@ -85,24 +85,26 @@ void TileMap::loadTileSet(int id)
 	}
 }
 
-void TileMap::loadTileMap(int id)
+bool TileMap::loadTileMap(int id)
 {
 	map = Database::Get()->map(id);
 	if (!map)
-		return;
+		return false;
 
 	size_t arraySize = map->width * map->height;
 
 	if (map->data.size() != arraySize * 6)
 	{
 		qDebug() << "map->data.size() != width * height * 6";
-		return;
+		return false;
 	}
 
 	for (size_t i = 0; i < 6; i++)
 		tileLayers[i] = { map->data.begin() + arraySize * i, arraySize };
 
-	loadTileSet(map->tilesetId);
+	loadTileSet(map->tilesetId); // make loadTileSet bool too
+	model = new MapEventsModel(&map->events);
+	return true;
 }
 
 int TileMap::tileId(int x, int y, int z)
@@ -124,9 +126,7 @@ TileItemInfo TileMap::tileItemInfo(int tileId)
 		y -= 16;
 	}
 
-	TileItemInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
-							tileSets[index], tileId };
-	return info;
+	return { tileSets[index], { x * tileSize, y * tileSize, tileSize, tileSize }, tileId };
 }
 
 TileItemInfo TileMap::tileItemInfo(int x, int y, TileSet::Set setIndex)
@@ -139,14 +139,52 @@ TileItemInfo TileMap::tileItemInfo(int x, int y, TileSet::Set setIndex)
 		y -= 16;
 	}
 
-	TileItemInfo info { { x * tileSize, y * tileSize, tileSize, tileSize },
-							tileSets[setIndex], tileId };
-	return info;
+	return { tileSets[setIndex], { x * tileSize, y * tileSize, tileSize, tileSize }, tileId };
 }
 
 void TileMap::putTile(int x, int y, int z, int id)
 {
 	tileLayers[z][y * width() + x] = id;
+}
+
+MapEvent *TileMap::addNewEvent(int x, int y)
+{
+	int lastEventId = 0;
+
+	auto it = map->events.begin() + 1;
+	while (it != map->events.end())
+	{
+		if (!it->has_value())
+		{
+			lastEventId = std::distance(it, map->events.begin());
+			break;
+		}
+
+		std::advance(it, 1);
+	}
+
+	bool updateExisting = true;
+	if (lastEventId == 0)
+	{
+		lastEventId = map->events.size();
+		updateExisting = false;
+	}
+
+	model->insertRows(model->rowCount(), 1);
+
+	MapEvent event { .id = lastEventId };
+	event.name = QString("EV%1").arg(event.id, 3, 10, QChar('0'));
+	event.x = x;
+	event.y = y;
+	event.pages.emplace_back();
+	event.pages.back().list.push_back(Command::makeZeroCommand(0));
+
+	if (updateExisting)
+		map->events[lastEventId] = event;
+	else
+		map->events.back() = event;
+
+	return &(*map->events.back());
 }
 
 void TileMap::clear()

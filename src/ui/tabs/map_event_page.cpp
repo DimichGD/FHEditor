@@ -13,6 +13,14 @@ MapEventPage::MapEventPage(MapEventPagesModel *model, int index, Page *page, QWi
 	ui->variableButton->setSource(SimpleChooserDialog::VARIABLE);
 	ui->itemButton->setSource(SimpleChooserDialog::ITEM);
 
+	Image &image = page->image;
+	if (!image.characterName.isEmpty())
+	{
+		ui->imageLabel->setIconMode(ClickableLabel::CHARACTER, image.characterName);
+		if (image.tileId == 0)
+			ui->imageLabel->setIconIndex((image.direction / 2 - 1) * 3 + image.characterIndex * 3 + image.pattern);
+	}
+
 	mapper = new DataMapper(this);
 	mapper->setModel(model);
 	mapper->addWidgets({

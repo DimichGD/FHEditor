@@ -1,13 +1,18 @@
 #include "map_tab.hpp"
+#include "map_event_tool.hpp"
 #include "map_events_tab.hpp"
 #include "map_info_model.hpp"
 #include "settings.hpp"
+#include "tile_paint_tool.hpp"
+#include "tile_picker_tool.hpp"
 #include "ui_map_tab.h"
 #include "command_factory.hpp"
 
 #include <QButtonGroup>
 #include <QDateTime>
 #include <QProcess>
+
+
 
 MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 {
@@ -19,9 +24,9 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	ui->visibleLayersButtonGroup->setId(ui->layerCheckBox_3, 3);
 	ui->visibleLayersButtonGroup->setId(ui->layerCheckBox_4, 4);
 	ui->visibleLayersButtonGroup->setId(ui->layerCheckBox_5, 5);
-	ui->modeButtonGroup->setId(ui->tileModeButton, MapView::Mode::TILES);
-	ui->modeButtonGroup->setId(ui->eventModeButton, MapView::Mode::EVENTS);
-	ui->modeButtonGroup->setId(ui->pickerModeButton, MapView::Mode::PICKER);
+	ui->modeButtonGroup->setId(ui->tileModeButton, 0);
+	ui->modeButtonGroup->setId(ui->eventModeButton, 1);
+	ui->modeButtonGroup->setId(ui->pickerModeButton, 2);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_1, 2);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_2, 3);
 	ui->tilePickerButtonGroup->setId(ui->tilePickerButtonA, 0);
@@ -48,8 +53,15 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		ui->toggleMapTableButton->setText(ui->mapInfoTable->isVisible() ? "-" : "+");
 	});
 
-	connect(ui->modeButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentMode);
-	connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentLayer);
+	//connect(ui->modeButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentMode);
+	connect(ui->modeButtonGroup, &QButtonGroup::idClicked, ui->mapView, [this](int id)
+	{
+		ui->mapView->setCurrentTool(mapViewTools[id]);
+		ui->mapView->setCurrentMode(id);
+	});
+
+
+	//connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, ui->mapView, &MapView::setCurrentLayer);
 
 	/*connect(ui->tilesTabWidget, &QTabWidget::currentChanged, ui->tilesTabWidget, [this](int index)
 	{
@@ -79,8 +91,8 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	connect(ui->tilePicker_D, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
 	connect(ui->tilePicker_E, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);*/
 
-	connect(ui->tilePickerView, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
-	connect(ui->tilePickerView, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
+	//connect(ui->tilePickerView, &TilePickerView::tileSelected, ui->mapView, &MapView::setCurrentTileSingle);
+	//connect(ui->tilePickerView, &TilePickerView::multipleTilesSelected, ui->mapView, &MapView::setCurrentTileMultiple);
 
 	connect(ui->runButton, &QPushButton::clicked, [this]()
 	{
@@ -94,27 +106,8 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		process->start(Settings::Get()->rpgmPath + "/nwjs-lnx-test/Game", arguments);
 	});
 
-	connect(ui->mapView, &MapView::editEvent, [this](int eventId)
+	/*connect(ui->mapView, &MapView::newEvent, [this](int x, int y)
 	{
-		/*MapEventsTab *mapEventsTab = new MapEventsTab();
-		mapEventsTab->resize(1280, 720);
-		mapEventsTab->setWindowModality(Qt::ApplicationModal);
-		mapEventsTab->init(currentMap);
-		mapEventsTab->selectEvent(eventId);
-		mapEventsTab->show();*/
-
-		emit editMapEvent(eventId);
-	});
-
-	connect(ui->mapView, &MapView::newEvent, [this](int x, int y)
-	{
-		/*MapEventsTab *mapEventsTab = new MapEventsTab(nullptr, true);
-		mapEventsTab->resize(1280, 720);
-		mapEventsTab->setWindowModality(Qt::ApplicationModal);
-		mapEventsTab->init(currentMap);
-		mapEventsTab->selectEvent(eventId);
-		mapEventsTab->show();*/
-
 		bool updateExisting = false;
 		auto it = std::next(currentMap->events.begin());
 		while (it != currentMap->events.end())
@@ -129,14 +122,15 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		}
 
 		//int lastEventId = currentMap->events.back().value().id + 1;
-		int lastEventId = std::prev(it)->value().id + 1;
+		int lastEventId = std::prev(it)->value().id + 1; // FIXME: this is wrong. some ids can be same
 		MapEvent event {};
 		event.id = lastEventId;
 		event.name = QString("EV%1").arg(lastEventId, 3, 10, QChar('0'));
 		event.x = x;
 		event.y = y;
 		event.pages.emplace_back();
-		event.pages.back().list.push_back({ CommandFactory::ZERO, 0, CommandFactory::createCommand2(0) });
+		event.pages.back().list.push_back(Command::makeZeroCommand(0));
+		//event.pages.back().list.push_back({ CommandFactory::ZERO, 0, CommandFactory::createCommand2(0) });
 
 		if (updateExisting)
 		{
@@ -151,19 +145,7 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 		}
 
 		ui->mapView->addNewEvent(event);
-	});
-
-	connect(ui->mapView, &MapView::pickTile, [this](int tileId)
-	{
-		/*TileSet::Set setIndex = tilesetIndexFromId(tileId);
-		if (setIndex >= TileSet::A1 && setIndex <= TileSet::A5)
-			ui->tilesTabWidget->setCurrentIndex(0);
-		else
-			ui->tilesTabWidget->setCurrentIndex(setIndex - 4);
-
-		TilePickerView *view = tilePickerViews[ui->tilesTabWidget->currentIndex()];
-		view->selectTile(tileId);*/
-	});
+	});*/
 
 	// TODO: remember last selection
 	connect(ui->tilePickerButtonGroup, &QButtonGroup::idClicked, [this](int id)
@@ -173,21 +155,49 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 
 		if (id == 0)
 		{
-			ui->mapView->setCurrentLayer(0);
+			//ui->mapView->setCurrentLayer(0);
+			tilePaintTool->setCurrentLayer(0);
 			ui->layerButton_1->setEnabled(false);
 			ui->layerButton_2->setEnabled(false);
 		}
 		else
 		{
-			ui->mapView->setCurrentLayer(ui->paintLayerButtonGroup->checkedId());
+			//ui->mapView->setCurrentLayer(ui->paintLayerButtonGroup->checkedId());
+			tilePaintTool->setCurrentLayer(ui->paintLayerButtonGroup->checkedId());
 			ui->layerButton_1->setEnabled(true);
 			ui->layerButton_2->setEnabled(true);
 		}
 	});
+
+	//mapViewTools[0] = tilePaintTool = new TilePaintTool(ui->mapView->currentScene(), this);
+	mapViewTools[0] = tilePaintTool = ui->mapView->makeTool<TilePaintTool>();
+	mapViewTools[1] = mapEventTool = ui->mapView->makeTool<MapEventTool>();
+	mapViewTools[2] = tilePickerTool = ui->mapView->makeTool<TilePickerTool>();
+
+	connect(ui->tilePickerView, &TilePickerView::tileSelected, tilePaintTool, &TilePaintTool::setCurrentTileSingle);
+	connect(ui->tilePickerView, &TilePickerView::multipleTilesSelected, tilePaintTool, &TilePaintTool::setCurrentTileMultiple);
+
+	connect(tilePickerTool, &TilePickerTool::pickTile,
+			[this](int tileId, int buttonIndex)
+	{
+		ui->tilePickerButtonGroup->button(buttonIndex)->click();
+		ui->tilePickerView->selectTile(tileId);
+	});
+
+	connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, tilePaintTool, &TilePaintTool::setCurrentLayer);
+
+	connect(mapEventTool, &MapEventTool::selectEvent, [this](int eventId)
+		{ emit editMapEvent(eventId); });
+
+	//connect(mapEventTool, &MapEventTool::newEvent, [this](int eventId)
+	//	{ emit addMapEvent(eventId); });
 }
 
 MapTab::~MapTab()
 {
+	for (auto tool: mapViewTools)
+		delete tool;
+
 	if (process)
 	{
 		process->terminate();
@@ -202,13 +212,13 @@ void MapTab::init()
 {
 	model = new MapInfoModel(ui->mapInfoTable);
 	ui->mapInfoTable->setModel2(model);
+	ui->mapView->clear();
 }
 
 void MapTab::loadMap(int id)
 {
-	uint64_t start = QDateTime::currentMSecsSinceEpoch();
-	currentMap = Database::Get()->map(id);
 	ui->mapView->clear();
+	//currentMap = Database::Get()->map(id);
 
 	const auto buttons = ui->visibleLayersButtonGroup->buttons();
 	for (auto checkBox: buttons)
@@ -218,6 +228,8 @@ void MapTab::loadMap(int id)
 	}
 
 	tileMap.loadTileMap(id);
+	for (auto tool: mapViewTools)
+		tool->setTileMap(&tileMap);
 
 	for (int layer = 0; layer < 6; layer++) // 6 - region
 	{
@@ -247,35 +259,35 @@ void MapTab::loadMap(int id)
 		ui->tilePickerButtonGroup->button(i)->setEnabled(tileMap.hasTileSet(setIndex));
 	}
 
-	/*for (int i = 0; i < 5; i++)
-	{
-		TileSet::Set setIndex = TileSet::Set(TileSet::A5 + i);
-		if (tileMap.hasTileSet(setIndex))
-		{
-			tilePickerViews[i]->setBackgroundPixmap(setIndex, 48, tileMap.pixmap(setIndex));
-			ui->tilesTabWidget->setTabEnabled(i, true);
-		}
-		else
-		{
-			tilePickerViews[i]->setBackgroundPixmap(setIndex, 48, nullptr);
-			ui->tilesTabWidget->setTabEnabled(i, false);
-		}
-	}*/
 
-	ui->mapView->load(currentMap, &tileMap);
+	ui->mapView->load(&tileMap);
 	ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
 
-	ui->tilePickerButtonA->click(); // FIXME: tileset A5 may not be present, find first existing tileset
+	// Set first existing tileset for tile picker
+	for (int i = 0; i < 5; i++)
+	{
+		if (ui->tilePickerButtonGroup->button(i)->isEnabled())
+		{
+			ui->tilePickerButtonGroup->button(i)->click();
+			break;
+		}
+	}
+
 	ui->tilePickerView->selectPoint(QPoint(0, 0));
+}
+
+void MapTab::mapInfoTableClicked(int row)
+{
+	uint64_t start = QDateTime::currentMSecsSinceEpoch();
+
+	//int id = ui->mapInfoTable->selectedRow();
+	currentMapId = row;
+	loadMap(row);
+	//emit mapLoaded(currentMap);
+	emit mapLoaded(&tileMap);
 
 	uint64_t end = QDateTime::currentMSecsSinceEpoch();
 	emit mapLoadTime(end - start);
 }
 
-void MapTab::mapInfoTableClicked(int row)
-{
-	//int id = ui->mapInfoTable->selectedRow();
-	currentMapId = row;
-	loadMap(row);
-	emit mapLoaded(currentMap);
-}
+

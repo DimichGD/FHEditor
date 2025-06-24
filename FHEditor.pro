@@ -1,16 +1,17 @@
-QT     += core gui widgets multimedia
+QT     += core gui widgets multimedia concurrent
 CONFIG += c++latest
 CONFIG -= debug_and_release debug_and_release_target qml_debug
 
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
 INCLUDEPATH += src src/rpgmmv src/events src/models \
-                src/ui src/ui/tabs src/ui/events src/ui/dialogs src/ui/widgets
+                src/ui src/ui/tabs src/ui/events src/ui/map_view src/ui/dialogs src/ui/widgets
 OBJECTS_DIR = obj
 MOC_DIR = moc
 UI_DIR = ui
 
 SOURCES += \
+    src/events/base_command.cpp \
     src/events/command_111.cpp \
     src/events/command_230.cpp \
     src/events/command_000.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
     src/models/common_events_model.cpp \
     src/models/event_content_list_model.cpp \
     src/models/event_content_selection_model.cpp \
+    src/models/item_effects_model.cpp \
     src/models/items_model.cpp \
     src/models/map_event_pages_model.cpp \
     src/models/map_events_model.cpp \
@@ -46,6 +48,10 @@ SOURCES += \
     src/ui/dialogs/item_effect_dialog.cpp \
     src/ui/dialogs/simple_chooser_dialog.cpp \
     src/ui/events/play_sound_dialog.cpp \
+    src/ui/map_view/map_event_tool.cpp \
+    src/ui/map_view/map_view_tool.cpp \
+    src/ui/map_view/tile_paint_tool.cpp \
+    src/ui/map_view/tile_picker_tool.cpp \
     src/ui/settings.cpp \
     src/ui/tabs/animations_tab.cpp \
     src/ui/tabs/armors_tab.cpp \
@@ -85,11 +91,13 @@ HEADERS += \
     src/events/command_simple.hpp \
     src/events/command_sound.hpp \
     src/events/command_unknown.hpp \
+    src/events/json_value.hpp \
     src/models/animations_model.hpp \
     src/models/base_model.hpp \
     src/models/common_events_model.hpp \
     src/models/event_content_list_model.hpp \
     src/models/event_content_selection_model.hpp \
+    src/models/item_effects_model.hpp \
     src/models/items_model.hpp \
     src/models/map_event_pages_model.hpp \
     src/models/map_events_model.hpp \
@@ -104,6 +112,7 @@ HEADERS += \
     src/rpgmmv/json_qstring.hpp \
     src/rpgmmv/json_stuff.hpp \
     src/rpgmmv/map.hpp \
+    src/rpgmmv/map_event.hpp \
     src/rpgmmv/map_info.hpp \
     src/rpgmmv/skill.hpp \
     src/rpgmmv/sound.hpp \
@@ -116,6 +125,10 @@ HEADERS += \
     src/ui/dialogs/games_list_dialog.hpp \
     src/ui/events/command_dialog.hpp \
     src/ui/events/play_sound_dialog.hpp \
+    src/ui/map_view/map_event_tool.hpp \
+    src/ui/map_view/map_view_tool.hpp \
+    src/ui/map_view/tile_paint_tool.hpp \
+    src/ui/map_view/tile_picker_tool.hpp \
     src/ui/settings.hpp \
     src/ui/tabs/animations_tab.hpp \
     src/ui/widgets/attrib_combo_box.hpp \

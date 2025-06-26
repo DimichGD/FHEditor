@@ -58,6 +58,26 @@ void SelectorButton::changeId(int id)
 		Event *value = Accessor<Event>().value(id);
 		setText(value ? value->name : "?");
 	}
+	else if (source == SimpleChooserDialog::ACTOR)
+	{
+		Actor *value = Accessor<Actor>().value(id);
+		setText(value ? value->name : "?");
+	}
+	else if (source == SimpleChooserDialog::CLASS)
+	{
+		Class *value = Accessor<Class>().value(id);
+		setText(value ? value->name : "?");
+	}
+	else if (source == SimpleChooserDialog::WEAPON)
+	{
+		Weapon *value = Accessor<Weapon>().value(id);
+		setText(value ? value->name : "?");
+	}
+	else if (source == SimpleChooserDialog::ARMOR)
+	{
+		Armor *value = Accessor<Armor>().value(id);
+		setText(value ? value->name : "?");
+	}
 	//} catch (std::exception &e) // TODO: remove this
 	//{ qDebug() << "idChanged(" << id << ") exception with source" << source; }
 }
@@ -71,7 +91,11 @@ void SelectorButton::buttonClicked(bool)
 		"Switches",
 		"Variables",
 		"Items",
-		"Common Events"
+		"Common Events",
+		"Actors",
+		"Classes",
+		"Weapons",
+		"Armors",
 	};
 
 	SimpleChooserDialog dialog(SimpleChooserDialog::Source(source), id, this);

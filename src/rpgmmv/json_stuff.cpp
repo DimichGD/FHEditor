@@ -1,5 +1,8 @@
 #include "json_stuff.hpp"
+#include "actor.hpp"
 #include "armor.hpp"
+#include "class.hpp"
+#include "enemy.hpp"
 #include "item.hpp"
 #include "map.hpp"
 #include "animation.hpp"
@@ -9,6 +12,7 @@
 #include "state.hpp"
 #include "system.hpp"
 #include "tileset.hpp"
+#include "troop.hpp"
 #include "weapon.hpp"
 #include "event.hpp"
 #include "command_factory.hpp"
@@ -163,20 +167,38 @@ bool loadJson<State>(const QString &filename, std::vector<std::optional<State>> 
 }
 
 template<>
+bool loadJson<Actor>(const QString &filename, std::vector<std::optional<Actor>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
+bool loadJson<Class>(const QString &filename, std::vector<std::optional<Class>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
+
+template<>
 bool loadJson<Animation>(const QString &filename, std::vector<std::optional<Animation>> &vector)
 {
 	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
-	if (err)
-	{
-		printParsingError(glz::format_error(err, std::string{}), filename, err.location);
-		return false;
-	}
+	return showParsingError(err, filename);
+}
 
-	/*Animation normalAttack { .id = -1, .name = "Normal Attack" };
-	vector.insert(vector.begin(), normalAttack);
-	vector[1] = { .id = 0, .name = "None" };*/
+template<>
+bool loadJson<Enemy>(const QString &filename, std::vector<std::optional<Enemy>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
+}
 
-	return true;
+template<>
+bool loadJson<Troop>(const QString &filename, std::vector<std::optional<Troop>> &vector)
+{
+	glz::error_ctx err = glz::read_file_json(vector, filename.toUtf8().data(), std::string{});
+	return showParsingError(err, filename);
 }
 
 /*template<>

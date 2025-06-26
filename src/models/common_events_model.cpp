@@ -18,18 +18,13 @@ QVariant CommonEventsModel::dataForDisplay(int row, int column) const
 	return QVariant();
 }
 
-QVariant CommonEventsModel::iconForDisplay(int row, int column) const
-{
-	Q_UNUSED(row)
-	Q_UNUSED(column)
-	return QVariant();
-}
 
 QVariant CommonEventsModel::dataForMapper(int row, int column) const
 {
 	const Event *event = accessor.value(row);
 	if (!event)
 		return QVariant();
+
 
 	switch (column)
 	{

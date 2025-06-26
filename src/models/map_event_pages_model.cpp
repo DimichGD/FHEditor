@@ -44,7 +44,7 @@ QVariant MapEventPagesModel::data(const QModelIndex &index, int role) const
 		case Page::MOVE_TYPE: return page->moveType;
 		case Page::PRIORITY_TYPE: return page->priorityType;
 		case Page::STEP_ANIME: return page->stepAnime;
-		case Page::THROUGH: return page->through;
+		case Page::THROUGH:return page->through;
 		case Page::TRIGGER: return page->trigger;
 		case Page::WALK_ANIME: return page->walkAnime;
 		default: return QVariant();

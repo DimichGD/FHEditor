@@ -1,6 +1,7 @@
 #include "create_command_dialog.hpp"
 #include "command_000.hpp"
 #include "command_simple.hpp"
+#include "conditional_branch_dialog.hpp"
 #include "events/command_text_dialog.hpp"
 #include "play_sound_dialog.hpp"
 #include "ui_create_command_dialog.h"
@@ -15,6 +16,7 @@ CreateCommandDialog::CreateCommandDialog(QModelIndex index, QWidget *parent):
 	indent = Command::iteratorFromIndex(currentIndex)->indent;
 
 	connect(ui->showTextButton, &QPushButton::clicked, this, &CreateCommandDialog::openShowTextDialog);
+	connect(ui->conditionalBranchButton, &QPushButton::clicked, this, &CreateCommandDialog::openConditionalBranchDialog);
 	connect(ui->waitButton, &QPushButton::clicked, this, &CreateCommandDialog::openWaitDialog);
 	connect(ui->playBGMButton, &QPushButton::clicked, this, &CreateCommandDialog::openPlayBGMDialog);
 	connect(ui->playBGSButton, &QPushButton::clicked, this, &CreateCommandDialog::openPlayBGSDialog);
@@ -31,7 +33,6 @@ CreateCommandDialog::CreateCommandDialog(QModelIndex index, QWidget *parent):
 
 CreateCommandDialog::~CreateCommandDialog()
 {
-	delete dialog;
 	delete ui;
 }
 
@@ -43,6 +44,12 @@ std::list<Command> CreateCommandDialog::resultCommands()
 void CreateCommandDialog::openShowTextDialog()
 {
 	dialog = new CommandTextDialog(false, { currentIndex }, this);
+	if (dialog->exec()) accept();
+}
+
+void CreateCommandDialog::openConditionalBranchDialog()
+{
+	dialog = new ConditionalBranchDialog(false, { currentIndex }, this);
 	if (dialog->exec()) accept();
 }
 

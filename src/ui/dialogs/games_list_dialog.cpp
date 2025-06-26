@@ -26,6 +26,11 @@ GamesListDialog::GamesListDialog(QWidget *parent): QDialog(parent), ui(new Ui::S
 	connect(ui->moveDownButton, &QPushButton::clicked, this, &GamesListDialog::moveDownClicked);
 	connect(ui->gameTable, &QTableWidget::itemDoubleClicked, this, &QDialog::accept);
 	connect(this, &QDialog::accepted, this, &GamesListDialog::saveSettings);
+
+	ui->addGameButton->setIcon(QIcon::fromTheme("list-add"));
+	ui->removeGameButton->setIcon(QIcon::fromTheme("list-remove"));
+	ui->moveUpButton->setIcon(qApp->style()->standardIcon(QStyle::SP_ArrowUp));
+	ui->moveDownButton->setIcon(qApp->style()->standardIcon(QStyle::SP_ArrowDown));
 }
 
 GamesListDialog::~GamesListDialog()

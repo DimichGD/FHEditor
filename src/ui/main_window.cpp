@@ -70,11 +70,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 	connect(ui->actionGamesList, &QAction::triggered, this, &MainWindow::openSettingsDialog);
 	connect(ui->mapTab, &MapTab::mapLoaded, ui->mapEventsTab, &MapEventsTab::init);
-	connect(ui->mapTab, &MapTab::editMapEvent, ui->mapEventsTab, [this](int eventId)
+	connect(ui->mapTab, &MapTab::editMapEvent, ui->mapTab, [this](int eventId)
 	{
-		ui->tabWidget->setCurrentIndex(1); // map events tab index
+		ui->tabWidget->setCurrentIndex(ui->tabWidget->indexOf(ui->mapEventsTab));
 		ui->mapEventsTab->selectEvent(eventId);
 	});
+
+	connect(ui->itemsTab, &ItemsTab::selectCommonEvent, ui->itemsTab, [this](int eventId)
+	{
+		ui->tabWidget->setCurrentIndex(ui->tabWidget->indexOf(ui->commonEventsTab));
+		//ui->commonEventsTab->selectEvent(eventId); // TODO: implement selectEvent
+	});
+
 
 	if (Settings::Get()->lastPath.isEmpty())
 	{
@@ -110,6 +117,10 @@ void MainWindow::loadGame()
 	}
 
 	Database::Get()->load(Database::ALL);
+	/*Database::Get()->load(Database::CLASSES);
+	Database::Get()->load(Database::ACTORS);
+	Database::Get()->load(Database::ITEMS);
+	Database::Get()->load(Database::SYSTEM);*/
 
 	//mapEventsTab->init();
 	ui->itemsTab->init();

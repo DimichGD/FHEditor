@@ -16,12 +16,13 @@ struct Command_111: ICommandParams
 	std::tuple<int, QString, int> selfSwitchCond;
 	std::array<int, 3> timerCond;
 	std::array<int, 3> actorInPartyCond;*/
-	Type type;
+	//Type type;
 	JsonValue condData;
 
 	int code() override { return 111; }
 
 	Command_111() = default;
+	Command_111(JsonValue condData) { this->condData = condData; }
 
 	void calculateWidth(QFontMetrics &metrics, int indent) override;
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;

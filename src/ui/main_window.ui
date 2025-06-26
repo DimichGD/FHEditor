@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>836</width>
+    <width>847</width>
     <height>600</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>6</number>
       </property>
       <widget class="MapTab" name="mapTab">
        <attribute name="title">
@@ -56,6 +56,26 @@
         <string>Animations</string>
        </attribute>
       </widget>
+      <widget class="QWidget" name="actorsTab">
+       <attribute name="title">
+        <string>Actors</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="classesTab">
+       <attribute name="title">
+        <string>Classes</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="enemiesTab">
+       <attribute name="title">
+        <string>Enemies</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="troopsTab">
+       <attribute name="title">
+        <string>Troops</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -65,7 +85,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>836</width>
+     <width>847</width>
      <height>25</height>
     </rect>
    </property>

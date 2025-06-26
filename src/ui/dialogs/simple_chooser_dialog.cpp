@@ -47,8 +47,8 @@ SimpleChooserDialog::SimpleChooserDialog(Source source, int targetId, QWidget *p
 	if (source == ANIMATION)
 	{
 		model->appendRow(newItem("Normal Attack", -1));
-		model->setData(model->index(1, 0), "None", Qt::DisplayRole);
 		readModel<Animation>(model);
+		model->setData(model->index(1, 0), "None", Qt::DisplayRole);
 		++targetId;
 	}
 
@@ -72,6 +72,18 @@ SimpleChooserDialog::SimpleChooserDialog(Source source, int targetId, QWidget *p
 
 	else if (source == COMMON_EVENT)
 		readModel<Event>(model);
+
+	else if (source == ACTOR)
+		readModel<Actor>(model);
+
+	else if (source == CLASS)
+		readModel<Class>(model);
+
+	else if (source == WEAPON)
+		readModel<Weapon>(model);
+
+	else if (source == ARMOR)
+		readModel<Armor>(model);
 
 	else
 		return;

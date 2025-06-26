@@ -2,12 +2,12 @@
 #include "base_command.hpp"
 //#include "event.hpp"
 
-struct Command_230: ICommandParams
+struct CommandWait: ICommandParams
 {
 	int frames = 0;
 
-	Command_230() = default;
-	Command_230(int frames);
+	CommandWait() = default;
+	CommandWait(int frames);
 	int code() override { return 230; };
 
 	void read(JsonValue &parameters) override;

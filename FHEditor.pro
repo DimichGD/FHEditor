@@ -13,17 +13,16 @@ UI_DIR = ui
 SOURCES += \
     src/events/base_command.cpp \
     src/events/command_111.cpp \
-    src/events/command_230.cpp \
     src/events/command_000.cpp \
     src/events/command_101.cpp \
     src/events/command_102.cpp \
     src/events/command_122.cpp \
-    src/events/command_353.cpp \
     src/events/command_401.cpp \
     src/events/command_comment.cpp \
     src/events/command_simple.cpp \
     src/events/command_sound.cpp \
     src/events/command_unknown.cpp \
+    src/events/command_wait.cpp \
     src/events/parameters_strings.cpp \
     src/main.cpp \
     src/models/animations_model.cpp \
@@ -41,6 +40,7 @@ SOURCES += \
     src/rpgmmv/json_stuff.cpp \
     src/rpgmmz/system_mz.cpp \
     src/ui/events/command_dialog.cpp \
+    src/ui/events/conditional_branch_dialog.cpp \
     src/ui/events/create_command_dialog.cpp \
     src/ui/events/command_text_dialog.cpp \
     src/ui/events/play_sound_dialog.cpp \
@@ -81,18 +81,17 @@ SOURCES += \
 
 HEADERS += \
     src/events/command_111.hpp \
-    src/events/command_230.hpp \
     src/events/base_command.hpp \
     src/events/command_000.hpp \
     src/events/command_101.hpp \
     src/events/command_102.hpp \
     src/events/command_122.hpp \
-    src/events/command_353.hpp \
     src/events/command_401.hpp \
     src/events/command_comment.hpp \
     src/events/command_simple.hpp \
     src/events/command_sound.hpp \
     src/events/command_unknown.hpp \
+    src/events/command_wait.hpp \
     src/events/json_value.hpp \
     src/events/parameters_strings.hpp \
     src/models/animations_model.hpp \
@@ -105,11 +104,14 @@ HEADERS += \
     src/models/map_event_pages_model.hpp \
     src/models/map_events_model.hpp \
     src/models/map_info_model.hpp \
+    src/rpgmmv/actor.hpp \
     src/rpgmmv/animation.hpp \
     src/rpgmmv/armor.hpp \
+    src/rpgmmv/class.hpp \
     src/rpgmmv/damage.hpp \
     src/rpgmmv/database.hpp \
     src/rpgmmv/effect.hpp \
+    src/rpgmmv/enemy.hpp \
     src/rpgmmv/event.hpp \
     src/rpgmmv/image.hpp \
     src/rpgmmv/item.hpp \
@@ -124,6 +126,7 @@ HEADERS += \
     src/rpgmmv/system.hpp \
     src/rpgmmv/tileset.hpp \
     src/rpgmmv/trait.hpp \
+    src/rpgmmv/troop.hpp \
     src/rpgmmv/weapon.hpp \
     src/rpgmmz/system_mz.hpp \
     src/ui/dialogs/games_list_dialog.hpp \
@@ -132,6 +135,7 @@ HEADERS += \
     src/ui/dialogs/simple_chooser_dialog.hpp \
     src/ui/dialogs/item_effect_dialog.hpp \
     src/ui/events/command_dialog.hpp \
+    src/ui/events/conditional_branch_dialog.hpp \
     src/ui/events/play_sound_dialog.hpp \
     src/ui/events/create_command_dialog.hpp \
     src/ui/events/command_text_dialog.hpp \
@@ -173,6 +177,7 @@ FORMS += \
     src/ui/dialogs/item_effect_dialog.ui \
     src/ui/dialogs/simple_chooser_dialog.ui \
     src/ui/events/command_text_dialog.ui \
+    src/ui/events/conditional_branch_dialog.ui \
     src/ui/events/create_command_dialog.ui \
     src/ui/events/play_sound_dialog.ui \
     src/ui/events/wait_dialog.ui \

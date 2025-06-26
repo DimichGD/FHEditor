@@ -37,7 +37,7 @@ private slots:
 	void enableGroupBoxes(bool enabled);
 
 	void itemNewClicked();
-	void itemChangeMaximumClicked();
+	void itemResizeClicked();
 	void itemClearClicked();
 
 private:

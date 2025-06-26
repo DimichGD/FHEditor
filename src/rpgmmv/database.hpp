@@ -1,10 +1,14 @@
 #pragma once
+#include "actor.hpp"
+#include "class.hpp"
+#include "enemy.hpp"
 #include "item.hpp"
 #include "event.hpp"
 #include "map.hpp"
 #include "map_info.hpp"
 #include "skill.hpp"
 #include "tileset.hpp"
+#include "troop.hpp"
 #include "weapon.hpp"
 #include "armor.hpp"
 #include "animation.hpp"
@@ -23,11 +27,17 @@ concept hasIconIndex = requires(T t)
 	t.iconIndex;
 };*/
 
+template<typename T>
+struct Storage
+{
+	std::vector<std::optional<T>> data { std::nullopt };
+};
+
 class Database
 {
 public:
-	template<typename T>
-	using Storage = std::vector<std::optional<T>>;
+	//template<typename T>
+	//using Storage = std::vector<std::optional<T>>;
 
 	enum Type
 	{
@@ -40,10 +50,15 @@ public:
 		TILE_SETS = 64,
 		ANIMATION = 128,
 		SKILLS = 256,
-		STATE = 512,
+		STATES = 512,
 		MAP = 1024,
+		ACTORS = 2048,
+		CLASSES = 4096,
+		ENEMIES = 8192,
+		TROOPS = 16384,
 		ALL = ITEMS | WEAPONS | ARMORS | EVENTS | SYSTEM |
-				MAP_INFO | TILE_SETS | ANIMATION | SKILLS | STATE,
+				MAP_INFO | TILE_SETS | ANIMATION | SKILLS | STATES |
+				ACTORS | CLASSES | ENEMIES | TROOPS,
 	};
 
 	//Database(QObject *parent = nullptr): QObject(parent) {}
@@ -69,10 +84,10 @@ public:
 	QString switchName(int id);
 	QString variableName(int id);
 
-	template<typename ValueType>
-	Storage<ValueType> &getStorage()
+	template<typename T>
+	std::vector<std::optional<T>> &getStorage()
 	{
-		return std::get<Storage<ValueType>>(storage);
+		return std::get<Storage<T>>(storage).data;
 	}
 
 private:
@@ -81,7 +96,8 @@ private:
 
 	std::tuple<Storage<Item>, Storage<Weapon>, Storage<Armor>,
 		Storage<Event>, Storage<MapInfo>, Storage<TileSet>,
-		Storage<Animation>, Storage<Skill>, Storage<State>> storage;
+		Storage<Animation>, Storage<Skill>, Storage<State>,
+		Storage<Actor>, Storage<Class>, Storage<Enemy>, Storage<Troop>> storage;
 };
 
 

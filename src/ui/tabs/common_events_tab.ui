@@ -26,6 +26,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="clearFilterButton">
+         <property name="text">
+          <string>Clear</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="autorunButton">
          <property name="text">
           <string>Autorun</string>
@@ -142,6 +149,9 @@
           </item>
           <item row="1" column="2">
            <widget class="SelectorButton" name="eventSwitchButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -160,11 +170,11 @@
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
          </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
          <property name="selectionBehavior">
           <enum>QAbstractItemView::SelectRows</enum>
@@ -227,14 +237,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>BaseTable</class>
-   <extends>QTableView</extends>
-   <header>base_table.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>SelectorButton</class>
    <extends>QPushButton</extends>
    <header>selector_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>BaseTable</class>
+   <extends>QTableView</extends>
+   <header>base_table.hpp</header>
   </customwidget>
   <customwidget>
    <class>EventContentList</class>

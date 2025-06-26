@@ -24,7 +24,7 @@ protected:
 private:
 	Ui::PlaySoundDialog *ui = nullptr;
 
-	int indent = 0;
+	//int indent = 0;
 	CommandSound::Type type;
 
 	QMediaPlayer *mediaPlayer = nullptr;

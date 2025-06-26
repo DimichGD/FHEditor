@@ -38,16 +38,23 @@ CommonEventsTab::CommonEventsTab(QWidget *parent):
 
 	connect(ui->autorunButton, &QPushButton::clicked, [this]()
 	{
+		//ui->eventContentList->clear();
 		ui->eventsTable->setCustomFilter(Event::TRIGGER, 1);
-		//ui->eventsTable->selectRow(0);
-		ui->eventContentList->clear();
+		ui->eventsTable->selectRow(0);
 	});
 
 	connect(ui->parallelButton, &QPushButton::clicked, [this]()
 	{
+		//ui->eventContentList->clear();
 		ui->eventsTable->setCustomFilter(Event::TRIGGER, 2);
-		//ui->eventsTable->selectRow(0);
-		ui->eventContentList->clear();
+		ui->eventsTable->selectRow(0);
+	});
+
+	connect(ui->clearFilterButton, &QPushButton::clicked, [this]()
+	{
+		//ui->eventContentList->clear();
+		ui->eventsTable->disableCustomFilter();
+		ui->eventsTable->selectRow(0);
 	});
 }
 
@@ -62,7 +69,6 @@ void CommonEventsTab::init()
 	// delete via deleteLater() ?
 	model = new CommonEventsModel(ui->eventsTable);
 	ui->eventsTable->setModel2(model);
-	//ui->eventsTable->hideColumn(1);
 
 	mapper = new DataMapper(this);
 	mapper->setModel(model);
@@ -72,6 +78,7 @@ void CommonEventsTab::init()
 		{ ui->eventSwitchButton, Event::SWITCH_ID },
 	});
 
+	mapper->toFirst();
 	ui->eventsTable->selectRow(0);
 	//ui->eventContentList->clear();
 }
@@ -91,7 +98,6 @@ void CommonEventsTab::eventRowSelected(int row)
 	//	enableGroupBoxes(true);
 
 	ui->eventContentList->loadList(&currentEvent->list);
-
 	mapper->setCurrentIndex(row);
 
 	//ui->eventContentList->clear();

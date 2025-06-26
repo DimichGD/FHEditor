@@ -1,8 +1,9 @@
 #pragma once
 #include "database.hpp"
 #include <QAbstractTableModel>
+#include <QAbstractItemModel>
 
-class BaseModel: public QAbstractTableModel
+class BaseModel: public QAbstractItemModel
 {
 	Q_OBJECT
 

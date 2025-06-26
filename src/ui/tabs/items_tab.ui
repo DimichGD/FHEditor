@@ -101,9 +101,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="itemChangeMaximumButton">
+          <widget class="QPushButton" name="itemResizeButton">
            <property name="text">
-            <string>Change Maximum</string>
+            <string>Resize</string>
            </property>
           </widget>
          </item>
@@ -848,6 +848,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>SelectorButton</class>
+   <extends>QPushButton</extends>
+   <header>selector_button.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>BaseTable</class>
    <extends>QTableView</extends>
    <header>base_table.hpp</header>
@@ -856,11 +861,6 @@
    <class>ClickableLabel</class>
    <extends>QLabel</extends>
    <header>clickable_label.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>SelectorButton</class>
-   <extends>QPushButton</extends>
-   <header>selector_button.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

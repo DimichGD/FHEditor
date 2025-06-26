@@ -3,7 +3,7 @@
 
 struct CommandSimple: ICommandParams
 {
-	CommandSimple(int codeVar) { this->codeVar = codeVar;  }
+	explicit CommandSimple(int codeVar) { this->codeVar = codeVar;  }
 
 	int codeVar;
 	int code() override { return codeVar; }

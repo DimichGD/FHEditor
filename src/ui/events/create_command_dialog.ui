@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>883</width>
+    <width>940</width>
     <height>550</height>
    </rect>
   </property>
@@ -47,6 +47,13 @@
           <string>Flow Control</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <widget class="QPushButton" name="conditionalBranchButton">
+            <property name="text">
+             <string>Conditional Branch</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QPushButton" name="loopButton">
             <property name="text">

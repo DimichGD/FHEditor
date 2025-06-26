@@ -81,7 +81,7 @@ void Command_111::calculateWidth(QFontMetrics &metrics, int indent)
 	// FIXME: ffffuuuuuck
 	QString result = "If: ";
 
-	switch (type)
+	switch (Type(condData[0].toInt()))
 	{
 		case SWITCH: result += switchCondToString(condData); break;
 		case VARIABLE: result += variableCondToString(condData); break;
@@ -99,7 +99,7 @@ void Command_111::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	QString result = "If: ";
 
-	switch (type)
+	switch (Type(condData[0].toInt()))
 	{
 		case SWITCH: result += switchCondToString(condData); break;
 		case VARIABLE: result += variableCondToString(condData); break;
@@ -115,7 +115,7 @@ void Command_111::drawImpl(QPainter *painter, bool selected, QRect &rect)
 void Command_111::read(JsonValue &parameters)
 {
 	condData = parameters;
-	type = Type(condData[0].toInt());
+	//type = Type(condData[0].toInt());
 }
 
 std::string Command_111::write()

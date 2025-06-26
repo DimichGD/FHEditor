@@ -19,16 +19,21 @@
 ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 {
 	ui->setupUi(this);
-	ui->itemAnimationButton->setSource(SimpleChooserDialog::ANIMATION);
 	itemEffectsListMenu = createMenu(this,
 	{
 		ui->actionEffectNew, ui->actionEffectEdit,
 		ui->actionEffectGoTo, nullptr, ui->actionEffectDelete
 	});
 
+	effectsModel = new ItemEffectsModel(ui->itemEffectsList);
+	ui->itemEffectsList->setModel(effectsModel);
+
+	ui->itemAnimationButton->setSource(SimpleChooserDialog::ANIMATION);
+
 	connect(ui->actionEffectNew, &QAction::triggered, this, &ItemsTab::actionEffectNewTriggered);
 	connect(ui->actionEffectEdit, &QAction::triggered, this, &ItemsTab::actionEffectEditTriggered);
 	connect(ui->actionEffectDelete, &QAction::triggered, this, &ItemsTab::actionEffectDeleteTriggered);
+	connect(ui->actionEffectGoTo, &QAction::triggered, this, &ItemsTab::actionEffectGotToTriggered);
 
 	connect(ui->itemEffectsList, &QTableView::customContextMenuRequested, this, &ItemsTab::contextMenuRequested);
 	connect(ui->itemEffectsList, &QTableView::doubleClicked, ui->itemEffectsList, [this](const QModelIndex &) { actionEffectEditTriggered(true); });
@@ -41,7 +46,7 @@ ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 
 	connect(ui->itemNewButton, &QPushButton::clicked, this, &ItemsTab::itemNewClicked);
 	connect(ui->itemClearButton, &QPushButton::clicked, this, &ItemsTab::itemClearClicked);
-	connect(ui->itemChangeMaximumButton, &QPushButton::clicked, this, &ItemsTab::itemChangeMaximumClicked);
+	connect(ui->itemResizeButton, &QPushButton::clicked, this, &ItemsTab::itemResizeClicked);
 	connect(ui->itemApplyButton, &QPushButton::clicked, this, &ItemsTab::applyButtonClicked);
 }
 
@@ -65,11 +70,13 @@ void ItemsTab::init()
 	ui->itemApplyButton->setEnabled(false);
 	ui->itemDamageElementComboBox->clear(); // Normal Attack and None only present in items?
 	ui->itemDamageElementComboBox->addItem("Normal Attack"); // -1
-	for (const QString &elementName: Database::Get()->system()->elements) // 1..x
-		if (!elementName.isEmpty())
-			ui->itemDamageElementComboBox->addItem(elementName);
+
+	std::vector<QString> &elements = Database::Get()->system()->elements;
+	for (size_t i = 0; i < elements.size(); i++) // 1..x
+		if (!elements[i].isEmpty())
+			ui->itemDamageElementComboBox->addItem(elements[i]);
 		else
-			ui->itemDamageElementComboBox->addItem("Empty element");
+			ui->itemDamageElementComboBox->addItem(QString("#%1").arg(i, 2, 10, QChar('0')));
 	ui->itemDamageElementComboBox->setItemText(1, "None");  // 0
 
 	mapper = new DataMapper(this);
@@ -97,7 +104,7 @@ void ItemsTab::init()
 		{ ui->itemTPGainSpinBox, Item::TP_GAIN },
 	});
 
-	ui->itemsTable->selectRow(1);
+	ui->itemsTable->selectRow(0);
 
 	connect(model, &QAbstractItemModel::dataChanged, model,
 			[this](const QModelIndex &, const QModelIndex &, const QList<int> &)
@@ -109,7 +116,7 @@ void ItemsTab::itemRowSelected(int row)
 	currentItem = model->item(row);
 	if (!currentItem)
 	{
-		delete effectsModel;
+		effectsModel->setEffects(nullptr);
 		mapper->toFirst();
 		enableGroupBoxes(false);
 		return;
@@ -121,9 +128,7 @@ void ItemsTab::itemRowSelected(int row)
 	mapper->setCurrentIndex(row);
 	ui->itemIconLabel->setIconIndex(currentItem->iconIndex);
 
-	delete effectsModel;
-	effectsModel = new ItemEffectsModel(&currentItem->effects, ui->itemEffectsList);
-	ui->itemEffectsList->setModel(effectsModel);
+	effectsModel->setEffects(&currentItem->effects);
 }
 
 void ItemsTab::itemDamageTypeChanged(int index)
@@ -217,15 +222,15 @@ void ItemsTab::itemNewClicked()
 	ui->itemsTable->selectRow(model->rowCount() - 1);
 }
 
-void ItemsTab::itemChangeMaximumClicked()
+void ItemsTab::itemResizeClicked()
 {
-	ChangeMaximumDialog dialog(model, ui->itemChangeMaximumButton);
+	ChangeMaximumDialog dialog(model, ui->itemResizeButton);
 	dialog.exec();
 }
 
 void ItemsTab::itemClearClicked()
 {
 	model->clearElement(ui->itemsTable->selectedRow());
-	delete effectsModel;
+	effectsModel->setEffects(nullptr);
 }
 

@@ -18,6 +18,7 @@ public:
 
 protected:
 	void openShowTextDialog();
+	void openConditionalBranchDialog();
 	void openWaitDialog();
 	void openPlayBGMDialog();
 	void openPlayBGSDialog();

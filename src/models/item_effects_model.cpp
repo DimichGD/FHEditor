@@ -1,15 +1,19 @@
 #include "item_effects_model.hpp"
 
-ItemEffectsModel::ItemEffectsModel(std::vector<Effect> *effects, QObject *parent)
-	: QAbstractTableModel(parent)
+ItemEffectsModel::ItemEffectsModel(QObject *parent)
+	: QAbstractTableModel(parent) {}
+
+void ItemEffectsModel::setEffects(std::vector<Effect> *effects)
 {
+	beginResetModel();
 	this->effects = effects;
+	endResetModel();
 }
 
 int ItemEffectsModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
-	return effects->size();
+	return effects ? effects->size() : 0;
 }
 
 int ItemEffectsModel::columnCount(const QModelIndex &parent) const
@@ -20,7 +24,7 @@ int ItemEffectsModel::columnCount(const QModelIndex &parent) const
 
 QVariant ItemEffectsModel::data(const QModelIndex &index, int role) const
 {
-	if (!index.isValid())
+	if (!effects || !index.isValid())
 		return QVariant();
 
 	if (role == CODE)
@@ -58,7 +62,7 @@ QVariant ItemEffectsModel::headerData(int section, Qt::Orientation orientation, 
 
 void ItemEffectsModel::addEffect()
 {
-	beginResetModel();
+	beginResetModel(); // FIXME: replace with insert
 	effects->emplace_back();
 	endResetModel();
 }
@@ -72,7 +76,7 @@ void ItemEffectsModel::setEffect(int row, Effect &&effect)
 
 void ItemEffectsModel::removeEffect(int row)
 {
-	beginResetModel();
+	beginResetModel(); // FIXME: replace with remove
 	effects->erase(effects->begin() + row);
 	endResetModel();
 }

@@ -61,12 +61,13 @@ void BaseTable::setFilterText(const QString &text)
 
 void BaseTable::selectRow(int row)
 {
-	QModelIndex index = filterModel->mapFromSource(model->index(row, 0));
+	//QModelIndex index = filterModel->mapFromSource(model->index(row, 0));
+	/*QModelIndex index = filterModel->mapToSource(filterModel->index(row, 0));
 	if (!index.isValid())
-		return;
+		return;*/
 
-	QTableView::selectRow(index.row());
-	//QTableView::selectRow(row);
+	//QTableView::selectRow(index.row());
+	QTableView::selectRow(row);
 }
 
 void BaseTable::onSelectionChanged(const QModelIndex &selected, const QModelIndex &)

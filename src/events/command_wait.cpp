@@ -1,25 +1,25 @@
-#include "command_230.hpp"
+#include "command_wait.hpp"
 #include "glaze/json/write.hpp"
 
 #include <QDebug>
 
-Command_230::Command_230(int frames)
+CommandWait::CommandWait(int frames)
 {
 	this->frames = frames;
 }
 
-void Command_230::read(JsonValue &parameters)
+void CommandWait::read(JsonValue &parameters)
 {
 	frames = parameters[0].toInt();
 }
 
-std::string Command_230::write()
+std::string CommandWait::write()
 {
 	auto params = std::tie(frames);
 	return checkExpected(glz::write_json(params));
 }
 
-void Command_230::drawImpl(QPainter *painter, bool selected, QRect &rect)
+void CommandWait::drawImpl(QPainter *painter, bool selected, QRect &rect)
 {
 	QString str = QString("Wait: %1 frames").arg(frames);
 	drawText(painter, selected, rect, str, ConstantColors::red);

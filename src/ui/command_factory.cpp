@@ -3,11 +3,10 @@
 #include "command_101.hpp"
 #include "command_102.hpp"
 #include "command_111.hpp"
-#include "command_230.hpp"
+#include "command_wait.hpp"
 #include "command_comment.hpp"
 #include "command_simple.hpp"
 #include "command_sound.hpp"
-#include "command_353.hpp"
 #include "command_401.hpp"
 #include "command_unknown.hpp"
 
@@ -60,7 +59,7 @@ QSharedPointer<ICommandParams> CommandFactory::createCommand2(int code)
 		case LOOP:             command = createCommand<CommandSimple>(code); break;
 		case BREAK_LOOP:       command = createCommand<CommandSimple>(code); break;
 		case GATHER_FOLLOWERS: command = createCommand<CommandSimple>(code); break;
-		case WAIT:             command = createCommand<Command_230>(); break;
+		case WAIT:             command = createCommand<CommandWait>(); break;
 		case PLAY_BGM:         command = createCommand<CommandSound>(CommandSound::BGM); break;
 		case PLAY_BGS:         command = createCommand<CommandSound>(CommandSound::BGS); break;
 		case PLAY_ME:          command = createCommand<CommandSound>(CommandSound::ME); break;

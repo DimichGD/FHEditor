@@ -2,6 +2,7 @@
 #include "command_factory.hpp"
 //#include "event.hpp"
 //#include "database.hpp"
+#include "conditional_branch_dialog.hpp"
 #include "event_content_list_model.hpp"
 #include "event_content_selection_model.hpp"
 #include "events/command_text_dialog.hpp"
@@ -81,12 +82,17 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 
 	// this signal not fired when selecting new item inside old selection range
 	// TODO: need to come up with different selection solution
-	connect(selectionModel(), &EventContentSelectionModel::selectionChanged,
+	connect(selectionModel(), &QItemSelectionModel::selectionChanged,
 			[this](const QItemSelection &selected, const QItemSelection &)
 	{
-		if (!selected.empty() && selected[0].indexes()[0].isValid())
+		if (!selected.empty()/* && selected[0].indexes()[0].isValid()*/)
 		{
-			auto parameters = Command::iteratorFromIndex(selected[0].indexes()[0])->parameters;
+			auto selectedIndices = selectionModel()->selectedIndexes();
+			std::sort(selectedIndices.begin(), selectedIndices.end(),
+				[](const QModelIndex &a, const QModelIndex &b) -> bool
+					{ return a.row() < b.row(); });
+
+			auto parameters = Command::iteratorFromIndex(selectedIndices[0])->parameters;
 
 			actionCommandNew->setEnabled(parameters->flags() & ICommandParams::CAN_ADD);
 			actionCommandEdit->setEnabled(parameters->flags() & ICommandParams::CAN_EDIT);
@@ -99,6 +105,82 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 			actionCommandDelete->setEnabled(false);
 		}
 	});
+
+
+
+	/*connect(selectionModel(), &QItemSelectionModel::currentRowChanged, [this](const QModelIndex &current, const QModelIndex &previous)
+	{
+		if (current.isValid())
+		{
+			auto parameters = Command::iteratorFromIndex(current)->parameters;
+
+			actionCommandNew->setEnabled(parameters->flags() & ICommandParams::CAN_ADD);
+			actionCommandEdit->setEnabled(parameters->flags() & ICommandParams::CAN_EDIT);
+			actionCommandDelete->setEnabled(parameters->flags() & ICommandParams::CAN_DELETE);
+
+			enum Strategy { SELECT_UNTIL, SELECT_WHILE };
+			struct Holder { int endCode; Strategy strategy; };
+			static std::map<int, Holder> codesMap = {
+				{ CommandFactory::TEXT,          { CommandFactory::TEXT_LINE,    SELECT_WHILE } },
+				{ CommandFactory::COMMENT,       { CommandFactory::COMMENT_LINE, SELECT_WHILE } },
+				{ CommandFactory::BEGIN_CHOICES, { CommandFactory::END_CHOICES,  SELECT_UNTIL } },
+				{ CommandFactory::IF,            { CommandFactory::END_IF     ,  SELECT_UNTIL } },
+				{ CommandFactory::LOOP,          { CommandFactory::REPEAT_LOOP,  SELECT_UNTIL } },
+			};
+
+			QModelIndex first = current;
+			QModelIndex last = current;
+
+			Command::Iterator command = Command::iteratorFromIndex(first);
+			int startCode = command->code;
+			int startIndent = command->indent;
+
+			auto it = codesMap.find(startCode);
+			if (it == codesMap.end())
+			{
+				selectionModel()->clearSelection();
+				return;
+			}
+
+			int endCode = it->second.endCode;
+			Strategy strategy = it->second.strategy;
+
+			std::advance(command, 1);
+			while (true)
+			{
+				last = model->index(last.row() + 1, 0);
+				if (strategy == SELECT_WHILE
+					&& std::next(command)->code != endCode)
+					break;
+
+				if (strategy == SELECT_UNTIL
+					&& command->code == endCode
+					&& command->indent == startIndent)
+					break;
+
+				std::advance(command, 1);
+			}
+
+			//qDebug() << selectionModel()->currentIndex();
+
+			//QItemSelection rowSelection(first, last);
+			QItemSelection rowSelection(model->index(first.row() + 1), last);
+			selectionModel()->clearSelection();
+			selectionModel()->select(rowSelection, QItemSelectionModel::ClearAndSelect);
+
+			//qDebug() << selectionModel()->selection()[0].indexes();
+
+			//QItemSelection rowSelection2(first, first);
+			//selectionModel()->select(rowSelection2, QItemSelectionModel::SelectCurrent);
+		}
+		else
+		{
+			qDebug() << "not valid";
+			actionCommandNew->setEnabled(false);
+			actionCommandEdit->setEnabled(false);
+			actionCommandDelete->setEnabled(false);
+		}
+	});*/
 }
 
 void EventContentList::loadList(std::list<Command> *list)
@@ -120,12 +202,13 @@ void EventContentList::actionCommandNewTriggered(bool)
 	if (!selectionModel()->hasSelection())
 		return;
 
-	auto selectedIndices = selectionModel()->selection()[0].indexes();
+	//auto selectedIndices = selectionModel()->selection()[0].indexes();
+	auto index = selectionModel()->currentIndex();
 
-	CreateCommandDialog dialog(selectedIndices[0], this);
+	CreateCommandDialog dialog(index, this);
 	if (dialog.exec())
 	{
-		int firstRow = selectedIndices[0].row();
+		int firstRow = index.row();
 		model->insertCommands(firstRow, dialog.resultCommands());
 
 		selectionModel()->clear();
@@ -138,10 +221,13 @@ void EventContentList::actionCommandEditTriggered(bool)
 	if (!selectionModel()->hasSelection())
 		return;
 
-	CommandDialog *dialog = nullptr;
-	auto selectedIndices = selectionModel()->selection()[0].indexes();
-	Command::Iterator command = Command::iteratorFromIndex(selectedIndices[0]);
+	auto selectedIndices = selectionModel()->selectedIndexes();
+	std::sort(selectedIndices.begin(), selectedIndices.end(),
+		[](const QModelIndex &a, const QModelIndex &b) -> bool
+			{ return a.row() < b.row(); });
 
+	CommandDialog *dialog = nullptr;
+	Command::Iterator command = Command::iteratorFromIndex(selectedIndices[0]);
 	switch (command->code)
 	{
 		case CommandFactory::TEXT: dialog = new CommandTextDialog(true, selectedIndices, this); break;
@@ -150,6 +236,7 @@ void EventContentList::actionCommandEditTriggered(bool)
 		case CommandFactory::PLAY_BGS: dialog = new PlaySoundDialog(CommandSound::BGS, true, selectedIndices[0], this); break;
 		case CommandFactory::PLAY_ME: dialog = new PlaySoundDialog(CommandSound::ME, true, selectedIndices[0], this); break;
 		case CommandFactory::PLAY_SE: dialog = new PlaySoundDialog(CommandSound::SE, true, selectedIndices[0], this); break;
+		case CommandFactory::IF: dialog = new ConditionalBranchDialog(true, selectedIndices, this); break;
 	}
 
 	if (dialog && dialog->exec())
@@ -170,7 +257,10 @@ void EventContentList::actionCommandDeleteTriggered(bool)
 	if (!selectionModel()->hasSelection())
 		return;
 
-	auto selectedIndices = selectionModel()->selection()[0].indexes();
+	auto selectedIndices = selectionModel()->selectedIndexes();
+	std::sort(selectedIndices.begin(), selectedIndices.end(),
+		[](const QModelIndex &a, const QModelIndex &b) -> bool
+			{ return a.row() < b.row(); });
 
 	int firstRow = selectedIndices[0].row();
 	model->removeCommands(firstRow, selectedIndices.size());

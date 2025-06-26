@@ -114,11 +114,27 @@ bool Database::load(Type type)
 	}
 
 	// ----------- States ------------
-	if (type & Type::STATE)
+	if (type & Type::STATES)
 	{
 		QString filename = path + "/data/States.json";
 		if (!loadJson(filename, getStorage<State>()))
 			errorMessage += "Failed to load 'States.json'\n";
+	}
+
+	// ----------- States ------------
+	if (type & Type::ACTORS)
+	{
+		QString filename = path + "/data/Actors.json";
+		if (!loadJson(filename, getStorage<Actor>()))
+			errorMessage += "Failed to load 'Actors.json'\n";
+	}
+
+	// ----------- States ------------
+	if (type & Type::CLASSES)
+	{
+		QString filename = path + "/data/Classes.json";
+		if (!loadJson(filename, getStorage<Class>()))
+			errorMessage += "Failed to load 'Classes.json'\n";
 	}
 
 	// -------- Error Message --------

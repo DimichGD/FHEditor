@@ -23,20 +23,12 @@ struct Command
 	int code;
 	int indent;
 	QSharedPointer<ICommandParams> parameters;
-	//std::vector<glz::json_t> jsonValues;
-	//JsonValue jsonValues;
-	//CommandParams parameters;
 
 	void readParams(JsonValue &&jsonValues)
 	{
 		parameters = CommandFactory::createCommand2(code);
 		parameters->read(jsonValues);
 	}
-
-	/*JsonValue &writeParams()
-	{
-		return jsonValues;
-	}*/
 };
 
 struct Event

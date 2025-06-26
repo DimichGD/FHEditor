@@ -15,6 +15,11 @@ struct JsonValue
 	using val_t = std::variant<null_t, double, std::string, bool, array_t, object_t>;
 	val_t data {};
 
+	/*array_t& asArray()
+	{
+		return std::get<array_t>(data);
+	}*/
+
 	JsonValue& operator[](int index)
 	{
 		return std::get<array_t>(data)[index];

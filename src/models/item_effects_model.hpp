@@ -14,7 +14,8 @@ public:
 		DATA = Qt::UserRole + 1,
 	};
 
-	explicit ItemEffectsModel(std::vector<Effect> *effects, QObject *parent = nullptr);
+	explicit ItemEffectsModel(QObject *parent = nullptr);
+	void setEffects(std::vector<Effect> *effects);
 
 	int rowCount(const QModelIndex &parent = {}) const override;
 	int columnCount(const QModelIndex &parent = {}) const override;
@@ -26,6 +27,6 @@ public:
 	void removeEffect(int row);
 
 private:
-	std::vector<Effect> *effects;
+	std::vector<Effect> *effects = nullptr;
 };
 

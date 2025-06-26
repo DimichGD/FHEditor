@@ -142,7 +142,7 @@ void MapTab::init()
 	ui->mapView->clear();
 	ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
 
-	if (Settings::Get()->lastMapId != 0)
+	if (Settings::Get()->lastTabIndex == 0 && Settings::Get()->lastMapId != 0)
 	{
 		ui->mapInfoTable->selectRow(Settings::Get()->lastMapId); // FIXME: filter null maps
 		//mapInfoTableClicked(Settings::Get()->lastMapId);

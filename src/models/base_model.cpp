@@ -1,6 +1,6 @@
 #include "base_model.hpp"
 
-BaseModel::BaseModel(IAccessor *accessor, int columns, QObject *parent): QAbstractTableModel(parent)
+BaseModel::BaseModel(IAccessor *accessor, int columns, QObject *parent): QAbstractItemModel(parent)
 {
 	this->accessor = accessor;
 	this->columns = columns;

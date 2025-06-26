@@ -22,6 +22,10 @@ public:
 		VARIABLE,
 		ITEM,
 		COMMON_EVENT,
+		ACTOR,
+		CLASS,
+		WEAPON,
+		ARMOR,
 	};
 
 	SimpleChooserDialog(Source source, int targetId, QWidget *parent);

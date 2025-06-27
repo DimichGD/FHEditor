@@ -76,26 +76,7 @@ QString timerCondToString(JsonValue &condData)
 			.arg(timeInSeconds % 60);
 }
 
-void Command_111::calculateWidth(QFontMetrics &metrics, int indent)
-{
-	// FIXME: ffffuuuuuck
-	QString result = "If: ";
-
-	switch (Type(condData[0].toInt()))
-	{
-		case SWITCH: result += switchCondToString(condData); break;
-		case VARIABLE: result += variableCondToString(condData); break;
-		case SELF_SWITCH: result += selfSwitchCondToString(condData); break;
-		case TIMER: result += timerCondToString(condData); break;
-		default:
-			result += "Unparsed";
-	}
-
-	int textAdvance = metrics.horizontalAdvance(result);
-	totalWidth = 8 + indent * 32 + textAdvance + 16;
-}
-
-void Command_111::drawImpl(QPainter *painter, bool selected, QRect &rect)
+void Command_111::prepare(const QFontMetrics &metrics)
 {
 	QString result = "If: ";
 
@@ -109,13 +90,12 @@ void Command_111::drawImpl(QPainter *painter, bool selected, QRect &rect)
 			result += "Unparsed";
 	}
 
-	drawText(painter, selected, rect, result, ConstantColors::blue);
+	paintData.push_back({ result, ConstantColors::blue, metrics.horizontalAdvance(result) });
 }
 
 void Command_111::read(JsonValue &parameters)
 {
 	condData = parameters;
-	//type = Type(condData[0].toInt());
 }
 
 std::string Command_111::write()

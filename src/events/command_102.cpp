@@ -15,6 +15,21 @@ Command_102::Command_102(QStringList choices, int value_0,
 	this->value_3 = value_3;
 }
 
+void Command_102::prepare(const QFontMetrics &metrics)
+{
+	QString text = QString(" (%1, %2, #%3, #%4)")
+			.arg(ToString::background(value_3), ToString::windowHPosition(value_2))
+			.arg(value_1)
+			.arg(value_0);
+
+	QString choicesText = choices.join(", ");
+
+	paintData.reserve(3);
+	paintData.push_back({ "Show Choices: ", ConstantColors::purple, metrics.horizontalAdvance("Show Choices: ") });
+	paintData.push_back({ choicesText, ConstantColors::blue, metrics.horizontalAdvance(choicesText) });
+	paintData.push_back({ text, ConstantColors::grey, metrics.horizontalAdvance(text) });
+}
+
 
 void Command_102::read(JsonValue &parameters)
 {
@@ -31,25 +46,6 @@ std::string Command_102::write()
 	for (auto &s: choices)
 		temp.push_back(s.toStdString());
 
-	//std::tuple<std::vector<std::string>, int, int, int, int> params;
 	auto params = std::tie(temp, value_0, value_1, value_2, value_3);
-	glz::expected<std::string, glz::error_ctx> result = glz::write_json(params);
-	return checkExpected(result);
-}
-
-void Command_102::drawImpl(QPainter *painter, bool selected, QRect &rect)
-{
-	drawText(painter, selected, rect, "Show Choices: ", ConstantColors::purple);
-
-	/*QStringList stringList;
-	for (auto &s: choices)
-		stringList.append(QString::fromStdString(s));*/
-
-	drawText(painter, selected, rect, choices.join(", "), ConstantColors::blue);
-
-	QString str = QString(" (%1, %2, #%3, #%4)")
-			.arg(ToString::background(value_3), ToString::windowHPosition(value_2))
-			.arg(value_1)
-			.arg(value_0);
-	drawText(painter, selected, rect, str, ConstantColors::grey);
+	return checkExpected(glz::write_json(params));
 }

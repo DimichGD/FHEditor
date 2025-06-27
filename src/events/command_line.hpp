@@ -1,17 +1,18 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_Unknown: ICommandParams
+struct CommandLine: ICommandParams
 {
-	Command_Unknown(int code);
-
+	QString line;
 	int commandCode;
-	JsonValue parameters;
+
+	CommandLine(int code);
+	CommandLine(int code, QString line);
 
 	int code() override { return commandCode; }
 	int flags() override { return 0; };
 
 	void prepare(const QFontMetrics &metrics) override;
 	void read(JsonValue &parameters) override;
-	std::string write() override;
+	auto write() -> std::string override;
 };

@@ -11,9 +11,9 @@ struct TileSet
 	};
 
 	int id;
-	std::vector<int> flags;
-	int mode;
-	QString name;
-	QString note;
-	std::vector<QString> tilesetNames;
+	std::vector<int> flags {};
+	int mode = 0;
+	QString name {};
+	QString note {};
+	std::vector<QString> tilesetNames {};
 };

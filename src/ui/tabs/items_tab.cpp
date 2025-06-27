@@ -40,7 +40,6 @@ ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 
 	connect(ui->itemsTable, &BaseTable::rowSelected, this, &ItemsTab::itemRowSelected);
 	connect(ui->itemNameFilter, &QLineEdit::textChanged, ui->itemsTable, &BaseTable::setFilterText);
-	connect(ui->itemClearFilterButton, &QPushButton::clicked, ui->itemNameFilter, &QLineEdit::clear);
 	connect(ui->itemIconLabel, &ClickableLabel::doubleClicked, this, &ItemsTab::itemIconClicked);
 	connect(ui->itemDamageTypeComboBox, &QComboBox::currentIndexChanged, this, &ItemsTab::itemDamageTypeChanged);
 
@@ -66,6 +65,10 @@ void ItemsTab::init()
 
 	model = new ItemsModel(this);
 	ui->itemsTable->setModel2(model, Images::Get()->iconSet());
+
+	/*connect(model, &QAbstractItemModel::rowsInserted,
+			[this](const QModelIndex &parent, int first, int last)
+	{ effectsModel->setEffects(nullptr); });*/
 
 	ui->itemApplyButton->setEnabled(false);
 	ui->itemDamageElementComboBox->clear(); // Normal Attack and None only present in items?

@@ -1,7 +1,7 @@
 #pragma once
 #include "base_command.hpp"
 
-struct Command_122: ICommandParams
+/*struct Command_122: ICommandParams
 {
 	int value_0;
 	int value_1;
@@ -15,4 +15,4 @@ struct Command_122: ICommandParams
 	int code() override { return 101; }
 	void drawImpl(QPainter *painter, bool selected, QRect &rect) override {};
 	//std::string write() override {};
-};
+};*/

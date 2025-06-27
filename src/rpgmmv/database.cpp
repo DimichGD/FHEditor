@@ -26,6 +26,7 @@ bool Database::load(Type type)
 	// ------------ Items ------------
 	if (type & Type::ITEMS)
 	{
+		getStorage<Item>().clear();
 		QString filename = path + "/data/Items.json";
 		if (!loadJson(filename, getStorage<Item>()))
 			errorMessage += "Failed to load 'Items.json'\n";
@@ -196,47 +197,13 @@ void Database::saveMap(int id)
 		return;
 	}
 
-	QString filename = Settings::Get()->lastPath + QString("/data/Map%1.json")
-			.arg(id, 3, 10, QChar('0'));
-	saveJson<Map>(filename, maps[id]);
+	//QString filename = Settings::Get()->lastPath + QString("/data/Map%1.json")
+	//		.arg(id, 3, 10, QChar('0'));
+	QString path = Settings::Get()->lastPath;
+	QString filename = QString("Map%1.json").arg(id, 3, 10, QChar('0'));
+	saveJson<Map>(path + "/data/" + filename, maps[id]);
 }
 
-template<typename T>
-T *vectorValue(std::vector<std::optional<T>> &vector, int id)
-{
-	if (id < 0 || id >= std::ssize(vector))
-		return nullptr;
-
-	if (!vector[id].has_value())
-		return nullptr;
-
-	return &vector[id].value();
-}
-
-/*Item *Database::item(int id)
-{
-	return vectorValue(getStorage<Item>(), id);
-}
-
-Weapon *Database::weapon(int id)
-{
-	return vectorValue(getStorage<Weapon>(), id);
-}
-
-Armor *Database::armor(int id)
-{
-	return vectorValue(getStorage<Armor>(), id);
-}*/
-
-Event *Database::event(int id)
-{
-	return vectorValue(getStorage<Event>(), id);
-}
-
-/*MapInfo *Database::mapInfo(int id)
-{
-	return vectorValue(getStorage<MapInfo>(), id);
-}*/
 
 Map *Database::map(int id)
 {
@@ -250,7 +217,6 @@ Map *Database::map(int id)
 	QString path = Settings::Get()->lastPath;
 	QString filename = QString("Map%1.json").arg(id, 3, 10, QChar('0'));
 
-	maps[id] = {};
 	if (!loadJson(path + "/data/" + filename, maps[id]))
 	{
 		qDebug() << QString("Failed to load '%1'").arg(filename);
@@ -261,25 +227,7 @@ Map *Database::map(int id)
 	return &maps[id];
 }
 
-TileSet *Database::tileSet(int id)
-{
-	return vectorValue(getStorage<TileSet>(), id);
-}
 
-Animation *Database::animation(int id)
-{
-	return vectorValue(getStorage<Animation>(), id);
-}
-
-Skill *Database::skill(int id)
-{
-	return vectorValue(getStorage<Skill>(), id);
-}
-
-State *Database::state(int id)
-{
-	return vectorValue(getStorage<State>(), id);
-}
 
 System *Database::system()
 {

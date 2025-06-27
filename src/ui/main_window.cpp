@@ -61,11 +61,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 		// write to status bar
 	});
 
-	connect(ui->mapTab, &MapTab::mapLoadTime, [this](int msecs)
+	/*connect(ui->mapTab, &MapTab::mapLoadTime, [this](int msecs)
 	{
 		QString message = QString("Map loaded in %1 milliseconds.").arg(msecs);
 		ui->statusBar->showMessage(message, 5000);
-	});
+	});*/
 
 	connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 	connect(ui->actionGamesList, &QAction::triggered, this, &MainWindow::openSettingsDialog);

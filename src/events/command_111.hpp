@@ -11,24 +11,18 @@ struct Command_111: ICommandParams
 		GOLD, ITEM, WEAPON, ARMOR, BUTTON, SCRIPT,
 	};
 
-	/*std::array<int, 3> switchCond;
-	std::array<int, 5> variableCond;
-	std::tuple<int, QString, int> selfSwitchCond;
-	std::array<int, 3> timerCond;
-	std::array<int, 3> actorInPartyCond;*/
-	//Type type;
 	JsonValue condData;
-
-	int code() override { return 111; }
 
 	Command_111() = default;
 	Command_111(JsonValue condData) { this->condData = condData; }
 
-	void calculateWidth(QFontMetrics &metrics, int indent) override;
-	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
+	int code() override { return 111; }
+	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; }
+
+	void prepare(const QFontMetrics &metrics) override;
 	void read(JsonValue &parameters) override;
 	auto write() -> std::string override;
 
-	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; }
+
 };
 

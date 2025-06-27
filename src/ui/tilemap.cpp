@@ -63,7 +63,7 @@ void TileMap::loadTileSet(int id)
 {
 	clear();
 
-	TileSet *tileSet = Database::Get()->tileSet(id);
+	TileSet *tileSet = Accessor<TileSet>().value(id);
 	if (tileSet->tilesetNames.size() != TileSet::COUNT)
 		throw std::runtime_error("tileSet->tilesetNames.size() != TileSet::Layer::COUNT");
 

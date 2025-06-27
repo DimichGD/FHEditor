@@ -41,27 +41,25 @@ public:
 
 	enum Type
 	{
-		ITEMS = 1,
-		WEAPONS = 2,
-		ARMORS = 4,
-		EVENTS = 8,
-		SYSTEM = 16,
-		MAP_INFO = 32,
-		TILE_SETS = 64,
-		ANIMATION = 128,
-		SKILLS = 256,
-		STATES = 512,
-		MAP = 1024,
-		ACTORS = 2048,
-		CLASSES = 4096,
-		ENEMIES = 8192,
-		TROOPS = 16384,
+		ITEMS     = 1 << 0,
+		WEAPONS   = 1 << 2,
+		ARMORS    = 1 << 3,
+		EVENTS    = 1 << 4,
+		SYSTEM    = 1 << 5,
+		MAP_INFO  = 1 << 6,
+		TILE_SETS = 1 << 7,
+		ANIMATION = 1 << 8,
+		SKILLS    = 1 << 9,
+		STATES    = 1 << 10,
+		MAP       = 1 << 11,
+		ACTORS    = 1 << 12,
+		CLASSES   = 1 << 13,
+		ENEMIES   = 1 << 14,
+		TROOPS    = 1 << 15,
 		ALL = ITEMS | WEAPONS | ARMORS | EVENTS | SYSTEM |
 				MAP_INFO | TILE_SETS | ANIMATION | SKILLS | STATES |
 				ACTORS | CLASSES | ENEMIES | TROOPS,
 	};
-
-	//Database(QObject *parent = nullptr): QObject(parent) {}
 
 	static Database *Get();
 
@@ -69,16 +67,7 @@ public:
 	bool save(Type type);
 	void saveMap(int id);
 
-	//Item *item(int id);
-	//Weapon *weapon(int id);
-	//Armor *armor(int id);
-	Event *event(int id);
-	//MapInfo *mapInfo(int id);
 	Map *map(int id);
-	TileSet *tileSet(int id);
-	Animation *animation(int id);
-	Skill *skill(int id);
-	State *state(int id);
 	System *system();
 
 	QString switchName(int id);

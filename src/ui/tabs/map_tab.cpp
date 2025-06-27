@@ -208,21 +208,21 @@ void MapTab::loadMap(int id)
 	}
 
 	ui->tilePickerView->selectPoint(QPoint(0, 0));
-	Settings::Get()->lastMapId = id;
 }
 
 void MapTab::mapInfoTableClicked(int row)
 {
-	uint64_t start = QDateTime::currentMSecsSinceEpoch();
+	//uint64_t start = QDateTime::currentMSecsSinceEpoch();
 
 	//int id = ui->mapInfoTable->selectedRow();
 	currentMapId = row;
 	loadMap(row);
+	Settings::Get()->lastMapId = row - 1; // FIXME: fucking off by one thing
 	//emit mapLoaded(currentMap);
 	emit mapLoaded(&tileMap);
 
-	uint64_t end = QDateTime::currentMSecsSinceEpoch();
-	emit mapLoadTime(end - start);
+	//uint64_t end = QDateTime::currentMSecsSinceEpoch();
+	//emit mapLoadTime(end - start);
 }
 
 

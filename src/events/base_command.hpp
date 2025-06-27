@@ -4,34 +4,39 @@
 #include "json_value.hpp"
 #include <QString>
 #include <QPainter>
-//#include <QSharedPointer>
 
 struct ICommandParams
 {
+	struct TextColor
+	{
+		QString text;
+		QColor color;
+		int advance;
+	};
+
 	enum Flags
 	{
-		CAN_ADD = 1,
-		CAN_EDIT = 2,
-		CAN_DELETE = 4,
+		CAN_ADD    = 1 << 0,
+		CAN_EDIT   = 1 << 1,
+		CAN_DELETE = 1 << 2,
 		ALL = CAN_ADD | CAN_EDIT | CAN_DELETE
 	};
 
 	virtual ~ICommandParams() = default;
 	virtual int code() { return -1; };
-	virtual void drawImpl(QPainter *painter, bool selected, QRect &rect) = 0;
+	virtual int flags() = 0;
+
+	virtual void prepare(const QFontMetrics &metrics) = 0;
 	virtual void read(JsonValue &parameters) = 0;
 	virtual auto write() -> std::string = 0;
 
-	virtual int flags() = 0;
-
-	// TODO: implement for other classes
-	virtual void calculateWidth(QFontMetrics &metrics, int indent) { (void)metrics; (void)indent; }
+	int width(int indent);
 	void draw(QPainter *painter, bool selected, QRect rect, int indent);
-	void drawText(QPainter *painter, bool selected, QRect &rect, const QString &text, QColor color);
-	std::string checkExpected(const glz::expected<std::string, glz::error_ctx> &result);
 
-	int totalWidth = 0;
+	std::vector<TextColor> paintData {};
 };
+
+std::string checkExpected(const glz::expected<std::string, glz::error_ctx> &result);
 
 struct ConstantColors
 {

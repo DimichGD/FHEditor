@@ -1,6 +1,8 @@
 #include "wait_dialog.hpp"
 #include "command_wait.hpp"
+#include "command_factory.hpp"
 #include "ui_wait_dialog.h"
+#include <QModelIndex>
 
 CommandWaitDialog::CommandWaitDialog(bool editing, QModelIndex index, QWidget *parent)
 	: CommandDialog(parent), ui(new Ui::WaitDialog)
@@ -12,7 +14,7 @@ CommandWaitDialog::CommandWaitDialog(bool editing, QModelIndex index, QWidget *p
 
 	if (editing)
 	{
-		auto params = command->parameters.staticCast<CommandWait>();
+		auto params = static_cast<CommandWait *>(command->parameters.get());
 		ui->spinBox->setValue(params->frames);
 	}
 }
@@ -27,7 +29,7 @@ std::list<Command> CommandWaitDialog::resultCommands()
 	std::list<Command> resultList;
 
 	auto rootParams = CommandFactory::createCommand<CommandWait>(ui->spinBox->value());
-	resultList.push_back({ CommandFactory::WAIT, indent, rootParams });
+	resultList.emplace_back(CommandFactory::WAIT, indent, rootParams);
 
 	return resultList;
 }

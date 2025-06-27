@@ -22,19 +22,18 @@ void Command_101_Params::read(JsonValue &parameters)
 
 std::string Command_101_Params::write()
 {
-	//std::tuple<QString, int, int, int> params;
 	auto params = std::tie(faceName, faceIndex, background, windowPosition);
-	glz::expected<std::string, glz::error_ctx> result = glz::write_json(params);
-	return checkExpected(result);
+	return checkExpected(glz::write_json(params));
 }
 
-void Command_101_Params::drawImpl(QPainter *painter, bool selected, QRect &rect)
+void Command_101_Params::prepare(const QFontMetrics &metrics)
 {
-	drawText(painter, selected, rect, "Text: ", ConstantColors::purple);
-
 	QString str = QString("%1, %2, %3")
 			.arg(ToString::face(faceName, faceIndex),
 				 ToString::background(background),
 				 ToString::windowVPosition(windowPosition));
-	drawText(painter, selected, rect, str, ConstantColors::grey);
+
+	paintData.reserve(2);
+	paintData.push_back({ "Text: ", ConstantColors::purple, metrics.horizontalAdvance("Text: ") });
+	paintData.push_back({ str, ConstantColors::grey, metrics.horizontalAdvance(str) });
 }

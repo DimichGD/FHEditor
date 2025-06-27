@@ -18,7 +18,7 @@ QStandardItem *newItem(QString name, int id)
 template<typename T>
 void readModel(QStandardItemModel *model)
 {
-	for (auto item: Database::Get()->getStorage<T>())
+	for (auto &item: Database::Get()->getStorage<T>())
 	{
 		if (!item)
 			model->appendRow(newItem("", 0));

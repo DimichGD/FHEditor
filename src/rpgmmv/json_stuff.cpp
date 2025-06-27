@@ -22,11 +22,21 @@
 #include <QDebug>
 
 
-template <>
+/*template <>
 struct glz::to<glz::JSON, QSharedPointer<ICommandParams>>
 {
 	template <auto Opts>
 	static void op(QSharedPointer<ICommandParams>& value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
+	{
+		serialize<JSON>::op<glz::opts{.raw = true}>(value->write(), ctx, it, end);
+	}
+};*/
+
+template<>
+struct glz::to<glz::JSON, std::shared_ptr<ICommandParams>>
+{
+	template <auto Opts>
+	static void op(std::shared_ptr<ICommandParams> &value, is_context auto&& ctx, auto&& it, auto&& end) noexcept
 	{
 		serialize<JSON>::op<glz::opts{.raw = true}>(value->write(), ctx, it, end);
 	}
@@ -36,9 +46,14 @@ template <>
 struct glz::meta<Command>
 {
 	using T = Command;
+	static constexpr auto readParams = [](Command &command, JsonValue &&jsonValues)
+	{
+		command.parameters = CommandFactory::createCommand2(command.code);
+		command.parameters->read(jsonValues);
+	};
 	static constexpr auto value = object("code", &T::code,
 										 "indent", &T::indent,
-										 "parameters", custom<&T::readParams, &T::parameters>);
+										 "parameters", custom<readParams, &T::parameters>);
 };
 
 
@@ -208,24 +223,24 @@ bool loadJson<MZ::System>(const QString &filename, MZ::System &object)
 	return showParsingError(err, filename);
 }*/
 
-template<>
-bool saveJson<Item>(const QString &filename, std::vector<std::optional<Item>> &vector)
+
+bool saveArray(const QString &filename, size_t count, std::function<glz::error_ctx(size_t, std::string &)> func)
 {
 	QFile json_file(filename);
 	if (!json_file.open(QFile::WriteOnly))
 		return false;
 
-	json_file.write("[\n");
+	json_file.write("[");
 
 	std::string buffer;
 	glz::error_ctx err;
 	bool first = true;
 
-	for (size_t i = 0; i < vector.size(); i++)
+	for (size_t i = 0; i < count; i++)
 	{
 		json_file.write(first ? "\n" : ",\n");
 
-		err = glz::write_json(vector.at(i), buffer);
+		err = func(i, buffer);
 		if (err)
 		{
 			qDebug() << err;
@@ -238,138 +253,51 @@ bool saveJson<Item>(const QString &filename, std::vector<std::optional<Item>> &v
 
 	json_file.write("\n]");
 	return true;
+}
+
+template<>
+bool saveJson<Item>(const QString &filename, std::vector<std::optional<Item>> &vector)
+{
+	return saveArray(filename, vector.size(),
+		[&vector](size_t i, std::string &buffer) -> glz::error_ctx
+			{ return glz::write_json(vector.at(i), buffer); });
 }
 
 template<>
 bool saveJson<Weapon>(const QString &filename, std::vector<std::optional<Weapon>> &vector)
 {
-	QFile json_file(filename);
-	if (!json_file.open(QFile::WriteOnly))
-		return false;
-
-	json_file.write("[\n");
-
-	std::string buffer;
-	glz::error_ctx err;
-	bool first = true;
-
-	for (size_t i = 0; i < vector.size(); i++)
-	{
-		json_file.write(first ? "\n" : ",\n");
-
-		err = glz::write_json(vector.at(i), buffer);
-		if (err)
-		{
-			qDebug() << err;
-			return false;
-		}
-
-		json_file.write(buffer.data(), buffer.size());
-		first = false;
-	}
-
-	json_file.write("\n]");
-	return true;
+	return saveArray(filename, vector.size(),
+		[&vector](size_t i, std::string &buffer) -> glz::error_ctx
+			{ return glz::write_json(vector.at(i), buffer); });
 }
 
 template<>
 bool saveJson<Event>(const QString &filename, std::vector<std::optional<Event>> &vector)
 {
-	QFile json_file(filename);
-	if (!json_file.open(QFile::WriteOnly))
-		return false;
-
-	json_file.write("[\n");
-
-	std::string buffer;
-	glz::error_ctx err;
-	bool first = true;
-
-	for (size_t i = 0; i < vector.size(); i++)
-	{
-		json_file.write(first ? "\n" : ",\n");
-
-		err = glz::write_json(vector.at(i), buffer);
-		if (err)
-		{
-			qDebug() << err;
-			return false;
-		}
-
-		json_file.write(buffer.data(), buffer.size());
-		first = false;
-	}
-
-	json_file.write("\n]");
-	return true;
+	return saveArray(filename, vector.size(),
+		[&vector](size_t i, std::string &buffer) -> glz::error_ctx
+			{ return glz::write_json(vector.at(i), buffer); });
 }
 
 template<>
 bool saveJson<Skill>(const QString &filename, std::vector<std::optional<Skill>> &vector)
 {
-	QFile json_file(filename);
-	if (!json_file.open(QFile::WriteOnly))
-		return false;
-
-	json_file.write("[\n");
-
-	std::string buffer;
-	glz::error_ctx err;
-	bool first = true;
-
-	for (size_t i = 0; i < vector.size(); i++)
-	{
-		json_file.write(first ? "\n" : ",\n");
-
-		err = glz::write_json(vector.at(i), buffer);
-		if (err)
-		{
-			qDebug() << err;
-			return false;
-		}
-
-		json_file.write(buffer.data(), buffer.size());
-		first = false;
-	}
-
-	json_file.write("\n]");
-	return true;
+	return saveArray(filename, vector.size(),
+		[&vector](size_t i, std::string &buffer) -> glz::error_ctx
+			{ return glz::write_json(vector.at(i), buffer); });
 }
 
 template<>
 bool saveJson<State>(const QString &filename, std::vector<std::optional<State>> &vector)
 {
-	QFile json_file(filename);
-	if (!json_file.open(QFile::WriteOnly))
-		return false;
-
-	json_file.write("[\n");
-
-	std::string buffer;
-	glz::error_ctx err;
-	bool first = true;
-
-	for (size_t i = 0; i < vector.size(); i++)
-	{
-		json_file.write(first ? "\n" : ",\n");
-
-		err = glz::write_json(vector.at(i), buffer);
-		if (err)
-		{
-			qDebug() << err;
-			return false;
-		}
-
-		json_file.write(buffer.data(), buffer.size());
-		first = false;
-	}
-
-	json_file.write("\n]");
-	return true;
+	return saveArray(filename, vector.size(),
+		[&vector](size_t i, std::string &buffer) -> glz::error_ctx
+			{ return glz::write_json(vector.at(i), buffer); });
 }
 
 void printParsingError(const std::string &message, const QString &filename, int location)
 {
+	// TODO: combine this and showParsingError
 	if (!message.empty())
 	{
 		//qDebug() << glz::format_error(err, std::string{});

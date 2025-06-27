@@ -1,21 +1,24 @@
 #pragma once
-//#include "event.hpp"
 #include "base_command.hpp"
-//#include "command_101.hpp"
-//#include "command_unknown.hpp"
-
-#include <QPainter>
 
 class CommandFactory
 {
 public:
-	template<typename T, typename ...Args>
+	/*template<typename T, typename ...Args>
 	static QSharedPointer<ICommandParams> createCommand(Args&& ...args)
 	{
 		return QSharedPointer<ICommandParams>(new T(std::forward<Args>(args)...));
 	}
 
-	static QSharedPointer<ICommandParams> createCommand2(int code);
+	static QSharedPointer<ICommandParams> createCommand2(int code);*/
+
+	template<typename T, typename ...Args>
+	static std::shared_ptr<ICommandParams> createCommand(Args&& ...args)
+	{
+		return std::make_shared<T>(std::forward<Args>(args)...);
+	}
+
+	static std::shared_ptr<ICommandParams> createCommand2(int code);
 
 	enum Code
 	{

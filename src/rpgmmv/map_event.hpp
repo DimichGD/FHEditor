@@ -1,6 +1,7 @@
 #pragma once
 #include "event.hpp"
 #include "image.hpp"
+#include "json_value.hpp"
 
 struct Condition
 {

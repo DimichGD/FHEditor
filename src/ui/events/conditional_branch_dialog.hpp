@@ -1,5 +1,6 @@
 #pragma once
 #include "command_dialog.hpp"
+#include "json_value.hpp"
 
 namespace Ui {class ConditionalBranchDialog; }
 
@@ -16,7 +17,7 @@ public:
 protected slots:
 	void setWidgetsVisible(QString prefix, bool toggled);
 	void radioButtonToggled(int index, bool toggled);
-	void fillWidgets(JsonValue &value);
+	//void fillWidgets(JsonValue &value);
 
 private:
 	Ui::ConditionalBranchDialog *ui = nullptr;

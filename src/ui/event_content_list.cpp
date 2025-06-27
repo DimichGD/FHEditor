@@ -42,8 +42,9 @@ public:
 		Command::Iterator command = Command::iteratorFromIndex(index);
 
 		QSize size = QStyledItemDelegate::sizeHint(option, index);
-		if (command->parameters->totalWidth)
-			size.setWidth(command->parameters->totalWidth);
+		size.setWidth(command->parameters->width(command->indent));
+		//if (command->parameters->totalWidth)
+		//	size.setWidth(command->parameters->totalWidth);
 
 		return size;
 	}
@@ -85,7 +86,7 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 	connect(selectionModel(), &QItemSelectionModel::selectionChanged,
 			[this](const QItemSelection &selected, const QItemSelection &)
 	{
-		if (!selected.empty()/* && selected[0].indexes()[0].isValid()*/)
+		if (!selected.empty())
 		{
 			auto selectedIndices = selectionModel()->selectedIndexes();
 			std::sort(selectedIndices.begin(), selectedIndices.end(),
@@ -105,82 +106,6 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 			actionCommandDelete->setEnabled(false);
 		}
 	});
-
-
-
-	/*connect(selectionModel(), &QItemSelectionModel::currentRowChanged, [this](const QModelIndex &current, const QModelIndex &previous)
-	{
-		if (current.isValid())
-		{
-			auto parameters = Command::iteratorFromIndex(current)->parameters;
-
-			actionCommandNew->setEnabled(parameters->flags() & ICommandParams::CAN_ADD);
-			actionCommandEdit->setEnabled(parameters->flags() & ICommandParams::CAN_EDIT);
-			actionCommandDelete->setEnabled(parameters->flags() & ICommandParams::CAN_DELETE);
-
-			enum Strategy { SELECT_UNTIL, SELECT_WHILE };
-			struct Holder { int endCode; Strategy strategy; };
-			static std::map<int, Holder> codesMap = {
-				{ CommandFactory::TEXT,          { CommandFactory::TEXT_LINE,    SELECT_WHILE } },
-				{ CommandFactory::COMMENT,       { CommandFactory::COMMENT_LINE, SELECT_WHILE } },
-				{ CommandFactory::BEGIN_CHOICES, { CommandFactory::END_CHOICES,  SELECT_UNTIL } },
-				{ CommandFactory::IF,            { CommandFactory::END_IF     ,  SELECT_UNTIL } },
-				{ CommandFactory::LOOP,          { CommandFactory::REPEAT_LOOP,  SELECT_UNTIL } },
-			};
-
-			QModelIndex first = current;
-			QModelIndex last = current;
-
-			Command::Iterator command = Command::iteratorFromIndex(first);
-			int startCode = command->code;
-			int startIndent = command->indent;
-
-			auto it = codesMap.find(startCode);
-			if (it == codesMap.end())
-			{
-				selectionModel()->clearSelection();
-				return;
-			}
-
-			int endCode = it->second.endCode;
-			Strategy strategy = it->second.strategy;
-
-			std::advance(command, 1);
-			while (true)
-			{
-				last = model->index(last.row() + 1, 0);
-				if (strategy == SELECT_WHILE
-					&& std::next(command)->code != endCode)
-					break;
-
-				if (strategy == SELECT_UNTIL
-					&& command->code == endCode
-					&& command->indent == startIndent)
-					break;
-
-				std::advance(command, 1);
-			}
-
-			//qDebug() << selectionModel()->currentIndex();
-
-			//QItemSelection rowSelection(first, last);
-			QItemSelection rowSelection(model->index(first.row() + 1), last);
-			selectionModel()->clearSelection();
-			selectionModel()->select(rowSelection, QItemSelectionModel::ClearAndSelect);
-
-			//qDebug() << selectionModel()->selection()[0].indexes();
-
-			//QItemSelection rowSelection2(first, first);
-			//selectionModel()->select(rowSelection2, QItemSelectionModel::SelectCurrent);
-		}
-		else
-		{
-			qDebug() << "not valid";
-			actionCommandNew->setEnabled(false);
-			actionCommandEdit->setEnabled(false);
-			actionCommandDelete->setEnabled(false);
-		}
-	});*/
 }
 
 void EventContentList::loadList(std::list<Command> *list)
@@ -189,7 +114,8 @@ void EventContentList::loadList(std::list<Command> *list)
 
 	QFontMetrics metrics = fontMetrics();
 	for (auto &command: *list)
-		command.parameters->calculateWidth(metrics, command.indent);
+		if (command.parameters->paintData.empty())
+			command.parameters->prepare(metrics);
 }
 
 void EventContentList::clear()
@@ -209,7 +135,11 @@ void EventContentList::actionCommandNewTriggered(bool)
 	if (dialog.exec())
 	{
 		int firstRow = index.row();
-		model->insertCommands(firstRow, dialog.resultCommands());
+		auto result = dialog.resultCommands();
+		for (auto &command: result)
+			command.parameters->prepare(fontMetrics());
+
+		model->insertCommands(firstRow, std::move(result));
 
 		selectionModel()->clear();
 		setCurrentIndex(model->index(firstRow));
@@ -241,9 +171,13 @@ void EventContentList::actionCommandEditTriggered(bool)
 
 	if (dialog && dialog->exec())
 	{
+		auto result = dialog->resultCommands();
+		for (auto &command: result)
+			command.parameters->prepare(fontMetrics());
+
 		int firstRow = selectedIndices[0].row();
 		model->removeCommands(firstRow, selectedIndices.size());
-		model->insertCommands(firstRow, dialog->resultCommands());
+		model->insertCommands(firstRow, std::move(result));
 
 		selectionModel()->clear();
 		setCurrentIndex(model->index(firstRow));

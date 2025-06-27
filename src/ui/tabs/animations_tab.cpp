@@ -119,7 +119,7 @@ void AnimationsTab::init()
 
 void AnimationsTab::rowSelected(int row)
 {
-	currentAnim = Database::Get()->animation(row);
+	currentAnim = Accessor<Animation>().value(row);
 	if (!currentAnim)
 		return;
 }

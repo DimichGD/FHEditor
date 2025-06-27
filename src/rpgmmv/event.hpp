@@ -1,34 +1,55 @@
 #pragma once
-#include "base_command.hpp"
-#include "command_factory.hpp"
-#include "json_value.hpp"
-#include <QAbstractItemModel>
-#include <vector>
+//#include "base_command.hpp"
+#include <QModelIndex>
+#include <QString>
+#include <QObject>
 #include <list>
+
+
+class ICommandParams;
 
 struct Command
 {
 	using Iterator = std::list<Command>::iterator;
 
-	static Iterator iteratorFromIndex(const QModelIndex &index)
+	//Q_DISABLE_COPY(Command)
+
+	int code = 0;
+	int indent = 0;
+	std::shared_ptr<ICommandParams> parameters;
+	//QSharedPointer<ICommandParams> parameters;
+
+	Command() = default;
+	Command(int code, int indent, std::shared_ptr<ICommandParams> parameters)
 	{
-		return index.data(Qt::UserRole + 1).value<Command::Iterator>();
+		this->code = code;
+		this->indent = indent;
+		this->parameters = parameters;
 	}
 
-	static Command makeZeroCommand(int indent)
+	/*Command() = default;
+	Command(int code, int indent, ICommandParams *parameters)
 	{
-		return { CommandFactory::ZERO, indent, CommandFactory::createCommand2(0) };
+		this->code = code;
+		this->indent = indent;
+		this->parameters = parameters;
 	}
-
-	int code;
-	int indent;
-	QSharedPointer<ICommandParams> parameters;
-
-	void readParams(JsonValue &&jsonValues)
+	~Command();
+	Command(Command &&other)
 	{
-		parameters = CommandFactory::createCommand2(code);
-		parameters->read(jsonValues);
+		std::swap(code, other.code);
+		std::swap(indent, other.indent);
+		std::swap(parameters, other.parameters);
 	}
+	Command &operator=(Command &&other)
+	{
+		std::swap(code, other.code);
+		std::swap(indent, other.indent);
+		std::swap(parameters, other.parameters);
+		return *this;
+	}*/
+	static Iterator iteratorFromIndex(const QModelIndex &index);
+	static Command makeZeroCommand(int indent);
 };
 
 struct Event

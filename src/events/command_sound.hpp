@@ -15,10 +15,10 @@ struct CommandSound: ICommandParams
 	CommandSound(Type type);
 	CommandSound(Type type, Sound sound);
 
-	void read(JsonValue &parameters) override;
-	std::string write() override;
-
+	int code() override { return type; }
 	int flags() override { return CAN_ADD | CAN_EDIT | CAN_DELETE; };
 
-	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
+	void prepare(const QFontMetrics &metrics) override;
+	void read(JsonValue &parameters) override;
+	std::string write() override;
 };

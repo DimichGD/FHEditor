@@ -33,7 +33,7 @@ public slots:
 	void mapInfoTableClicked(int row);
 
 signals:
-	void mapLoadTime(int msecs);
+	//void mapLoadTime(int msecs);
 	//void mapLoaded(Map *map);
 	void mapLoaded(TileMap *tileMap);
 	void editMapEvent(int eventId);

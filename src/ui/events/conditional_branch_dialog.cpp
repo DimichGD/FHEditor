@@ -1,7 +1,10 @@
 #include "conditional_branch_dialog.hpp"
 #include "command_111.hpp"
+#include "command_factory.hpp"
 #include "ui_conditional_branch_dialog.h"
 #include <QRegularExpression>
+
+void fillWidgets(Ui::ConditionalBranchDialog *ui, JsonValue &value);
 
 ConditionalBranchDialog::ConditionalBranchDialog(bool editing, QList<QModelIndex> indices, QWidget *parent) :
 	CommandDialog(parent), ui(new Ui::ConditionalBranchDialog)
@@ -92,10 +95,10 @@ ConditionalBranchDialog::ConditionalBranchDialog(bool editing, QList<QModelIndex
 			bodyList = { std::next(rootCommand), endCommand };
 		}
 
-		JsonValue &value = rootCommand->parameters.staticCast<Command_111>()->condData;
+		JsonValue &value = static_cast<Command_111 *>(rootCommand->parameters.get())->condData;
 		int index = value[0].toInt();
 		ui->mainRadioGroup->button(index)->toggle();
-		fillWidgets(value);
+		fillWidgets(ui, value);
 
 		if (index >= 0 && index <= 3)
 			ui->tabWidget->setCurrentIndex(0);
@@ -181,14 +184,14 @@ std::list<Command> ConditionalBranchDialog::resultCommands()
 			break;
 	}
 
-	commands.push_back({ CommandFactory::IF, indent, CommandFactory::createCommand<Command_111>(JsonValue { condData }) });
+	commands.emplace_back(CommandFactory::IF, indent, CommandFactory::createCommand<Command_111>(JsonValue { condData }));
 
 	if (!bodyList.empty())
 	{
 		if (!elseList.empty())
 		{
 			commands.insert(commands.end(), bodyList.begin(), bodyList.end());
-			commands.push_back({ CommandFactory::ELSE, indent, CommandFactory::createCommand2(411) });
+			commands.emplace_back(CommandFactory::ELSE, indent, CommandFactory::createCommand2(411));
 			commands.insert(commands.end(), elseList.begin(), elseList.end());
 		}
 		else
@@ -241,7 +244,7 @@ void ConditionalBranchDialog::radioButtonToggled(int index, bool toggled)
 	setWidgetsVisible(prefixList[index], toggled);
 }
 
-void ConditionalBranchDialog::fillWidgets(JsonValue &value)
+void fillWidgets(Ui::ConditionalBranchDialog *ui, JsonValue &value)
 {
 	int index = value[0].toInt();
 	switch (index)

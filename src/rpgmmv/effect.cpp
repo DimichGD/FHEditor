@@ -18,8 +18,7 @@ QString makeRecoverHPString(int value1, int value2)
 
 QString makeStateString(int stateId, int value1)
 {
-	// TODO: get from another source
-	State *state = Database::Get()->state(stateId);
+	State *state = Accessor<State>().value(stateId);
 	QString stateName = state ? state->name : "?";
 
 	return QString("%1 %2%").arg(stateName).arg(value1);
@@ -47,15 +46,13 @@ QString makeGrowString(int attribId, int value1)
 
 QString makeSkillString(int skillId)
 {
-	// TODO: get from another source
-	Skill *skill = Database::Get()->skill(skillId);
+	Skill *skill = Accessor<Skill>().value(skillId);
 	return skill ? skill->name : "?";
 }
 
 QString makeCommonEventString(int eventId)
 {
-	// TODO: get from another source
-	Event *event = Database::Get()->event(eventId);
+	Event *event = Accessor<Event>().value(eventId);
 	return event ? event->name : "?";
 }
 

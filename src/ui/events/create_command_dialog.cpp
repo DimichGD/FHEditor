@@ -1,6 +1,7 @@
 #include "create_command_dialog.hpp"
 #include "command_000.hpp"
 #include "command_simple.hpp"
+#include "command_factory.hpp"
 #include "conditional_branch_dialog.hpp"
 #include "events/command_text_dialog.hpp"
 #include "play_sound_dialog.hpp"
@@ -38,7 +39,7 @@ CreateCommandDialog::~CreateCommandDialog()
 
 std::list<Command> CreateCommandDialog::resultCommands()
 {
-	return dialog ? dialog->resultCommands() : commands;
+	return dialog ? dialog->resultCommands() : std::move(commands);
 }
 
 void CreateCommandDialog::openShowTextDialog()

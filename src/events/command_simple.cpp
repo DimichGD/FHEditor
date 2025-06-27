@@ -2,7 +2,7 @@
 
 int CommandSimple::flags()
 {
-	switch (codeVar)
+	switch (commandCode)
 	{
 		case 112: return CAN_ADD | CAN_DELETE;
 		case 113: return CAN_ADD | CAN_DELETE;
@@ -19,19 +19,25 @@ int CommandSimple::flags()
 	return 0;
 }
 
-void CommandSimple::drawImpl(QPainter *painter, bool selected, QRect &rect)
+void CommandSimple::prepare(const QFontMetrics &metrics)
 {
-	switch (codeVar)
+	QString text;
+	QColor color;
+
+	switch (commandCode)
 	{
-		case 112: drawText(painter, selected, rect, "Loop", ConstantColors::blue); break;
-		case 113: drawText(painter, selected, rect, "Break Loop", ConstantColors::blue); break;
-		case 217: drawText(painter, selected, rect, "Gather Followers", ConstantColors::darkRed); break;
-		case 251: drawText(painter, selected, rect, "Stop SE", ConstantColors::cyan); break;
-		case 352: drawText(painter, selected, rect, "Open Save Screen", ConstantColors::lightBlue); break;
-		case 353: drawText(painter, selected, rect, "Game Over", ConstantColors::lightBlue); break;
-		case 404: drawText(painter, selected, rect, "End Choices", ConstantColors::purple); break;
-		case 411: drawText(painter, selected, rect, "Else", ConstantColors::blue); break;
-		case 412: drawText(painter, selected, rect, "End If", ConstantColors::blue); break;
-		case 413: drawText(painter, selected, rect, "Repeat Loop", ConstantColors::blue); break;
+		case 112: text = "Loop"; color = ConstantColors::blue; break;
+		case 113: text = "Break Loop"; color = ConstantColors::blue; break;
+		case 217: text = "Gather Followers"; color = ConstantColors::darkRed; break;
+		case 251: text = "Stop SE"; color = ConstantColors::cyan; break;
+		case 352: text = "Open Save Screen"; color = ConstantColors::lightBlue; break;
+		case 353: text = "Game Over"; color = ConstantColors::lightBlue; break;
+		case 404: text = "End Choices"; color = ConstantColors::purple; break;
+		case 411: text = "Else"; color = ConstantColors::blue; break;
+		case 412: text = "End If"; color = ConstantColors::blue; break;
+		case 413: text = "Repeat Loop"; color = ConstantColors::blue; break;
 	}
+
+	paintData.push_back({ text, color, metrics.horizontalAdvance(text) });
 }
+

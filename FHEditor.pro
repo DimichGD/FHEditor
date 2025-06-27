@@ -17,8 +17,8 @@ SOURCES += \
     src/events/command_101.cpp \
     src/events/command_102.cpp \
     src/events/command_122.cpp \
-    src/events/command_401.cpp \
     src/events/command_comment.cpp \
+    src/events/command_line.cpp \
     src/events/command_simple.cpp \
     src/events/command_sound.cpp \
     src/events/command_unknown.cpp \
@@ -37,6 +37,7 @@ SOURCES += \
     src/models/map_info_model.cpp \
     src/rpgmmv/database.cpp \
     src/rpgmmv/effect.cpp \
+    src/rpgmmv/event.cpp \
     src/rpgmmv/json_stuff.cpp \
     src/rpgmmz/system_mz.cpp \
     src/ui/events/command_dialog.cpp \
@@ -86,8 +87,8 @@ HEADERS += \
     src/events/command_101.hpp \
     src/events/command_102.hpp \
     src/events/command_122.hpp \
-    src/events/command_401.hpp \
     src/events/command_comment.hpp \
+    src/events/command_line.hpp \
     src/events/command_simple.hpp \
     src/events/command_sound.hpp \
     src/events/command_unknown.hpp \

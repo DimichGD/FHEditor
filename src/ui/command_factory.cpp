@@ -7,7 +7,7 @@
 #include "command_comment.hpp"
 #include "command_simple.hpp"
 #include "command_sound.hpp"
-#include "command_401.hpp"
+#include "command_line.hpp"
 #include "command_unknown.hpp"
 
 #include <QDebug>
@@ -45,9 +45,11 @@
 }*/
 
 
-QSharedPointer<ICommandParams> CommandFactory::createCommand2(int code)
+std::shared_ptr<ICommandParams> CommandFactory::createCommand2(int code)
+//ICommandParams *CommandFactory::createCommand2(int code)
 {
-	QSharedPointer<ICommandParams> command;
+	//QSharedPointer<ICommandParams> command;
+	std::shared_ptr<ICommandParams> command;
 
 	switch (code)
 	{
@@ -67,9 +69,9 @@ QSharedPointer<ICommandParams> CommandFactory::createCommand2(int code)
 		case STOP_SE:          command = createCommand<CommandSimple>(code); break;
 		case OPEN_SAVE_SCREEN: command = createCommand<CommandSimple>(code); break;
 		case GAME_OVER:        command = createCommand<CommandSimple>(code); break;
-		case TEXT_LINE:        command = createCommand<Command_401_Params>(); break;
+		case TEXT_LINE:        command = createCommand<CommandLine>(code); break;
 		case END_CHOICES:      command = createCommand<CommandSimple>(code); break;
-		case COMMENT_LINE:     command = createCommand<CommandCommentLine>(); break;
+		case COMMENT_LINE:     command = createCommand<CommandLine>(code); break;
 		case ELSE:             command = createCommand<CommandSimple>(code); break;
 		case END_IF:           command = createCommand<CommandSimple>(code); break;
 		case REPEAT_LOOP:      command = createCommand<CommandSimple>(code); break;

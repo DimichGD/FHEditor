@@ -70,6 +70,12 @@ void CommonEventsTab::init()
 	model = new CommonEventsModel(ui->eventsTable);
 	ui->eventsTable->setModel2(model);
 
+	/*QFontMetrics metrics = ui->eventContentList->fontMetrics();
+	for (auto &event: Database::Get()->getStorage<Event>())
+		if (event.has_value())
+			for (auto &command: event.value().list)
+				command.parameters->prepare(metrics);*/
+
 	mapper = new DataMapper(this);
 	mapper->setModel(model);
 	mapper->addWidgets({

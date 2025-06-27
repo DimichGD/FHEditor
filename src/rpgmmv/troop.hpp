@@ -36,5 +36,5 @@ struct Troop
 
 	int id;
 	std::vector<Member> members {};
-	std::vector<Condition> pages { {} };
+	std::vector<Page> pages { {} };
 };

@@ -3,14 +3,14 @@
 
 struct CommandSimple: ICommandParams
 {
-	explicit CommandSimple(int codeVar) { this->codeVar = codeVar;  }
+	explicit CommandSimple(int code) { this->commandCode = code;  }
 
-	int codeVar;
-	int code() override { return codeVar; }
-	void read(JsonValue &parameters) override { (void)parameters; }
-	auto write() -> std::string override { return "[]"; };
+	int commandCode = -1;
 
+	int code() override { return commandCode; }
 	int flags() override;
 
-	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
+	void prepare(const QFontMetrics &metrics) override;
+	void read(JsonValue &parameters) override { (void)parameters; }
+	auto write() -> std::string override { return "[]"; };
 };

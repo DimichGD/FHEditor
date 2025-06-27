@@ -1,6 +1,5 @@
 #pragma once
 #include "base_command.hpp"
-//#include "event.hpp"
 
 struct CommandWait: ICommandParams
 {
@@ -8,11 +7,11 @@ struct CommandWait: ICommandParams
 
 	CommandWait() = default;
 	CommandWait(int frames);
-	int code() override { return 230; };
 
-	void read(JsonValue &parameters) override;
-	auto write() -> std::string override;
+	int code() override { return 230; };
 	int flags() override  { return CAN_ADD | CAN_EDIT | CAN_DELETE; }
 
-	void drawImpl(QPainter *painter, bool selected, QRect &rect) override;
+	void prepare(const QFontMetrics &metrics) override;
+	void read(JsonValue &parameters) override;
+	auto write() -> std::string override;
 };

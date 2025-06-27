@@ -2,7 +2,7 @@
 #include "icon_picker_dialog.hpp"
 #include "images.hpp"
 #include "command_101.hpp"
-#include "command_401.hpp"
+#include "command_line.hpp"
 #include "command_factory.hpp"
 #include "ui_command_text_dialog.h"
 
@@ -16,14 +16,14 @@ CommandTextDialog::CommandTextDialog(bool editing, QList<QModelIndex> indices, Q
 
 	if (editing)
 	{
-		auto params = command->parameters.staticCast<Command_101_Params>();
+		auto params = static_cast<Command_101_Params *>(command->parameters.get());
 		ui->backgroundComboBox->setCurrentIndex(params->background);
 		ui->windowPositionComboBox->setCurrentIndex(params->windowPosition);
 
 		for (int i = 1; i < indices.size(); i++)
 		{
 			std::advance(command, 1);
-			auto params = command->parameters.staticCast<Command_401_Params>();
+			auto params = static_cast<CommandLine *>(command->parameters.get());
 			ui->messageLinesEdit->appendPlainText(params->line);
 		}
 
@@ -58,7 +58,7 @@ std::list<Command> CommandTextDialog::resultCommands()
 	QStringList lines = ui->messageLinesEdit->toPlainText().split('\n');
 	for (auto &line: lines)
 	{
-		auto lineParams = CommandFactory::createCommand<Command_401_Params>(line);
+		auto lineParams = CommandFactory::createCommand<CommandLine>(CommandFactory::TEXT_LINE, line);
 		resultList.push_back({ CommandFactory::TEXT_LINE, indent, lineParams });
 	}
 

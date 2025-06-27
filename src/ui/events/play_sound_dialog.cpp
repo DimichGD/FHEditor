@@ -19,7 +19,7 @@ PlaySoundDialog::PlaySoundDialog(CommandSound::Type type, bool editing, QModelIn
 	QString expectedString;
 	if (editing)
 	{
-		auto params = command->parameters.staticCast<CommandSound>();
+		auto params = static_cast<CommandSound *>(command->parameters.get());
 		expectedString = params->sound.name;
 		ui->volumeSlider->setValue(params->sound.volume);
 		ui->volumeSpinBox->setValue(params->sound.volume);

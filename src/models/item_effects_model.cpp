@@ -1,19 +1,33 @@
 #include "item_effects_model.hpp"
+#include "base_model.hpp"
+#include "item.hpp"
 
-ItemEffectsModel::ItemEffectsModel(QObject *parent)
-	: QAbstractTableModel(parent) {}
-
-void ItemEffectsModel::setEffects(std::vector<Effect> *effects)
+ItemEffectsModel::ItemEffectsModel(QAbstractItemModel *sourceModel, QObject *parent)
+	: QAbstractProxyModel(parent)
 {
-	beginResetModel();
-	this->effects = effects;
-	endResetModel();
+	setSourceModel(sourceModel);
+	connect(sourceModel, &QAbstractItemModel::dataChanged, this, &ItemEffectsModel::sourceModelChanged);
+}
+
+QModelIndex ItemEffectsModel::index(int row, int column, const QModelIndex &parent) const
+{
+	Q_UNUSED(parent)
+	return createIndex(row, column);
+}
+
+QModelIndex ItemEffectsModel::parent(const QModelIndex &child) const
+{
+	Q_UNUSED(child)
+	return QModelIndex();
 }
 
 int ItemEffectsModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
-	return effects ? effects->size() : 0;
+	if (itemIndex < 0)
+		return 0;
+
+	return sourceModel()->index(itemIndex, Item::EFFECTS).data(Qt::UserRole).toInt();
 }
 
 int ItemEffectsModel::columnCount(const QModelIndex &parent) const
@@ -22,61 +36,57 @@ int ItemEffectsModel::columnCount(const QModelIndex &parent) const
 	return 2;
 }
 
-QVariant ItemEffectsModel::data(const QModelIndex &index, int role) const
-{
-	if (!effects || !index.isValid())
-		return QVariant();
-
-	if (role == CODE)
-		return effects->at(index.row()).code;
-
-	if (role == DATA)
-		return effects->at(index.row()).dataId;
-
-	if (role != Qt::DisplayRole)
-		return QVariant();
-
-	QStringList list = effectToStringList(&effects->at(index.row()));
-	switch (index.column())
-	{
-		case 0: return list[0];
-		case 1: return list[1];
-	}
-
-	return QVariant();
-}
-
 QVariant ItemEffectsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
 		return QVariant();
 
-	switch (section)
-	{
-		case 0: return "Type";
-		case 1: return "Content";
-	}
-
-	return QVariant();
+	return section == 0 ? "Type" : "Content";
 }
 
-void ItemEffectsModel::addEffect()
+Qt::ItemFlags ItemEffectsModel::flags(const QModelIndex &index) const
 {
-	beginResetModel(); // FIXME: replace with insert
-	effects->emplace_back();
-	endResetModel();
+	if (!index.isValid())
+		return Qt::NoItemFlags;
+
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemNeverHasChildren;
 }
 
-void ItemEffectsModel::setEffect(int row, Effect &&effect)
+QModelIndex ItemEffectsModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+	if (!proxyIndex.isValid())
+		return QModelIndex();
+
+	Triple value;
+	value.row = proxyIndex.row();
+	value.column = proxyIndex.column();
+	return createIndex(itemIndex, Item::EFFECTS, pack(value));
+}
+
+QModelIndex ItemEffectsModel::mapFromSource(const QModelIndex &sourceIndex) const
+{
+	if (!sourceIndex.isValid())
+		return QModelIndex();
+
+	Triple value = unpack<Triple>(sourceIndex.internalPointer());
+	return createIndex(value.row, value.column);
+}
+
+void ItemEffectsModel::setItemIndex(int index)
 {
 	beginResetModel();
-	effects->at(row) = effect;
+	itemIndex = index;
 	endResetModel();
 }
 
-void ItemEffectsModel::removeEffect(int row)
+void ItemEffectsModel::sourceModelChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles)
 {
-	beginResetModel(); // FIXME: replace with remove
-	effects->erase(effects->begin() + row);
-	endResetModel();
+	//if (roles.contains(Qt::EditRole))
+	{
+		if (topLeft.column() <= Item::EFFECTS && bottomRight.column() >= Item::EFFECTS)
+		{
+			beginResetModel();
+			endResetModel();
+		}
+	}
 }

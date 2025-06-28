@@ -7,7 +7,7 @@ MapInfo *MapInfoModel::mapInfo(int row)
 	return accessor.value(row);
 }
 
-QVariant MapInfoModel::dataForDisplay(int row, int column) const
+QVariant MapInfoModel::displayRoleData(int row, int column, Triple pointer) const
 {
 	const MapInfo *info = accessor.value(row);
 	if (!info)
@@ -17,5 +17,15 @@ QVariant MapInfoModel::dataForDisplay(int row, int column) const
 	if (column == 1) return info->name;
 
 	return QVariant();
+}
+
+QVariant MapInfoModel::editRoleData(int row, int column, Triple pointer) const
+{
+
+}
+
+void MapInfoModel::setEditRoleData(int row, int column, const QVariant &value, Triple pointer)
+{
+
 }
 

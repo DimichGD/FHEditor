@@ -1,6 +1,6 @@
 #include "animations_model.hpp"
 
-QVariant AnimationsModel::dataForDisplay(int row, int column) const
+QVariant AnimationsModel::displayRoleData(int row, int column, Triple pointer) const
 {
 	const Animation *anim = accessor.value(row);
 	if (!anim)
@@ -11,3 +11,19 @@ QVariant AnimationsModel::dataForDisplay(int row, int column) const
 
 	return QVariant();
 }
+
+QVariant AnimationsModel::editRoleData(int row, int column, Triple pointer) const
+{
+	//
+}
+
+QVariant AnimationsModel::userRoleData(int row, int column, Triple pointer) const
+{
+	//
+}
+
+void AnimationsModel::setEditRoleData(int row, int column, const QVariant &value, Triple pointer)
+{
+	//
+}
+

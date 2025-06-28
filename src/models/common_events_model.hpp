@@ -11,9 +11,9 @@ public:
 	Event *eventFromRow(int row);
 
 protected:
-	QVariant dataForDisplay(int row, int column) const override;
-	QVariant dataForMapper(int row, int column) const override;
-	void setDataFromMapper(int row, int column, const QVariant &value) override;
+	QVariant displayRoleData(int row, int column, Triple) const override;
+	QVariant editRoleData(int row, int column, Triple) const override;
+	void setEditRoleData(int row, int column, const QVariant &value, Triple) override;
 
 private:
 	Accessor<Event> accessor;

@@ -5,6 +5,7 @@
 
 #include <QItemSelectionModel>
 
+
 MapEventsTab::MapEventsTab(QWidget *parent): QWidget(parent), ui(new Ui::MapEventsTab)
 {
 	ui->setupUi(this);
@@ -60,7 +61,7 @@ void MapEventsTab::mapEventsTableClicked(int row)
 	{
 		MapEventPage *page = new MapEventPage(pagesModel, i, &event->pages[i], ui->mapEventPagesWidget);
 		ui->mapEventPagesWidget->addTab(page, QString::number(i));
-	}
+	};
 }
 
 void MapEventsTab::selectEvent(int id)

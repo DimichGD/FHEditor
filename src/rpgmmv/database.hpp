@@ -27,18 +27,25 @@ concept hasIconIndex = requires(T t)
 	t.iconIndex;
 };*/
 
-template<typename T>
+/*template<typename T>
 struct Storage
 {
 	std::vector<std::optional<T>> data { std::nullopt };
-};
+};*/
+
+template<typename T>
+using Storage = std::vector<std::optional<T>>;
+
+/*using Tuple = std::tuple<
+	Storage<Item>, Storage<Weapon>, Storage<Armor>,
+	Storage<Event>, Storage<MapInfo>, Storage<TileSet>,
+	Storage<Animation>, Storage<Skill>, Storage<State>,
+	Storage<Actor>, Storage<Class>, Storage<Enemy>, Storage<Troop>
+>;*/
 
 class Database
 {
 public:
-	//template<typename T>
-	//using Storage = std::vector<std::optional<T>>;
-
 	enum Type
 	{
 		ITEMS     = 1 << 0,
@@ -74,9 +81,9 @@ public:
 	QString variableName(int id);
 
 	template<typename T>
-	std::vector<std::optional<T>> &getStorage()
+	Storage<T> &getStorage()
 	{
-		return std::get<Storage<T>>(storage).data;
+		return std::get<Storage<T>>(storage);
 	}
 
 private:
@@ -95,12 +102,17 @@ class IAccessor
 public:
 	virtual ~IAccessor() = default;
 	virtual int size() = 0;
-	//virtual bool hasElement(int index) = 0;
+	virtual bool hasElement(int index) = 0;
 	virtual void clearElement(int index) = 0;
 	virtual void insertToEnd(int count) = 0;
 	virtual void removeFromEnd(int count) = 0;
 };
 
+/*template <typename, typename>
+struct tuple_holds {};
+
+template <typename ...A, typename B>
+struct tuple_holds<std::tuple<A...>, B>: std::bool_constant<(std::is_same_v<A, B> || ...)> {};*/
 
 template<typename T>
 class Accessor: public IAccessor
@@ -137,10 +149,10 @@ public:
 		return storage->size();
 	}
 
-	/*bool hasElement(int index) override
+	bool hasElement(int index) override
 	{
 		return value(index) != nullptr;
-	}*/
+	}
 
 	void clearElement(int index) override
 	{

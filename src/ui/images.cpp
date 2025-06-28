@@ -13,7 +13,7 @@ Images *Images::Get()
 
 bool Images::load()
 {
-	iconSetPixmap = nullptr;
+	//iconSetPixmap = nullptr;
 	cache.clear();
 
 	if (Settings::Get()->lastPath.isEmpty())
@@ -26,7 +26,7 @@ bool Images::load()
 		return false;
 	}
 
-	iconSetPixmap = loadImage("system/IconSet");
+	iconSetPixmap = *loadImage("system/IconSet");
 
 	return true;
 }
@@ -76,7 +76,7 @@ QPixmap *Images::loadImage(const QString &name)
 
 QPixmap *Images::iconSet()
 {
-	return iconSetPixmap;
+	return &iconSetPixmap;
 }
 
 QPixmap *Images::face(const QString &name)

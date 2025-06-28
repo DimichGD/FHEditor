@@ -14,7 +14,7 @@
 
 
 
-MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
+MapTab::MapTab(QWidget *parent): BaseTab(parent), ui(new Ui::MapTab)
 {
 	ui->setupUi(this);
 
@@ -41,6 +41,9 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 	tilePickerViews[2] = ui->tilePicker_C;
 	tilePickerViews[3] = ui->tilePicker_D;
 	tilePickerViews[4] = ui->tilePicker_E;*/
+
+	model = new MapInfoModel(this);
+	ui->mapInfoTable->setModel2(model);
 
 	//connect(ui->mapInfoTable, &QAbstractItemView::activated, this, &MapTab::mapInfoTableDoubleClicked);
 	connect(ui->mapInfoTable, &BaseTable::rowSelected, this, &MapTab::mapInfoTableClicked);
@@ -113,11 +116,9 @@ MapTab::MapTab(QWidget *parent): QWidget(parent), ui(new Ui::MapTab)
 
 	connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, tilePaintTool, &TilePaintTool::setCurrentLayer);
 
-	connect(mapEventTool, &MapEventTool::selectEvent, [this](int eventId)
-		{ emit editMapEvent(eventId); });
-
-	//connect(mapEventTool, &MapEventTool::newEvent, [this](int eventId)
-	//	{ emit addMapEvent(eventId); });
+	//connect(mapEventTool, &MapEventTool::selectEvent, [this](int eventId)
+	//	{ emit editMapEvent(eventId); });
+	connect(mapEventTool, &MapEventTool::selectEvent, this, &MapTab::selectMapEvent);
 }
 
 MapTab::~MapTab()
@@ -137,15 +138,15 @@ MapTab::~MapTab()
 
 void MapTab::init()
 {
-	model = new MapInfoModel(ui->mapInfoTable);
-	ui->mapInfoTable->setModel2(model);
+	model->reset();
 	ui->mapView->clear();
 	ui->modeButtonGroup->button(Settings::Get()->mapToolIndex)->click();
 
-	if (Settings::Get()->lastTabIndex == 0 && Settings::Get()->lastMapId != 0)
+	ui->mapInfoTable->setCurrentIndex(QModelIndex());
+	if (Settings::Get()->lastTabIndex == 0 && Settings::Get()->lastTableRow != 0)
 	{
-		ui->mapInfoTable->selectRow(Settings::Get()->lastMapId); // FIXME: filter null maps
-		//mapInfoTableClicked(Settings::Get()->lastMapId);
+		//ui->mapInfoTable->selectRow(Settings::Get()->lastTableRow); // FIXME: filter null maps
+		// FIXME: load last map only on app start
 	}
 }
 
@@ -208,6 +209,7 @@ void MapTab::loadMap(int id)
 	}
 
 	ui->tilePickerView->selectPoint(QPoint(0, 0));
+	ui->mapToolBar->setEnabled(true);
 }
 
 void MapTab::mapInfoTableClicked(int row)
@@ -215,9 +217,14 @@ void MapTab::mapInfoTableClicked(int row)
 	//uint64_t start = QDateTime::currentMSecsSinceEpoch();
 
 	//int id = ui->mapInfoTable->selectedRow();
+	if (row < 0)
+	{
+		ui->mapToolBar->setEnabled(false);
+		return;
+	}
 	currentMapId = row;
 	loadMap(row);
-	Settings::Get()->lastMapId = row - 1; // FIXME: fucking off by one thing
+	Settings::Get()->lastTableRow = ui->mapInfoTable->currentIndex().row(); // FIXME: fucking off by one thing
 	//emit mapLoaded(currentMap);
 	emit mapLoaded(&tileMap);
 

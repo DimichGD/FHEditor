@@ -1,32 +1,30 @@
 #pragma once
-#include "effect.hpp"
-#include <QAbstractTableModel>
-#include <QAbstractItemModel>
+//#include "effect.hpp"
+//#include "base_model.hpp"
+#include <QAbstractProxyModel>
+//#include <QAbstractTableModel>
+//#include <QAbstractItemModel>
 
-class ItemEffectsModel : public QAbstractTableModel
+class ItemEffectsModel: public QAbstractProxyModel
 {
-	Q_OBJECT
-
 public:
-	enum
-	{
-		CODE = Qt::UserRole + 0,
-		DATA = Qt::UserRole + 1,
-	};
+	ItemEffectsModel(QAbstractItemModel *sourceModel, QObject *parent);
 
-	explicit ItemEffectsModel(QObject *parent = nullptr);
-	void setEffects(std::vector<Effect> *effects);
-
+	QModelIndex index(int row, int column, const QModelIndex &parent = {}) const override;
+	QModelIndex parent(const QModelIndex &child = {}) const override;
 	int rowCount(const QModelIndex &parent = {}) const override;
 	int columnCount(const QModelIndex &parent = {}) const override;
-	QVariant data(const QModelIndex &index, int role) const override;
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-	void addEffect();
-	void setEffect(int row, Effect &&effect);
-	void removeEffect(int row);
+	Qt::ItemFlags flags(const QModelIndex &index) const override;
+	QModelIndex mapToSource(const QModelIndex &proxyIndex) const override;
+	QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override;
+
+	void setItemIndex(int index);
+
+protected:
+	void sourceModelChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles);
 
 private:
-	std::vector<Effect> *effects = nullptr;
+	int itemIndex = -1;
 };
-

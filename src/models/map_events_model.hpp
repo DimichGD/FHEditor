@@ -11,38 +11,16 @@ public:
 	explicit MapEventsModel(std::vector<std::optional<MapEvent>> *events, QObject *parent = nullptr)
 		: BaseModel(&accessor, 2, parent), accessor(events)
 	{
-		//accessor = Accessor<MapEvent>(&map->events);
 	}
-		//QAbstractTableModel(parent), currentMap(map) {};
 
 protected:
-	QVariant dataForDisplay(int row, int column) const override
-	{
-		const MapEvent *event = accessor.value(row);
-		if (!event)
-			return QVariant();
-
-		if (column == 0) return event->id;
-		if (column == 1) return event->name;
-
-		return QVariant();
-	}
-
-	/*int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-	QVariant data(const QModelIndex &index, int role) const override;*/
-
-	//MapEvent *eventFromRow(int row);
-	/*QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-	QModelIndex parent(const QModelIndex &child = QModelIndex()) const override;
-	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-	QVariant data(const QModelIndex &index, int role) const override;*/
+	QVariant displayRoleData(int row, int column, Triple pointer) const override;
+	QVariant editRoleData(int row, int column, Triple pointer) const override;
+	QVariant userRoleData(int row, int column, Triple pointer) const override;
+	void setEditRoleData(int row, int column, const QVariant &value, Triple pointer) override;
 
 private:
 	Map *currentMap = nullptr;
 	Accessor<MapEvent> accessor;
-
-	// BaseModel interface
 };
 

@@ -34,3 +34,30 @@ QVariant MapEventsModel::data(const QModelIndex &index, int role) const
 
 	return QVariant();
 }*/
+
+QVariant MapEventsModel::displayRoleData(int row, int column, Triple pointer) const
+{
+	const MapEvent *event = accessor.value(row);
+	if (!event)
+		return QVariant();
+
+	if (column == 0) return event->id;
+	if (column == 1) return event->name;
+
+	return QVariant();
+}
+
+QVariant MapEventsModel::editRoleData(int row, int column, Triple pointer) const
+{
+
+}
+
+QVariant MapEventsModel::userRoleData(int row, int column, Triple pointer) const
+{
+
+}
+
+void MapEventsModel::setEditRoleData(int row, int column, const QVariant &value, Triple pointer)
+{
+
+}

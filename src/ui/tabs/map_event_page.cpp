@@ -16,30 +16,27 @@ MapEventPage::MapEventPage(MapEventPagesModel *model, int index, Page *page, QWi
 		if (page->image.tileId == 0)
 			ui->imageLabel->setIconImage(page->image);
 
-	mapper = new DataMapper(this);
-	mapper->setModel(model);
-	mapper->addWidgets({
-		{ ui->actorCheckBox, Page::COND_ACTOR_VALID },
-		{ ui->itemCheckBox, Page::COND_ITEM_VALID },
-		{ ui->itemButton, Page::COND_ITEM_ID },
-		{ ui->selfSwitchCheckBox, Page::COND_SELF_SWITCH_VALID },
-		{ ui->selfSwitchComboBox, Page::COND_SELF_SWITCH_CHAR },
-		{ ui->switch1CheckBox, Page::COND_SWITCH_1_VALID },
-		{ ui->switch1Button, Page::COND_SWITCH_1_ID },
-		{ ui->switch2CheckBox, Page::COND_SWITCH_2_VALID },
-		{ ui->switch2Button, Page::COND_SWITCH_2_ID },
-		{ ui->variableCheckBox, Page::COND_VARIABLE_VALID },
-		{ ui->variableButton, Page::COND_VARIABLE_ID },
-		{ ui->directionFixCheckBox, Page::DIRECTION_FIX },
-		{ ui->movementFreqComboBox, Page::MOVE_FREQ },
-		{ ui->movementSpeedComboBox, Page::MOVE_SPEED },
-		{ ui->movementTypeComboBox, Page::MOVE_TYPE },
-		{ ui->priorityComboBox, Page::PRIORITY_TYPE },
-		{ ui->steppingCheckBox, Page::STEP_ANIME },
-		{ ui->throughCheckBox, Page::THROUGH },
-		{ ui->triggerComboBox, Page::TRIGGER },
-		{ ui->walkingCheckBox, Page::WALK_ANIME },
-	});
+	mapper = new DataMapper(model, this);
+	mapper->add(ui->actorCheckBox, Page::COND_ACTOR_VALID);
+	mapper->add(ui->itemCheckBox, Page::COND_ITEM_VALID);
+	mapper->add(ui->itemButton, Page::COND_ITEM_ID);
+	mapper->add(ui->selfSwitchCheckBox, Page::COND_SELF_SWITCH_VALID);
+	mapper->add(ui->selfSwitchComboBox, Page::COND_SELF_SWITCH_CHAR);
+	mapper->add(ui->switch1CheckBox, Page::COND_SWITCH_1_VALID);
+	mapper->add(ui->switch1Button, Page::COND_SWITCH_1_ID);
+	mapper->add(ui->switch2CheckBox, Page::COND_SWITCH_2_VALID);
+	mapper->add(ui->switch2Button, Page::COND_SWITCH_2_ID);
+	mapper->add(ui->variableCheckBox, Page::COND_VARIABLE_VALID);
+	mapper->add(ui->variableButton, Page::COND_VARIABLE_ID);
+	mapper->add(ui->directionFixCheckBox, Page::DIRECTION_FIX);
+	mapper->add(ui->movementFreqComboBox, Page::MOVE_FREQ);
+	mapper->add(ui->movementSpeedComboBox, Page::MOVE_SPEED);
+	mapper->add(ui->movementTypeComboBox, Page::MOVE_TYPE);
+	mapper->add(ui->priorityComboBox, Page::PRIORITY_TYPE);
+	mapper->add(ui->steppingCheckBox, Page::STEP_ANIME);
+	mapper->add(ui->throughCheckBox, Page::THROUGH);
+	mapper->add(ui->triggerComboBox, Page::TRIGGER);
+	mapper->add(ui->walkingCheckBox, Page::WALK_ANIME);
 	mapper->setCurrentIndex(index);
 
 	ui->selfSwitchComboBox->setEnabled(ui->selfSwitchCheckBox->isChecked());

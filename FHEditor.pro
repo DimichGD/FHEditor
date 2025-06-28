@@ -68,6 +68,7 @@ SOURCES += \
     src/ui/widgets/attrib_combo_box.cpp \
     src/ui/widgets/clickable_label.cpp \
     src/ui/widgets/directory_list_view.cpp \
+    src/ui/widgets/icon_widget.cpp \
     src/ui/widgets/selector_button.cpp \
     src/ui/command_factory.cpp \
     src/ui/data_mapper.cpp \
@@ -144,6 +145,7 @@ HEADERS += \
     src/ui/menu.hpp \
     src/ui/tabs/animations_tab.hpp \
     src/ui/tabs/armors_tab.hpp \
+    src/ui/tabs/base_tab.hpp \
     src/ui/tabs/common_events_tab.hpp \
     src/ui/tabs/items_tab.hpp \
     src/ui/tabs/map_event_page.hpp \
@@ -157,6 +159,7 @@ HEADERS += \
     src/ui/tools/tile_picker_tool.hpp \
     src/ui/widgets/attrib_combo_box.hpp \
     src/ui/widgets/directory_list_view.hpp \
+    src/ui/widgets/icon_widget.hpp \
     src/ui/widgets/selector_button.hpp \
     src/ui/widgets/clickable_label.hpp \
     src/ui/command_factory.hpp \
@@ -191,6 +194,10 @@ FORMS += \
     src/ui/tabs/map_events_tab.ui \
     src/ui/tabs/map_tab.ui \
     src/ui/tabs/types_tab.ui \
-    src/ui/tabs/weapons_tab.ui
+    src/ui/tabs/weapons_tab.ui \
+    src/ui/widgets/icon_widget.ui
 
 TRANSLATIONS +=
+
+RESOURCES += \
+    assets/icons.qrc

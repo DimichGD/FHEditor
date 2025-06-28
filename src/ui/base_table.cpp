@@ -21,11 +21,12 @@ BaseTable::BaseTable(QWidget *parent): QTableView(parent)
 	setFont(currentFont);*/
 
 	//setItemDelegateForColumn(1, new IconDelegate(this));
+	filterModel = new ProxyModel(this);
 }
 
 void BaseTable::setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap)
 {
-	filterModel = new ProxyModel(this);
+	//filterModel = new ProxyModel(this);
 	filterModel->setSourceModel(model);
 	filterModel->setDynamicSortFilter(true);
 	filterModel->setFilterKeyColumn(model->columnCount() - 1);
@@ -40,8 +41,7 @@ void BaseTable::setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap)
 	//resizeRowsToContents();
 	//verticalHeader()->setDefaultSectionSize(40);
 
-	connect(selectionModel(), &QItemSelectionModel::currentChanged,
-		this, &BaseTable::onSelectionChanged);
+	connect(selectionModel(), &QItemSelectionModel::currentChanged, this, &BaseTable::currentRowChanged);
 
 	this->model = model;
 
@@ -52,6 +52,11 @@ void BaseTable::setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap)
 int BaseTable::originalRow(int filteredRow)
 {
 	return filterModel->mapToSource(filterModel->index(filteredRow, 0)).row();
+}
+
+int BaseTable::rowCount()
+{
+	return filterModel->rowCount();
 }
 
 void BaseTable::setFilterText(const QString &text)
@@ -70,7 +75,7 @@ void BaseTable::selectRow(int row)
 	QTableView::selectRow(row);
 }
 
-void BaseTable::onSelectionChanged(const QModelIndex &selected, const QModelIndex &)
+void BaseTable::currentRowChanged(const QModelIndex &selected, const QModelIndex &)
 {
 	currentRow = originalRow(selected.row());
 	emit rowSelected(currentRow);

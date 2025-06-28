@@ -6,7 +6,7 @@ Event *CommonEventsModel::eventFromRow(int row)
 	return accessor.value(row);
 }
 
-QVariant CommonEventsModel::dataForDisplay(int row, int column) const
+QVariant CommonEventsModel::displayRoleData(int row, int column, Triple) const
 {
 	const Event *event = accessor.value(row);
 	if (!event)
@@ -18,8 +18,7 @@ QVariant CommonEventsModel::dataForDisplay(int row, int column) const
 	return QVariant();
 }
 
-
-QVariant CommonEventsModel::dataForMapper(int row, int column) const
+QVariant CommonEventsModel::editRoleData(int row, int column, Triple) const
 {
 	const Event *event = accessor.value(row);
 	if (!event)
@@ -38,7 +37,7 @@ QVariant CommonEventsModel::dataForMapper(int row, int column) const
 	return QVariant();
 }
 
-void CommonEventsModel::setDataFromMapper(int row, int column, const QVariant &value)
+void CommonEventsModel::setEditRoleData(int row, int column, const QVariant &value, Triple)
 {
 	Event *event = accessor.value(row);
 	if (!event)
@@ -47,11 +46,10 @@ void CommonEventsModel::setDataFromMapper(int row, int column, const QVariant &v
 	switch (column)
 	{
 		case Event::ID: event->id = value.toInt(); break;
-		case Event::NAME: event->name = value.toString(); break;
+		case Event::NAME: event->name = value.toString(); updateDisplayRole(index(row, 1)); break;
 		case Event::SWITCH_ID: event->switchId = value.toInt(); break;
 		case Event::TRIGGER: event->trigger = value.toInt(); break;
 		default: qDebug() << "CommonEventsModel::setDataFromMapper column" << column << "does not exist";
 	}
 }
-
 

@@ -1,6 +1,6 @@
 #include "items_tab.hpp"
 #include "change_maximum_dialog.hpp"
-#include "icon_picker_dialog.hpp"
+//#include "icon_picker_dialog.hpp"
 #include "database.hpp"
 //#include "iconset.hpp"
 #include "images.hpp"
@@ -12,9 +12,9 @@
 #include "ui_items_tab.h"
 
 //#include <QMenu>
-#include <QDataWidgetMapper>
-#include <QListWidgetItem>
-#include <QItemSelectionModel>
+//#include <QDataWidgetMapper>
+//#include <QListWidgetItem>
+//#include <QItemSelectionModel>
 
 ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 {
@@ -24,11 +24,6 @@ ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 		ui->actionEffectNew, ui->actionEffectEdit,
 		ui->actionEffectGoTo, nullptr, ui->actionEffectDelete
 	});
-
-	effectsModel = new ItemEffectsModel(ui->itemEffectsList);
-	ui->itemEffectsList->setModel(effectsModel);
-
-	ui->itemAnimationButton->setSource(SimpleChooserDialog::ANIMATION);
 
 	connect(ui->actionEffectNew, &QAction::triggered, this, &ItemsTab::actionEffectNewTriggered);
 	connect(ui->actionEffectEdit, &QAction::triggered, this, &ItemsTab::actionEffectEditTriggered);
@@ -40,13 +35,40 @@ ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 
 	connect(ui->itemsTable, &BaseTable::rowSelected, this, &ItemsTab::itemRowSelected);
 	connect(ui->itemNameFilter, &QLineEdit::textChanged, ui->itemsTable, &BaseTable::setFilterText);
-	connect(ui->itemIconLabel, &ClickableLabel::doubleClicked, this, &ItemsTab::itemIconClicked);
 	connect(ui->itemDamageTypeComboBox, &QComboBox::currentIndexChanged, this, &ItemsTab::itemDamageTypeChanged);
 
 	connect(ui->itemNewButton, &QPushButton::clicked, this, &ItemsTab::itemNewClicked);
 	connect(ui->itemClearButton, &QPushButton::clicked, this, &ItemsTab::itemClearClicked);
 	connect(ui->itemResizeButton, &QPushButton::clicked, this, &ItemsTab::itemResizeClicked);
-	connect(ui->itemApplyButton, &QPushButton::clicked, this, &ItemsTab::applyButtonClicked);
+
+	model = new ItemsModel(this);
+	effectsModel = new ItemEffectsModel(model, this);
+
+	mapper = new DataMapper(model, this);
+	mapper->add(ui->itemAnimationButton, Item::ANIMATION_ID);
+	mapper->add(ui->itemConsumableComboBox, Item::CONSUMABLE);
+	mapper->add(ui->itemDamageCriticalHitsComboBox, Item::DAMAGE_CRITICAL);
+	mapper->add(ui->itemDamageElementComboBox, Item::DAMAGE_ELEMENT);
+	mapper->add(ui->itemDamageFormulaEdit, Item::DAMAGE_FORMULA);
+	mapper->add(ui->itemDamageTypeComboBox, Item::DAMAGE_TYPE);
+	mapper->add(ui->itemDamageVarianceSpinBox, Item::DAMAGE_VARIANCE);
+	mapper->add(ui->itemDescEdit, Item::DESC);
+	mapper->add(ui->itemHitTypeComboBox, Item::HIT_TYPE);
+	mapper->add(ui->itemIconWidget, Item::ICON_INDEX);
+	mapper->add(ui->itemTypeComboBox, Item::ITEM_TYPE);
+	mapper->add(ui->itemNameEdit, Item::NAME);
+	mapper->add(ui->itemNotes, Item::NOTE);
+	mapper->add(ui->itemOccasionComboBox, Item::OCCASION);
+	mapper->add(ui->itemPriceSpinBox, Item::PRICE);
+	mapper->add(ui->itemRepeatSpinBox, Item::REPEAT);
+	mapper->add(ui->itemScopeComboBox, Item::SCOPE);
+	mapper->add(ui->itemSpeedSpinBox, Item::SPEED);
+	mapper->add(ui->itemSuccessSpinBox, Item::SUCCESS);
+	mapper->add(ui->itemTPGainSpinBox, Item::TP_GAIN);
+
+	ui->itemEffectsList->setModel(effectsModel);
+	ui->itemsTable->setModel2(model, Images::Get()->iconSet());
+	ui->itemAnimationButton->setSource(SimpleChooserDialog::ANIMATION);
 }
 
 ItemsTab::~ItemsTab()
@@ -58,22 +80,12 @@ ItemsTab::~ItemsTab()
 
 void ItemsTab::init()
 {
-	delete mapper;
-	delete model;
+	model->reset();
 
-	ui->itemIconLabel->setIconMode(ClickableLabel::Mode::ICON_SET, Images::Get()->iconSet());
-
-	model = new ItemsModel(this);
-	ui->itemsTable->setModel2(model, Images::Get()->iconSet());
-
-	/*connect(model, &QAbstractItemModel::rowsInserted,
-			[this](const QModelIndex &parent, int first, int last)
-	{ effectsModel->setEffects(nullptr); });*/
-
-	ui->itemApplyButton->setEnabled(false);
 	ui->itemDamageElementComboBox->clear(); // Normal Attack and None only present in items?
 	ui->itemDamageElementComboBox->addItem("Normal Attack"); // -1
 
+	// TODO: make model for this
 	std::vector<QString> &elements = Database::Get()->system()->elements;
 	for (size_t i = 0; i < elements.size(); i++) // 1..x
 		if (!elements[i].isEmpty())
@@ -82,45 +94,16 @@ void ItemsTab::init()
 			ui->itemDamageElementComboBox->addItem(QString("#%1").arg(i, 2, 10, QChar('0')));
 	ui->itemDamageElementComboBox->setItemText(1, "None");  // 0
 
-	mapper = new DataMapper(this);
-	mapper->setModel(model);
-	mapper->addWidgets({
-		{ ui->itemAnimationButton, Item::ANIMATION_ID },
-		{ ui->itemConsumableComboBox, Item::CONSUMABLE },
-		{ ui->itemDamageCriticalHitsComboBox, Item::DAMAGE_CRITICAL },
-		{ ui->itemDamageElementComboBox, Item::DAMAGE_ELEMENT },
-		{ ui->itemDamageFormulaEdit, Item::DAMAGE_FORMULA },
-		{ ui->itemDamageTypeComboBox, Item::DAMAGE_TYPE },
-		{ ui->itemDamageVarianceSpinBox, Item::DAMAGE_VARIANCE },
-		{ ui->itemDescEdit, Item::DESC },
-		{ ui->itemHitTypeComboBox, Item::HIT_TYPE },
-		{ ui->itemIconIndexLabel, Item::ICON_INDEX },
-		{ ui->itemTypeComboBox, Item::ITEM_TYPE },
-		{ ui->itemNameEdit, Item::NAME },
-		{ ui->itemNotes, Item::NOTE },
-		{ ui->itemOccasionComboBox, Item::OCCASION },
-		{ ui->itemPriceSpinBox, Item::PRICE },
-		{ ui->itemRepeatSpinBox, Item::REPEAT },
-		{ ui->itemScopeComboBox, Item::SCOPE },
-		{ ui->itemSpeedSpinBox, Item::SPEED },
-		{ ui->itemSuccessSpinBox, Item::SUCCESS },
-		{ ui->itemTPGainSpinBox, Item::TP_GAIN },
-	});
-
 	ui->itemsTable->selectRow(0);
-
-	connect(model, &QAbstractItemModel::dataChanged, model,
-			[this](const QModelIndex &, const QModelIndex &, const QList<int> &)
-	{ ui->itemApplyButton->setEnabled(true); });
 }
 
 void ItemsTab::itemRowSelected(int row)
 {
-	currentItem = model->item(row);
-	if (!currentItem)
+	//currentItem = model->item(row);
+	if (!model->item(row))
 	{
-		effectsModel->setEffects(nullptr);
-		mapper->toFirst();
+		effectsModel->setItemIndex(-1);
+		mapper->setCurrentIndex(-1);
 		enableGroupBoxes(false);
 		return;
 	}
@@ -129,9 +112,7 @@ void ItemsTab::itemRowSelected(int row)
 		enableGroupBoxes(true);
 
 	mapper->setCurrentIndex(row);
-	ui->itemIconLabel->setIconIndex(currentItem->iconIndex);
-
-	effectsModel->setEffects(&currentItem->effects);
+	effectsModel->setItemIndex(row);
 }
 
 void ItemsTab::itemDamageTypeChanged(int index)
@@ -144,47 +125,35 @@ void ItemsTab::itemDamageTypeChanged(int index)
 	ui->itemDamageCriticalHitsComboBox->setEnabled(toggle);
 }
 
-void ItemsTab::itemIconClicked()
-{
-	IconPickerDialog dialog(this, PickerType::ICON_SET, "", currentItem->iconIndex);
-	if (dialog.exec())
-	{
-		int index = dialog.index();
-		model->setData(model->index(currentItem->id, Item::ICON_INDEX), index, Qt::EditRole);
-		ui->itemIconLabel->setIconIndex(index);
-	}
-}
 
 void ItemsTab::contextMenuRequested(const QPoint &pos)
 {
-	if (!currentItem)
-		return;
-
 	QModelIndex index = ui->itemEffectsList->indexAt(pos);
 	bool enabled = index.isValid();
 
 	ui->actionEffectEdit->setEnabled(enabled);
 	ui->actionEffectDelete->setEnabled(enabled);
 
-	bool flag = enabled && index.data(ItemEffectsModel::CODE).toInt() == Effect::COMMON_EVENT;
-	ui->actionEffectGoTo->setEnabled(flag);
+	//bool flag = enabled && index.data(ItemEffectsModel::CODE).toInt() == Effect::COMMON_EVENT;
+	ui->actionEffectGoTo->setEnabled(false);
 
 	itemEffectsListMenu->exec(ui->itemEffectsList->viewport()->mapToGlobal(pos));
 }
 
 void ItemsTab::actionEffectNewTriggered(bool)
 {
-	effectsModel->addEffect();
+	model->addEffect(ui->itemsTable->selectedRow());
 	ui->itemEffectsList->selectRow(effectsModel->rowCount() - 1);
 }
 
 void ItemsTab::actionEffectEditTriggered(bool)
 {
 	int effectIndex = ui->itemEffectsList->currentIndex().row();
-	ItemEffectDialog dialog(currentItem->effects.at(effectIndex), this);
+	int itemIndex = ui->itemsTable->selectedRow(); // TODO: Change name to selectedId or something
+	ItemEffectDialog dialog(model->item(itemIndex)->effects.at(effectIndex), this);
 	if (dialog.exec())
 	{
-		effectsModel->setEffect(effectIndex, dialog.value());
+		model->setEffect(ui->itemsTable->selectedRow(), effectIndex, dialog.value());
 		ui->itemEffectsList->selectRow(effectIndex);
 	}
 }
@@ -192,25 +161,20 @@ void ItemsTab::actionEffectEditTriggered(bool)
 void ItemsTab::actionEffectDeleteTriggered(bool)
 {
 	int effectIndex = ui->itemEffectsList->currentIndex().row();
-	effectsModel->removeEffect(effectIndex);
+	model->removeEffect(ui->itemsTable->selectedRow(), effectIndex);
 }
 
 void ItemsTab::actionEffectGotToTriggered(bool)
 {
 	QModelIndex index = ui->itemEffectsList->currentIndex();
-	emit selectCommonEvent(index.data(ItemEffectsModel::DATA).toInt());
+	//emit selectCommonEvent(index.data(ItemEffectsModel::DATA).toInt());
 }
 
-
-void ItemsTab::applyButtonClicked()
-{
-	ui->itemApplyButton->setEnabled(false);
-}
 
 void ItemsTab::enableGroupBoxes(bool enabled)
 {
 	if (!enabled)
-		ui->itemIconLabel->setIconIndex(0);
+		ui->itemIconWidget->setIconIndex(0);
 
 	ui->generalBox->setEnabled(enabled);
 	ui->invocationBox->setEnabled(enabled);
@@ -222,7 +186,7 @@ void ItemsTab::enableGroupBoxes(bool enabled)
 void ItemsTab::itemNewClicked()
 {
 	model->insertRows(model->rowCount(), 1);
-	ui->itemsTable->selectRow(model->rowCount() - 1);
+	ui->itemsTable->selectRow(ui->itemsTable->rowCount() - 1);
 }
 
 void ItemsTab::itemResizeClicked()
@@ -234,6 +198,6 @@ void ItemsTab::itemResizeClicked()
 void ItemsTab::itemClearClicked()
 {
 	model->clearElement(ui->itemsTable->selectedRow());
-	effectsModel->setEffects(nullptr);
+	//effectsModel->setEffects(nullptr); // Should auto clear itself?
 }
 

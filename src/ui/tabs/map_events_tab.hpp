@@ -1,10 +1,11 @@
 #pragma once
-#include "map.hpp"
+//#include "map.hpp"
 #include "map_event_pages_model.hpp"
 #include "map_events_model.hpp"
 #include "tilemap.hpp"
 
 #include <QWidget>
+#include <QPushButton>
 
 namespace Ui { class MapEventsTab; }
 

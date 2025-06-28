@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 	connect(ui->actionGamesList, &QAction::triggered, this, &MainWindow::openSettingsDialog);
 	connect(ui->mapTab, &MapTab::mapLoaded, ui->mapEventsTab, &MapEventsTab::init);
-	connect(ui->mapTab, &MapTab::editMapEvent, ui->mapTab, [this](int eventId)
+	connect(ui->mapTab, &MapTab::selectMapEvent, ui->mapTab, [this](int eventId)
 	{
 		ui->tabWidget->setCurrentIndex(ui->tabWidget->indexOf(ui->mapEventsTab));
 		ui->mapEventsTab->selectEvent(eventId);

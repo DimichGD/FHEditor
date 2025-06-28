@@ -11,6 +11,12 @@ BaseModel::BaseModel(IAccessor *accessor, int columns, QObject *parent): QAbstra
 		headerTitle = { "ID", "Name" };
 }
 
+void BaseModel::reset()
+{
+	beginResetModel();
+	endResetModel();
+}
+
 QModelIndex BaseModel::index(int row, int column, const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
@@ -26,44 +32,13 @@ QModelIndex BaseModel::parent(const QModelIndex &child) const
 int BaseModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
-	return accessor->size();
+	return accessor ? accessor->size() : 0;
 }
 
 int BaseModel::columnCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
 	return columns;
-}
-
-QVariant BaseModel::data(const QModelIndex &index, int role) const
-{
-	if (!index.isValid())
-		return QVariant();
-
-	switch (role)
-	{
-		case Qt::DisplayRole: return dataForDisplay(index.row(), index.column());
-		case Qt::EditRole: return dataForMapper(index.row(), index.column());
-		case Qt::DecorationRole: return iconForDisplay(index.row(), index.column());
-	};
-
-	return QVariant();
-}
-
-bool BaseModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-	if (!index.isValid())
-		return false;
-
-
-	if (role != Qt::EditRole)
-		return false;
-
-	setDataFromMapper(index.row(), index.column(), value);
-	emit dataChanged(index, index, { Qt::EditRole });
-	emit dataChanged(this->index(index.row(), 0), this->index(index.row(), 2), { Qt::DisplayRole });
-
-	return true;
 }
 
 QVariant BaseModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -74,11 +49,47 @@ QVariant BaseModel::headerData(int section, Qt::Orientation orientation, int rol
 	return headerTitle[section];
 }
 
-/*bool BaseModel::hasElement(int row)
+QVariant BaseModel::data(const QModelIndex &index, int role) const
 {
-	return accessor->hasElement(row);
-}*/
+	if (!index.isValid())
+		return QVariant();
 
+	if (index.row() >= rowCount())
+	{
+		qDebug() << "ItemsModel::data index.row() >= rowCount()";
+		return QVariant();
+	}
+
+	if (!accessor->hasElement(index.row()))
+		return QVariant();
+
+	Triple value = unpack<Triple>(index.internalPointer());
+	switch (role)
+	{
+		case Qt::DisplayRole: return displayRoleData(index.row(), index.column(), value);
+		case Qt::EditRole: return editRoleData(index.row(), index.column(), value);
+		case Qt::UserRole: return userRoleData(index.row(), index.column(), value);
+	}
+
+	return QVariant();
+}
+
+bool BaseModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+	if (!index.isValid())
+		return false;
+
+	if (role != Qt::EditRole)
+		return false;
+
+	if (!accessor->hasElement(index.row()))
+		return false;
+
+	Triple triple = unpack<Triple>(index.internalPointer());
+	setEditRoleData(index.row(), index.column(), value, triple);
+
+	return true;
+}
 
 void BaseModel::clearElement(int row)
 {
@@ -105,26 +116,16 @@ bool BaseModel::removeRows(int row, int count, const QModelIndex &parent)
 	return true;
 }
 
-QVariant BaseModel::iconForDisplay(int row, int column) const
+void BaseModel::updateDisplayRole(const QModelIndex &index)
+{
+	emit dataChanged(index, index, { Qt::DisplayRole });
+}
+
+QVariant BaseModel::userRoleData(int row, int column, Triple pointer) const
 {
 	Q_UNUSED(row)
 	Q_UNUSED(column)
+	Q_UNUSED(pointer)
 	return QVariant();
 }
-
-QVariant BaseModel::dataForMapper(int row, int column) const
-{
-	Q_UNUSED(row)
-	Q_UNUSED(column)
-	return QVariant();
-}
-
-void BaseModel::setDataFromMapper(int row, int column, const QVariant &value)
-{
-	Q_UNUSED(row)
-	Q_UNUSED(column)
-	Q_UNUSED(value)
-}
-
-
 

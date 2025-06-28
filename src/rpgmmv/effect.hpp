@@ -1,5 +1,5 @@
 #pragma once
-#include <QStringList>
+#include <QString>
 
 struct Effect
 {
@@ -17,4 +17,5 @@ struct Effect
 	float value2 = 0.0f;
 };
 
-QStringList effectToStringList(Effect *effect);
+QString effectType(const Effect *effect);
+QString effectValue(const Effect *effect);

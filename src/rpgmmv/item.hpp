@@ -19,7 +19,7 @@ struct Item
 
 	int id;
 	int animationId = 0;
-	bool consumable = false;
+	bool consumable = true;
 	Damage damage {};
 	QString description {};
 	std::vector<Effect> effects {};
@@ -31,7 +31,7 @@ struct Item
 	int occasion = 0;
 	int price = 0;
 	int repeats = 1;
-	int scope = 0;
+	int scope = 7;
 	int speed = 0;
 	int successRate = 100;
 	int tpGain = 0;

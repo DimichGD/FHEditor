@@ -76,15 +76,11 @@ void CommonEventsTab::init()
 			for (auto &command: event.value().list)
 				command.parameters->prepare(metrics);*/
 
-	mapper = new DataMapper(this);
-	mapper->setModel(model);
-	mapper->addWidgets({
-		{ ui->eventNameEdit, Event::NAME },
-		{ ui->eventTriggerComboBox, Event::TRIGGER },
-		{ ui->eventSwitchButton, Event::SWITCH_ID },
-	});
+	mapper = new DataMapper(model, this);
+	mapper->add(ui->eventNameEdit, Event::NAME);
+	mapper->add(ui->eventTriggerComboBox, Event::TRIGGER);
+	mapper->add(ui->eventSwitchButton, Event::SWITCH_ID);
 
-	mapper->toFirst();
 	ui->eventsTable->selectRow(0);
 	//ui->eventContentList->clear();
 }
@@ -95,7 +91,7 @@ void CommonEventsTab::eventRowSelected(int row)
 	if (!currentEvent)
 	{
 		ui->eventContentList->clear();
-		mapper->toFirst();
+		mapper->setCurrentIndex(-1);
 		//enableGroupBoxes(false);
 		return;
 	}

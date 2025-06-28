@@ -32,7 +32,8 @@ public:
 
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 	{
-		int iconIndex = index.data(Qt::DecorationRole).toInt();
+		//int iconIndex = index.data(Qt::DecorationRole).toInt();
+		int iconIndex = index.data(Qt::DisplayRole).toInt();
 		int y = iconIndex / 16; // TODO: Check boundaries
 		int x = iconIndex % 16;
 
@@ -64,11 +65,8 @@ public:
 	//int selectedId() const { return currentId; }
 	int selectedRow() const { return currentRow; }
 	int originalRow(int filteredRow); // TODO: move this to private?
-	//int rowCount();
+	int rowCount();
 
-	//void addRow(int id, std::string name, int iconIndex);
-	//void updateRow(int rowIndex, QString name, int iconIndex = -1);
-	//void removeRows(int rowIndex, int count);
 	void setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap = nullptr);
 
 	void setCustomFilter(int column, QVariant filter)
@@ -81,12 +79,7 @@ public slots:
 	void selectRow(int row);
 
 protected:
-	//QSortFilterProxyModel *filterModel = nullptr;
-	//QAbstractItemModel *model = nullptr;
-	//int currentRow = -1;
-	//int currentId = -1;
-
-	void onSelectionChanged(const QModelIndex &selected, const QModelIndex &);
+	void currentRowChanged(const QModelIndex &selected, const QModelIndex &);
 	void mousePressEvent(QMouseEvent *event) override;
 
 signals:

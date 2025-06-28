@@ -1,4 +1,5 @@
 #pragma once
+#include "base_tab.hpp"
 #include "map_event_tool.hpp"
 #include "tile_paint_tool.hpp"
 #include "tile_picker_tool.hpp"
@@ -17,7 +18,7 @@ class QButtonGroup;
 class QProcess;
 
 
-class MapTab: public QWidget
+class MapTab: public BaseTab
 {
 	Q_OBJECT
 
@@ -36,7 +37,7 @@ signals:
 	//void mapLoadTime(int msecs);
 	//void mapLoaded(Map *map);
 	void mapLoaded(TileMap *tileMap);
-	void editMapEvent(int eventId);
+	void selectMapEvent(int eventId);
 	//void addMapEvent(MapEvent event);
 	//void addMapEvent(int eventId);
 

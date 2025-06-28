@@ -5,6 +5,7 @@
 class MapEventPagesModel: public QAbstractTableModel
 {
 	Q_OBJECT
+
 public:
 	explicit MapEventPagesModel(std::vector<Page> *pages, QObject *parent):
 		QAbstractTableModel(parent) { this->pages = pages; }

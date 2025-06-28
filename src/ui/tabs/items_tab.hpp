@@ -7,7 +7,6 @@ class QMenu;
 class DataMapper;
 class ItemsModel;
 class ItemEffectsModel;
-struct Item;
 
 class ItemsTab: public QWidget
 {
@@ -25,7 +24,6 @@ signals:
 private slots:
 	void itemRowSelected(int row);
 	void itemDamageTypeChanged(int index);
-	void itemIconClicked();
 
 	void contextMenuRequested(const QPoint &pos);
 	void actionEffectNewTriggered(bool);
@@ -33,7 +31,6 @@ private slots:
 	void actionEffectDeleteTriggered(bool);
 	void actionEffectGotToTriggered(bool);
 
-	void applyButtonClicked();
 	void enableGroupBoxes(bool enabled);
 
 	void itemNewClicked();
@@ -43,7 +40,6 @@ private slots:
 private:
 	Ui::ItemsTab *ui = nullptr;
 	QMenu *itemEffectsListMenu = nullptr;
-	Item *currentItem = nullptr;
 	ItemsModel *model = nullptr;
 	ItemEffectsModel *effectsModel = nullptr;
 	DataMapper *mapper = nullptr;

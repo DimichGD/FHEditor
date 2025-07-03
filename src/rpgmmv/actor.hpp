@@ -5,6 +5,14 @@
 
 struct Actor
 {
+	enum Type
+	{
+		ID, BATTLER_NAME, CHARACTER_INDEX, CHARACTER_NAME, CLASS_ID,
+		/* EQUIP_0, ... */
+		FACE_INDEX, FACE_NAME, INITIAL_LEVEL, MAX_LEVEL,
+		NAME, NICKNAME, NOTE, PROFILE, COUNT,
+	};
+
 	int id;
 	QString battlerName {};
 	int characterIndex = 0;

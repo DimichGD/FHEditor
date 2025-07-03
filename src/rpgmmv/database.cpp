@@ -4,6 +4,8 @@
 #include "settings.hpp"
 //#include "rpgmmz/system_mz.hpp"
 
+#include "items_model.hpp"
+
 #include <QFile>
 #include <QMessageBox>
 
@@ -182,10 +184,28 @@ bool Database::save(Type type)
 			qDebug() << "Error while saving CommonEvents.json";
 	}
 
+	// ------------- Maps ------------
+	if (type & Type::MAP)
+	{
+		QString filename = path + "/data/MapInfos.json";
+		if (!saveJson<MapInfo>(filename, getStorage<MapInfo>()))
+			qDebug() << "Error while saving MapInfos.json";
+
+		for (auto it: maps)
+		{
+			QString filename = QString("/data/Map%1.json").arg(it.first, 3, 10, QChar('0'));
+
+			if (!saveJson<Map>(path + filename, it.second))
+			{
+				qDebug() << QString("Failed to save '%1'").arg(filename);
+			}
+		}
+	}
+
 	return true;
 }
 
-void Database::saveMap(int id)
+/*void Database::saveMap(int id)
 {
 	if (Settings::Get()->lastPath.isEmpty())
 		return;
@@ -202,7 +222,7 @@ void Database::saveMap(int id)
 	QString path = Settings::Get()->lastPath;
 	QString filename = QString("Map%1.json").arg(id, 3, 10, QChar('0'));
 	saveJson<Map>(path + "/data/" + filename, maps[id]);
-}
+}*/
 
 
 Map *Database::map(int id)
@@ -215,9 +235,9 @@ Map *Database::map(int id)
 		return nullptr;
 
 	QString path = Settings::Get()->lastPath;
-	QString filename = QString("Map%1.json").arg(id, 3, 10, QChar('0'));
+	QString filename = QString("/data/Map%1.json").arg(id, 3, 10, QChar('0'));
 
-	if (!loadJson(path + "/data/" + filename, maps[id]))
+	if (!loadJson(path + filename, maps[id]))
 	{
 		qDebug() << QString("Failed to load '%1'").arg(filename);
 		maps.erase(id);
@@ -236,15 +256,22 @@ System *Database::system()
 
 QString Database::switchName(int id)
 {
-	return systemObject.switches[id]; // FIXME: validate id
+	if (id <= 0 || id >= std::ssize(systemObject.switches))
+		return "?";
+
+	return systemObject.switches[id];
 }
 
 QString Database::variableName(int id)
 {
-	return systemObject.variables[id]; // FIXME: validate id
+	if (id <= 0 || id >= std::ssize(systemObject.variables))
+		return "?";
+
+	return systemObject.variables[id];
 }
 
-template<typename T>
+
+/*template<typename T>
 void forEach(std::vector<std::optional<T>> &vector, std::function<void(T&)> func)
 {
 	for (auto &entry: vector)
@@ -258,118 +285,4 @@ void forEach(std::vector<std::optional<T>> &vector, std::function<void(T&)> func
 
 		func(item);
 	}
-}
-
-/*QStandardItemModel *Database::createItemsModel()
-{
-	itemsModel = createModel({ "ID", "Icon", "Name" });
-	forEach<Item>(items, [this](Item &item)
-	{
-		addRow(itemsModel, item.id, item.name, item.iconIndex);
-	});
-
-	return itemsModel;
-}*/
-
-/*QStandardItemModel *Database::createWeaponsModel()
-{
-	weaponsModel = createModel({ "ID", "Icon", "Name" });
-	forEach<Weapon>(weapons, [this](Weapon &weapon)
-	{
-		addRow(weaponsModel, weapon.id, weapon.name, weapon.iconIndex);
-	});
-
-	return weaponsModel;
-}*/
-
-/*QStandardItemModel *Database::createEventsModel()
-{
-	eventsModel = createModel({ "ID", "Name" });
-	for (auto &entry: events)
-	{
-		if (!entry.has_value())
-			continue;
-
-		Event &event = entry.value();
-		addRow(eventsModel, event.id, event.name);
-	}
-
-	return eventsModel;
-}*/
-
-/*QStandardItemModel *Database::createMapInfoModel()
-{
-	mapInfoModel = createModel({ "ID", "Name" });
-	forEach<MapInfo>(mapInfos, [this](MapInfo &mapInfo)
-	{
-		addRow(mapInfoModel, mapInfo.id, mapInfo.name, -1);
-	});
-
-	return mapInfoModel;
-}
-
-QStandardItemModel *Database::createModel(QStringList columns)
-{
-	QStandardItemModel *model = new QStandardItemModel();
-	model->setColumnCount(columns.size());
-	for (int i = 0; i < columns.size(); i++)
-		model->setHeaderData(i, Qt::Horizontal, columns[i]);
-
-	return model;
-}*/
-
-/*QStandardItemModel *Database::createModel(int columnCount)
-{
-	QStandardItemModel *model = new QStandardItemModel();
-	model->setColumnCount(columnCount);
-	model->setHeaderData(0, Qt::Horizontal, "ID");
-	if (columnCount == 3)
-	{
-		model->setHeaderData(1, Qt::Horizontal, "Icon");
-		model->setHeaderData(2, Qt::Horizontal, "Name");
-	}
-	else if (columnCount == 2)
-		model->setHeaderData(1, Qt::Horizontal, "Name");
-
-	return model;
-}*/
-
-/*void Database::addRow(QStandardItemModel *model, int id, std::string name)
-{
-	QStandardItem *idItem = new QStandardItem();
-	idItem->setData(id, Qt::DisplayRole);
-
-	QStandardItem *nameItem = new QStandardItem();
-	nameItem->setData(QString::fromStdString(name), Qt::DisplayRole);
-
-	QList<QStandardItem *> item_row { idItem, nameItem };
-	model->appendRow(item_row);
-}*/
-
-/*void Database::addRow(QStandardItemModel *model, int id, std::string name, int iconIndex)
-{
-	QStandardItem *idItem = new QStandardItem();
-	idItem->setData(id, Qt::DisplayRole);
-
-	QStandardItem *nameItem = new QStandardItem();
-	nameItem->setData(QString::fromStdString(name), Qt::DisplayRole);
-
-	if (iconIndex == -1)
-	{
-		model->appendRow({ idItem, nameItem });
-	}
-	else
-	{
-		QStandardItem *imageItem = new QStandardItem();
-		imageItem->setData(IconSet::Get()->get(iconIndex), Qt::DecorationRole);
-
-		model->appendRow({ idItem, imageItem, nameItem });
-	}
-}
-
-void Database::removeRow(QStandardItemModel *model, int index)
-{
-	Q_UNUSED(model)
-	Q_UNUSED(index)
-	qDebug() << "Database::removeRow";
 }*/

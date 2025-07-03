@@ -18,6 +18,7 @@ CommonEventsTab::CommonEventsTab(QWidget *parent):
 {
 	ui->setupUi(this);
 	ui->eventSwitchButton->setSource(SimpleChooserDialog::SWITCH);
+	//ui->undoView->setStack(ui->eventContentList->undoStack);
 
 	/*contextMenu = new QMenu(this);
 	contextMenu->addAction(ui->actionCommandNew);
@@ -29,6 +30,15 @@ CommonEventsTab::CommonEventsTab(QWidget *parent):
 	connect(ui->actionCommandEdit, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandEditTriggered);
 	connect(ui->actionCommandDelete, &QAction::triggered, ui->eventContentList, &EventContentList::actionCommandDeleteTriggered);
 	connect(ui->eventContentList, &EventContentList::customContextMenuRequested, this, &CommonEventsTab::contextMenuRequested);*/
+
+	model = new CommonEventsModel(ui->eventsTable);
+	ui->eventsTable->setModel2(model, Event::NAME);
+
+	for (int i = 0; i < Event::COUNT; i++)
+		ui->eventsTable->setColumnHidden(i, true);
+
+	ui->eventsTable->setColumnHidden(Event::ID, false);
+	ui->eventsTable->setColumnHidden(Event::NAME, false);
 
 	connect(ui->eventsTable, &BaseTable::rowSelected, this, &CommonEventsTab::eventRowSelected);
 	connect(ui->eventsNameFilter, &QLineEdit::textChanged, ui->eventsTable, &BaseTable::setFilterText);
@@ -67,14 +77,16 @@ void CommonEventsTab::init()
 {
 	// TODO: delete and nullify model pointer
 	// delete via deleteLater() ?
-	model = new CommonEventsModel(ui->eventsTable);
-	ui->eventsTable->setModel2(model);
+
 
 	/*QFontMetrics metrics = ui->eventContentList->fontMetrics();
 	for (auto &event: Database::Get()->getStorage<Event>())
 		if (event.has_value())
 			for (auto &command: event.value().list)
 				command.parameters->prepare(metrics);*/
+
+	model->reset();
+	ui->eventsTable->resizeColumnToContents(0);
 
 	mapper = new DataMapper(model, this);
 	mapper->add(ui->eventNameEdit, Event::NAME);
@@ -87,10 +99,10 @@ void CommonEventsTab::init()
 
 void CommonEventsTab::eventRowSelected(int row)
 {
-	currentEvent = model->eventFromRow(row);
+	Event *currentEvent = model->commonEvent(row);
 	if (!currentEvent)
 	{
-		ui->eventContentList->clear();
+		ui->eventContentList->loadList(nullptr);
 		mapper->setCurrentIndex(-1);
 		//enableGroupBoxes(false);
 		return;
@@ -101,17 +113,13 @@ void CommonEventsTab::eventRowSelected(int row)
 
 	ui->eventContentList->loadList(&currentEvent->list);
 	mapper->setCurrentIndex(row);
-
-	//ui->eventContentList->clear();
-
 }
 
-void CommonEventsTab::contextMenuRequested(const QPoint &pos)
+/*void CommonEventsTab::contextMenuRequested(const QPoint &pos)
 {
 	QModelIndex index = ui->eventContentList->indexAt(pos);
 	if (index.isValid())
 	{
-		//Command::Iterator command = Command::iteratorFromIndex(index);
 		auto parameters = Command::iteratorFromIndex(index)->parameters;
 
 		ui->actionCommandNew->setEnabled(parameters->flags() & ICommandParams::CAN_ADD);
@@ -126,10 +134,5 @@ void CommonEventsTab::contextMenuRequested(const QPoint &pos)
 	}
 
 	contextMenu->exec(ui->eventContentList->viewport()->mapToGlobal(pos));
-}
-
-void CommonEventsTab::applyButtonClicked()
-{
-	//
-}
+}*/
 

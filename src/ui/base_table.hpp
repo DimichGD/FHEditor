@@ -18,6 +18,7 @@ public:
 	void disableCustomFilter();
 
 private:
+	//bool skipZeroIndex = true;
 	bool customFilter = false;
 	int customFilterColumn = 0;
 	QVariant customFilterValue {};
@@ -63,11 +64,12 @@ public:
 	BaseTable(QWidget *parent = nullptr);
 
 	//int selectedId() const { return currentId; }
+	// TODO: Change name to selectedId or something
 	int selectedRow() const { return currentRow; }
 	int originalRow(int filteredRow); // TODO: move this to private?
 	int rowCount();
 
-	void setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap = nullptr);
+	void setModel2(QAbstractItemModel *model, int nameColumn);
 
 	void setCustomFilter(int column, QVariant filter)
 		{ filterModel->setFilterEditRole(column, filter); }

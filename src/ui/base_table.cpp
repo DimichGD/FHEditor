@@ -24,20 +24,20 @@ BaseTable::BaseTable(QWidget *parent): QTableView(parent)
 	filterModel = new ProxyModel(this);
 }
 
-void BaseTable::setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap)
+void BaseTable::setModel2(QAbstractItemModel *model, int nameColumn)
 {
 	//filterModel = new ProxyModel(this);
 	filterModel->setSourceModel(model);
 	filterModel->setDynamicSortFilter(true);
-	filterModel->setFilterKeyColumn(model->columnCount() - 1);
+	filterModel->setFilterKeyColumn(nameColumn);
 	filterModel->setFilterCaseSensitivity(Qt::CaseSensitivity::CaseInsensitive);
 
 	QTableView::setModel(filterModel);
 	//sortByColumn(0, Qt::SortOrder::AscendingOrder);
 
-	resizeColumnToContents(0);
+	/*resizeColumnToContents(0);
 	if (model->columnCount() == 3)
-		resizeColumnToContents(1);
+		resizeColumnToContents(1);*/
 	//resizeRowsToContents();
 	//verticalHeader()->setDefaultSectionSize(40);
 
@@ -45,8 +45,8 @@ void BaseTable::setModel2(QAbstractItemModel *model, QPixmap *iconSetPixmap)
 
 	this->model = model;
 
-	if (iconSetPixmap)
-		setItemDelegateForColumn(1, new IconDelegate(iconSetPixmap, this));
+	//if (iconSetPixmap)
+	//	setItemDelegateForColumn(1, new IconDelegate(iconSetPixmap, this));
 }
 
 int BaseTable::originalRow(int filteredRow)
@@ -94,8 +94,8 @@ void BaseTable::mousePressEvent(QMouseEvent *event)
 
 bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-	if (source_row == 0)
-		return false;
+	//if (source_row == 0)
+	//	return false;
 
 	if (customFilter)
 		if (sourceModel()->data(sourceModel()->index(source_row, customFilterColumn), Qt::EditRole) != customFilterValue)
@@ -106,7 +106,9 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
 
 void ProxyModel::setFilterEditRole(int column, QVariant filter)
 {
-	// beginFilterChange(); TODO: Since Qt 6.9
+#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
+	beginFilterChange();
+#endif
 	customFilter = true;
 	customFilterColumn = column;
 	customFilterValue = filter;
@@ -115,7 +117,9 @@ void ProxyModel::setFilterEditRole(int column, QVariant filter)
 
 void ProxyModel::disableCustomFilter()
 {
-	// beginFilterChange(); TODO: Since Qt 6.9
+#if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
+	beginFilterChange();
+#endif
 	customFilter = false;
 	invalidateFilter();
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "map.hpp"
 #include "map_view_tool.hpp"
-#include "tilemap.hpp"
+#include "tile_map.hpp"
 
 #include <QGraphicsView>
 #include <QPixmap>

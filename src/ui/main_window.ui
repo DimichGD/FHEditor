@@ -24,7 +24,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>1</number>
       </property>
       <widget class="MapTab" name="mapTab">
        <attribute name="title">
@@ -106,6 +106,8 @@
      <string>Settings</string>
     </property>
     <addaction name="actionGamesList"/>
+    <addaction name="actionInterface"/>
+    <addaction name="actionGroups"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -169,6 +171,16 @@
    </property>
    <property name="menuRole">
     <enum>QAction::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="actionInterface">
+   <property name="text">
+    <string>Interface</string>
+   </property>
+  </action>
+  <action name="actionGroups">
+   <property name="text">
+    <string>Groups</string>
    </property>
   </action>
  </widget>

@@ -3,6 +3,11 @@
 
 struct MapInfo
 {
+	enum Type
+	{
+		ID, EXPANDED, NAME, ORDER, PARENT_ID, SCROLL_X, SCROLL_Y, COUNT,
+	};
+
 	int id;
 	bool expanded = false;
 	QString name {};

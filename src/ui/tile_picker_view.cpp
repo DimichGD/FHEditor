@@ -20,7 +20,7 @@ TilePickerView::TilePickerView(QWidget *parent): QGraphicsView(parent)
 	cursorItem->setPen(whitePen);
 }
 
-void TilePickerView::setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap *pixmap)
+void TilePickerView::setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap pixmap)
 {
 	this->setIndex = setIndex;
 	this->tileSize = tileSize;
@@ -32,11 +32,31 @@ void TilePickerView::setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QP
 	cursorItem->setVisible(cursorSetIndex == setIndex);
 
 	if (setIndex >= TileSet::B && setIndex <= TileSet::E)
-		scene->setSceneRect(0, 0, pixmap->width() / 2, pixmap->height() * 2);
+		scene->setSceneRect(0, 0, pixmap.width() / 2, pixmap.height() * 2);
 	else
-		scene->setSceneRect(0, 0, pixmap->width(), pixmap->height());
+		scene->setSceneRect(0, 0, pixmap.width(), pixmap.height());
 
 	scene->update();
+}
+
+void TilePickerView::setBackgroundPixmap(QPixmap pixmap, int tileSize, bool split)
+{
+	this->tileSize = tileSize;
+	this->backgroundPixmap = pixmap;
+
+	if (pixmap.isNull())
+		return;
+
+	if (split)
+		scene->setSceneRect(0, 0, pixmap.width() / 2, pixmap.height() * 2);
+
+	else
+		scene->setSceneRect(0, 0, pixmap.width(), pixmap.height());
+}
+
+QGraphicsRectItem *TilePickerView::cursor()
+{
+	return cursorItem;
 }
 
 
@@ -135,7 +155,7 @@ void TilePickerView::drawBackground(QPainter *painter, const QRectF &rect)
 
 	if (setIndex == TileSet::A5)
 	{
-		painter->drawPixmap(rect, *backgroundPixmap, rect);
+		painter->drawPixmap(rect, backgroundPixmap, rect);
 		return;
 	}
 
@@ -146,8 +166,8 @@ void TilePickerView::drawBackground(QPainter *painter, const QRectF &rect)
 	QRectF intersection1 = rect.intersected(rect1);
 	QRectF intersection2 = rect.intersected(rect2);
 
-	painter->drawPixmap(intersection1, *backgroundPixmap, intersection1);
-	painter->drawPixmap(intersection2, *backgroundPixmap, intersection2.adjusted(dx, -dy, dx, -dy));
+	painter->drawPixmap(intersection1, backgroundPixmap, intersection1);
+	painter->drawPixmap(intersection2, backgroundPixmap, intersection2.adjusted(dx, -dy, dx, -dy));
 
 	return;
 }
@@ -222,7 +242,7 @@ void TilePickerView::mouseReleaseEvent(QMouseEvent *event)
 
 void TilePickerView::resizeEvent(QResizeEvent *event)
 {
-	if (backgroundPixmap)
+	if (!backgroundPixmap.isNull())
 	{
 		float scaleFactor = static_cast<float>(viewport()->width()) / 384; // FIXME: remove hardcoded variables
 		setTransform(QTransform::fromScale(scaleFactor, scaleFactor));

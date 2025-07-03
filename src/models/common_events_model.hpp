@@ -1,19 +1,16 @@
 #pragma once
 #include "base_model.hpp"
-#include "database.hpp"
+#include "event.hpp"
 
-class CommonEventsModel: public BaseModel
+class CommonEventsModel: public BaseModel2
 {
-	Q_OBJECT
-
 public:
-	explicit CommonEventsModel(QObject *parent = nullptr): BaseModel(&accessor, 2, parent) {};
-	Event *eventFromRow(int row);
+	CommonEventsModel(QObject *parent = nullptr);
+	Event *commonEvent(int row);
 
 protected:
-	QVariant displayRoleData(int row, int column, Triple) const override;
-	QVariant editRoleData(int row, int column, Triple) const override;
-	void setEditRoleData(int row, int column, const QVariant &value, Triple) override;
+	QVariant data(int id, int column) const override;
+	void setData(int id, int column, const QVariant &value) override;
 
 private:
 	Accessor<Event> accessor;

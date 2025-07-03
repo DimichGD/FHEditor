@@ -123,8 +123,6 @@ void DataMapper::widgetDataChanged(QObject *sender, QVariant data)
 	if (!model)
 		return;
 
-	//qDebug() << "widgetDataChanged" << data;
-
 	for (auto &entry: widgetMap)
 		if (entry.widget == sender)
 			model->setData(model->index(currentIndex, entry.section), data, Qt::EditRole);

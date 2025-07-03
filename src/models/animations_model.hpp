@@ -1,19 +1,16 @@
 #pragma once
 #include "base_model.hpp"
+#include "animation.hpp"
 
-class AnimationsModel: public BaseModel
+class AnimationsModel: public BaseModel2
 {
-	Q_OBJECT
-
 public:
-	explicit AnimationsModel(QObject *parent = nullptr)
-		: BaseModel(&accessor, 2, parent) {}
+	AnimationsModel(QObject *parent = nullptr);
+	Animation *animation(int row);
 
 protected:
-	QVariant displayRoleData(int row, int column, Triple pointer) const override;
-	QVariant editRoleData(int row, int column, Triple pointer) const override;
-	QVariant userRoleData(int row, int column, Triple pointer) const override;
-	void setEditRoleData(int row, int column, const QVariant &value, Triple pointer) override;
+	QVariant data(int id, int column) const override;
+	void setData(int id, int column, const QVariant &value) override;
 
 private:
 	Accessor<Animation> accessor;

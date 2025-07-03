@@ -1,29 +1,17 @@
 #include "common_events_model.hpp"
+#include "database.hpp"
 
-Event *CommonEventsModel::eventFromRow(int row)
+CommonEventsModel::CommonEventsModel(QObject *parent)
+	: BaseModel2(&accessor, parent), accessor(Database::Get()->accessor<Event>()) {}
+
+Event *CommonEventsModel::commonEvent(int row)
 {
-	// TODO: check for valid id
-	return accessor.value(row);
+	return accessor.value(row + 1);
 }
 
-QVariant CommonEventsModel::displayRoleData(int row, int column, Triple) const
+QVariant CommonEventsModel::data(int id, int column) const
 {
-	const Event *event = accessor.value(row);
-	if (!event)
-		return QVariant();
-
-	if (column == 0) return event->id;
-	if (column == 1) return event->name;
-
-	return QVariant();
-}
-
-QVariant CommonEventsModel::editRoleData(int row, int column, Triple) const
-{
-	const Event *event = accessor.value(row);
-	if (!event)
-		return QVariant();
-
+	const Event *event = accessor.value(id);
 
 	switch (column)
 	{
@@ -31,25 +19,23 @@ QVariant CommonEventsModel::editRoleData(int row, int column, Triple) const
 		case Event::NAME: return event->name;
 		case Event::SWITCH_ID: return event->switchId;
 		case Event::TRIGGER: return event->trigger;
+		default: qDebug() << "CommonEventsModel::data column" << column << "does not exist";
 	}
 
-	qDebug() << "EventModel::dataForMapper column" << column << "does not exist";
 	return QVariant();
 }
 
-void CommonEventsModel::setEditRoleData(int row, int column, const QVariant &value, Triple)
+void CommonEventsModel::setData(int id, int column, const QVariant &value)
 {
-	Event *event = accessor.value(row);
-	if (!event)
-		return;
+	Event *event = accessor.value(id);
 
 	switch (column)
 	{
 		case Event::ID: event->id = value.toInt(); break;
-		case Event::NAME: event->name = value.toString(); updateDisplayRole(index(row, 1)); break;
+		case Event::NAME: event->name = value.toString(); break;
 		case Event::SWITCH_ID: event->switchId = value.toInt(); break;
 		case Event::TRIGGER: event->trigger = value.toInt(); break;
-		default: qDebug() << "CommonEventsModel::setDataFromMapper column" << column << "does not exist";
+		default: qDebug() << "CommonEventsModel::setData column" << column << "does not exist";
 	}
 }
 

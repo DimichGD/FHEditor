@@ -101,6 +101,15 @@ AnimationsTab::AnimationsTab(QWidget *parent)
 	animationView = new AnimationView(this);
 	ui->framesBox->layout()->addWidget(animationView);
 
+	model = new AnimationsModel(this);
+	ui->tableView->setModel2(model, Animation::NAME);
+
+	for (int i = 0; i < Animation::COUNT; i++)
+		ui->tableView->setColumnHidden(i, true);
+
+	ui->tableView->setColumnHidden(Animation::ID, false);
+	ui->tableView->setColumnHidden(Animation::NAME, false);
+
 	connect(ui->tableView, &BaseTable::rowSelected, this, &AnimationsTab::rowSelected);
 	connect(ui->playButton, &QPushButton::clicked, this, &AnimationsTab::playButtonClicked);
 	connect(timer, &QTimer::timeout, this, &AnimationsTab::doFrame);
@@ -113,13 +122,13 @@ AnimationsTab::~AnimationsTab()
 
 void AnimationsTab::init()
 {
-	model = new AnimationsModel(ui->tableView);
-	ui->tableView->setModel2(model);
+	model->reset();
+	ui->tableView->resizeColumnToContents(0);
 }
 
 void AnimationsTab::rowSelected(int row)
 {
-	currentAnim = Accessor<Animation>().value(row);
+	currentAnim = model->animation(row);
 	if (!currentAnim)
 		return;
 }

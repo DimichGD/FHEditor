@@ -9,7 +9,10 @@ class TilePickerView: public QGraphicsView
 
 public:
 	TilePickerView(QWidget *parent = nullptr);
-	void setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap *pixmap);
+	void setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap pixmap);
+	void setBackgroundPixmap(QPixmap pixmap, int tileSize, bool split);
+	QGraphicsRectItem *cursor();
+
 	void selectPoint(const QPoint &point);
 	void selectRect(const QPoint &first, const QPoint &second);
 	void clearSelection();
@@ -43,7 +46,7 @@ private:
 	QRect lastTilesSelectionRect {};
 
 	QGraphicsScene *scene = nullptr;
-	QPixmap *backgroundPixmap = nullptr;
+	QPixmap backgroundPixmap;
 	QGraphicsRectItem *cursorItem = nullptr;
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "effect.hpp"
 #include "damage.hpp"
+#include <QVariant>
 
 struct Item
 {
@@ -12,7 +13,7 @@ struct Item
 		DAMAGE_FORMULA,
 		DAMAGE_TYPE,
 		DAMAGE_VARIANCE,
-		DESC, EFFECTS, HIT_TYPE, ICON_INDEX, ITEM_TYPE, NAME, NOTE,
+		DESC, HIT_TYPE, ICON_INDEX, ITEM_TYPE, NAME, NOTE,
 		OCCASION, PRICE, REPEAT, SCOPE, SPEED, SUCCESS, TP_GAIN,
 		COUNT,
 	};
@@ -35,5 +36,8 @@ struct Item
 	int speed = 0;
 	int successRate = 100;
 	int tpGain = 0;
+
+//	QVariant toVariant(int column) const;
+//	void fromVariant(int column, const QVariant &value);
 };
 

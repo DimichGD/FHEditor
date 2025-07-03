@@ -1,11 +1,19 @@
 #include "map_event_page.hpp"
 #include "ui_map_event_page.h"
 
-MapEventPage::MapEventPage(MapEventPagesModel *model, int index, Page *page, QWidget *parent)
+MapEventPage::MapEventPage(QWidget *parent): QWidget(parent), ui(new Ui::MapEventPage)
+{
+	ui->setupUi(this);
+
+	//
+}
+
+MapEventPage::MapEventPage(MapEventPagesModel *model, int index, QWidget *parent)
 	: QWidget(parent), ui(new Ui::MapEventPage)
 {
 	ui->setupUi(this);
 
+	Page *page = model->page(index);
 	ui->eventContentList->loadList(&page->list);
 	ui->switch1Button->setSource(SimpleChooserDialog::SWITCH);
 	ui->switch2Button->setSource(SimpleChooserDialog::SWITCH);

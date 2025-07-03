@@ -52,6 +52,15 @@ public:
 
 EventContentList::EventContentList(QWidget *parent): QListView(parent)
 {
+	/*undoStack = new QUndoStack(this);
+	undoAction = undoStack->createUndoAction(this);
+	redoAction = undoStack->createRedoAction(this);
+	undoAction->setShortcut(QKeySequence::Undo);
+	redoAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Y));
+	addAction(undoAction);
+	addAction(redoAction);
+	connect(undoAction, &QAction::triggered, [this](){ qDebug() << this->hasFocus(); });*/
+
 	actionCommandNew = new QAction("New", contextMenu);
 	actionCommandEdit = new QAction("Edit", contextMenu);
 	actionCommandDelete = new QAction("Delete", contextMenu);
@@ -111,16 +120,13 @@ EventContentList::EventContentList(QWidget *parent): QListView(parent)
 void EventContentList::loadList(std::list<Command> *list)
 {
 	model->load(list);
+	if (!list)
+		return;
 
 	QFontMetrics metrics = fontMetrics();
 	for (auto &command: *list)
 		if (command.parameters->paintData.empty())
 			command.parameters->prepare(metrics);
-}
-
-void EventContentList::clear()
-{
-	model->load(nullptr);
 }
 
 void EventContentList::actionCommandNewTriggered(bool)
@@ -140,6 +146,7 @@ void EventContentList::actionCommandNewTriggered(bool)
 			command.parameters->prepare(fontMetrics());
 
 		model->insertCommands(firstRow, std::move(result));
+		//undoStack->push(new NewCommand(model, selectionModel(), std::move(result), firstRow));
 
 		selectionModel()->clear();
 		setCurrentIndex(model->index(firstRow));

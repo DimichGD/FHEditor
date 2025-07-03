@@ -15,6 +15,7 @@ struct TileItemInfo
 
 int tileIdOffset(TileSet::Set index);
 TileSet::Set tilesetIndexFromId(int id);
+QString makeMapName(int id);
 
 class TileMap
 {
@@ -32,14 +33,14 @@ public:
 	TileItemInfo tileItemInfo(int x, int y, TileSet::Set setIndex);
 
 	void putTile(int x, int y, int z, int id);
-	MapEvent *addNewEvent(int x, int y);
+	//MapEvent *addNewEvent(int x, int y);
 
 	int width() { return map->width; }
 	int height() { return map->height; }
 	void clear();
 
-	std::vector<std::optional<MapEvent>> *events() { return &map->events; }
-	MapEventsModel *eventsModel() { return model; }
+	//std::vector<std::optional<MapEvent>> *events() { return &map->events; }
+	void setEventsModel(MapEventsModel *model);
 
 protected:
 	//void generatePixmapForSet(int index);
@@ -53,6 +54,6 @@ private:
 	QList<std::span<int>> tileLayers;
 	QList<QPixmap *> tileSets;
 
-	MapEventsModel *model = nullptr;
+	//MapEventsModel *model = nullptr;
 };
 

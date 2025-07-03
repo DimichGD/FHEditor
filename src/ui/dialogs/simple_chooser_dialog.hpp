@@ -26,6 +26,7 @@ public:
 		CLASS,
 		WEAPON,
 		ARMOR,
+		EMPTY,
 	};
 
 	SimpleChooserDialog(Source source, int targetId, QWidget *parent);

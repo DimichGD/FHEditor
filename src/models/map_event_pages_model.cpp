@@ -1,5 +1,12 @@
 #include "map_event_pages_model.hpp"
 
+void MapEventPagesModel::setPages(std::vector<Page> *pages)
+{
+	beginResetModel();
+	this->pages = pages;
+	endResetModel();
+}
+
 int MapEventPagesModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent);

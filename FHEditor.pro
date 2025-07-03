@@ -38,6 +38,7 @@ SOURCES += \
     src/rpgmmv/database.cpp \
     src/rpgmmv/effect.cpp \
     src/rpgmmv/event.cpp \
+    src/rpgmmv/item.cpp \
     src/rpgmmv/json_stuff.cpp \
     src/rpgmmz/system_mz.cpp \
     src/ui/events/command_dialog.cpp \
@@ -52,6 +53,7 @@ SOURCES += \
     src/ui/dialogs/item_effect_dialog.cpp \
     src/ui/dialogs/simple_chooser_dialog.cpp \
     src/ui/menu.cpp \
+    src/ui/tile_map.cpp \
     src/ui/tools/map_event_tool.cpp \
     src/ui/tools/tile_paint_tool.cpp \
     src/ui/tools/tile_picker_tool.cpp \
@@ -79,9 +81,10 @@ SOURCES += \
     src/ui/main_window.cpp \
     src/ui/map_view.cpp \
     src/ui/tile_picker_view.cpp \
-    src/ui/tilemap.cpp
+    src/ui/widgets/tile_picker_widget.cpp
 
 HEADERS += \
+    src/accessor.hpp \
     src/events/command_111.hpp \
     src/events/base_command.hpp \
     src/events/command_000.hpp \
@@ -153,6 +156,7 @@ HEADERS += \
     src/ui/tabs/map_tab.hpp \
     src/ui/tabs/types_tab.hpp \
     src/ui/tabs/weapons_tab.hpp \
+    src/ui/tile_map.hpp \
     src/ui/tools/map_event_tool.hpp \
     src/ui/tools/map_view_tool.hpp \
     src/ui/tools/tile_paint_tool.hpp \
@@ -172,7 +176,7 @@ HEADERS += \
     src/ui/map_view.hpp \
     src/ui/settings.hpp \
     src/ui/tile_picker_view.hpp \
-    src/ui/tilemap.hpp
+    src/ui/widgets/tile_picker_widget.hpp
 
 FORMS += \
     src/ui/dialogs/change_maximum_dialog.ui \
@@ -195,7 +199,8 @@ FORMS += \
     src/ui/tabs/map_tab.ui \
     src/ui/tabs/types_tab.ui \
     src/ui/tabs/weapons_tab.ui \
-    src/ui/widgets/icon_widget.ui
+    src/ui/widgets/icon_widget.ui \
+    src/ui/widgets/tile_picker_widget.ui
 
 TRANSLATIONS +=
 

@@ -5,5 +5,8 @@
         <file>icons8-close-50.png</file>
         <file>icons8-copy-50.png</file>
         <file>icons8-paste-50.png</file>
+        <file>icons8-collapse-arrow-48.png</file>
+        <file>icons8-expand-48.png</file>
+        <file>color-grid.png</file>
     </qresource>
 </RCC>

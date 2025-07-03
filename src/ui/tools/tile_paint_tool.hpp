@@ -1,6 +1,6 @@
 #pragma once
 #include "map_view_tool.hpp"
-#include "tilemap.hpp"
+#include "tile_map.hpp"
 
 class TilePaintTool : public MapViewTool
 {

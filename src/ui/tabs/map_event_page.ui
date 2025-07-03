@@ -2,10 +2,30 @@
 <ui version="4.0">
  <class>MapEventPage</class>
  <widget class="QWidget" name="MapEventPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>921</width>
+    <height>556</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="4,20">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QWidget" name="widget" native="true">
      <property name="sizePolicy">
@@ -17,6 +37,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QGroupBox" name="conditionsBox">
           <property name="title">
@@ -584,14 +607,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ClickableLabel</class>
-   <extends>QLabel</extends>
-   <header>clickable_label.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>SelectorButton</class>
    <extends>QPushButton</extends>
    <header>selector_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>ClickableLabel</class>
+   <extends>QLabel</extends>
+   <header>clickable_label.hpp</header>
   </customwidget>
   <customwidget>
    <class>EventContentList</class>

@@ -1,4 +1,4 @@
-#include "tilemap.hpp"
+#include "tile_map.hpp"
 #include "database.hpp"
 #include "images.hpp"
 
@@ -37,6 +37,7 @@ int tileIdOffset(TileSet::Set index)
 {
 	switch (index)
 	{
+		case TileSet::R: return 0;
 		case TileSet::B: return 0;
 		case TileSet::C: return 256;
 		case TileSet::D: return 512;
@@ -53,6 +54,12 @@ int tileIdOffset(TileSet::Set index)
 	return 0;
 }
 
+
+QString makeMapName(int id)
+{
+
+}
+
 TileMap::TileMap()
 {
 	tileSets.resize(TileSet::COUNT);
@@ -63,26 +70,29 @@ void TileMap::loadTileSet(int id)
 {
 	clear();
 
-	TileSet *tileSet = Accessor<TileSet>().value(id);
-	if (tileSet->tilesetNames.size() != TileSet::COUNT)
-		throw std::runtime_error("tileSet->tilesetNames.size() != TileSet::Layer::COUNT");
+	TileSet *tileSet = &Database::Get()->getStorage<TileSet>().at(id).value(); //Accessor<TileSet>().value(id);
+	//if (tileSet->tilesetNames.size() != TileSet::COUNT)
+	//	throw std::runtime_error("tileSet->tilesetNames.size() != TileSet::Layer::COUNT");
 
+	// FIXME: Wrong loading autotiles
 	for (size_t i = 0; i < tileSet->tilesetNames.size(); i++)
 	{
 		QString &name = tileSet->tilesetNames[i];
 		if (name.isEmpty())
 			continue;
 
-		QPixmap *pixmap = Images::Get()->tileSet(name);
+		/*QPixmap *pixmap = Images::Get()->tileSet(name);
 		if (!pixmap)
-			continue;
+			continue;*/
 
-		tileSets[i] = pixmap;
+		tileSets[i] = nullptr;
 		if (i >= TileSet::A1 && i < TileSet::A5)
 			autoTilesFlag = true;
 
 		mask.set(i);
 	}
+
+	tileSets[TileSet::R] = new QPixmap(":/color-grid.png");
 }
 
 bool TileMap::loadTileMap(int id)
@@ -103,7 +113,6 @@ bool TileMap::loadTileMap(int id)
 		tileLayers[i] = { map->data.begin() + arraySize * i, arraySize };
 
 	loadTileSet(map->tilesetId); // make loadTileSet bool too
-	model = new MapEventsModel(&map->events);
 	return true;
 }
 
@@ -147,7 +156,7 @@ void TileMap::putTile(int x, int y, int z, int id)
 	tileLayers[z][y * width() + x] = id;
 }
 
-MapEvent *TileMap::addNewEvent(int x, int y)
+/*MapEvent *TileMap::addNewEvent(int x, int y)
 {
 	int lastEventId = 0;
 
@@ -170,14 +179,6 @@ MapEvent *TileMap::addNewEvent(int x, int y)
 		updateExisting = false;
 	}
 
-
-	/*MapEvent event { .id = lastEventId };
-	event.name = QString("EV%1").arg(event.id, 3, 10, QChar('0'));
-	event.x = x;
-	event.y = y;
-	event.pages.emplace_back();
-	event.pages.back().list.push_back(Command::makeZeroCommand(0));*/
-
 	if (updateExisting)
 		map->events[lastEventId] = MapEvent::makeDefault(lastEventId, x, y);
 
@@ -188,7 +189,7 @@ MapEvent *TileMap::addNewEvent(int x, int y)
 	}
 
 	return &(*map->events.back());
-}
+}*/
 
 void TileMap::clear()
 {
@@ -198,5 +199,11 @@ void TileMap::clear()
 	for (int i = 0; i < TileSet::COUNT; i++)
 		tileSets[i] = nullptr;
 }
+
+void TileMap::setEventsModel(MapEventsModel *model)
+{
+	model->setEvents(&map->events);
+}
+
 
 

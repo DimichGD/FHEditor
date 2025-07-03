@@ -16,6 +16,12 @@ struct Timing
 
 struct Animation
 {
+	enum Type
+	{
+		ID, ANIM1_HUE, ANIM1_NAME, ANIM2_HUE, ANIM2_NAME,
+		NAME, POSITION, COUNT,
+	};
+
 	int id;
 	int animation1Hue = 0;
 	QString animation1Name {};

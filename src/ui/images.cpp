@@ -87,12 +87,12 @@ QPixmap *Images::face(const QString &name)
 	return loadImage("faces/" + name);
 }
 
-QPixmap *Images::tileSet(const QString &name)
+QPixmap Images::tileSet(const QString &name)
 {
 	if (name.isEmpty())
-		return nullptr;
+		return {};
 
-	return loadImage("tilesets/" + name);
+	return *loadImage("tilesets/" + name);
 }
 
 QPixmap *Images::animation(const QString &name)

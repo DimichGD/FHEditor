@@ -295,6 +295,14 @@ bool saveJson<State>(const QString &filename, std::vector<std::optional<State>> 
 			{ return glz::write_json(vector.at(i), buffer); });
 }
 
+template<>
+bool saveJson<MapInfo>(const QString &filename, std::vector<std::optional<MapInfo>> &vector)
+{
+	return saveArray(filename, vector.size(),
+		[&vector](size_t i, std::string &buffer) -> glz::error_ctx
+			{ return glz::write_json(vector.at(i), buffer); });
+}
+
 void printParsingError(const std::string &message, const QString &filename, int location)
 {
 	// TODO: combine this and showParsingError

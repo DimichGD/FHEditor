@@ -1,21 +1,18 @@
 #pragma once
 #include "base_model.hpp"
+#include "item.hpp"
 
-class ItemsModel: public BaseModel
+class ItemsModel: public BaseModel2
 {
 public:
-	ItemsModel(QObject *parent): BaseModel(&accessor, 3, parent) {}
+	ItemsModel(QObject *parent = nullptr);
 
 	Item *item(int row);
-	QVariant displayRoleData(int row, int column, Triple pointer) const override;
-	QVariant editRoleData(int row, int column, Triple pointer) const override;
-	QVariant userRoleData(int row, int column, Triple pointer) const override;
-	void setEditRoleData(int row, int column, const QVariant &value, Triple pointer) override;
+	std::vector<Effect> *effects(int row);
 
-	QVariant effectsData(const Item *item, int row, int column) const;
-	void addEffect(int itemIndex);
-	void setEffect(int itemIndex, int effectIndex, Effect &&effect);
-	void removeEffect(int itemIndex, int effectIndex);
+protected:
+	QVariant data(int row, int column) const override;
+	void setData(int row, int column, const QVariant &value) override;
 
 private:
 	Accessor<Item> accessor;

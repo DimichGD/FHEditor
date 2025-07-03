@@ -12,6 +12,11 @@ struct Learning
 
 struct Class
 {
+	enum Type
+	{
+		ID, NAME, NOTE, COUNT,
+	};
+
 	int id;
 	std::array<int, 4> expParams { 30, 20, 30, 30 };
 	std::vector<Trait> traits {};

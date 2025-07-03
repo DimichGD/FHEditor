@@ -41,13 +41,13 @@ void MapEventTool::mouseDoubleClick(QPoint pos)
 	}
 	else
 	{
-		MapEvent *event = tileMap->addNewEvent(pos.x(), pos.y());
+		/*MapEvent *event = tileMap->addNewEvent(pos.x(), pos.y());
 
 		EventGraphicsItem *item = new EventGraphicsItem(event);
 		item->setPos(pos.x() * tileSize, pos.y() * tileSize);
 		item->setOpacity(EventGraphicsItem::drawFullItem ? 1.0f : 0.5f);
 		scene->addItem(item);
 
-		emit selectEvent(event->id);
+		emit selectEvent(event->id);*/
 	}
 }

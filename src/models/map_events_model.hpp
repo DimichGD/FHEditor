@@ -1,26 +1,20 @@
 #pragma once
 #include "base_model.hpp"
-#include "map.hpp"
-#include <QAbstractTableModel>
+#include "map_event.hpp"
 
-class MapEventsModel: public BaseModel
+class MapEventsModel: public BaseModel2
 {
-	Q_OBJECT
-
 public:
-	explicit MapEventsModel(std::vector<std::optional<MapEvent>> *events, QObject *parent = nullptr)
-		: BaseModel(&accessor, 2, parent), accessor(events)
-	{
-	}
+	MapEventsModel(QObject *parent = nullptr);
+
+	MapEvent *mapEvent(int row);
+	void setEvents(std::vector<std::optional<MapEvent>> *events);
 
 protected:
-	QVariant displayRoleData(int row, int column, Triple pointer) const override;
-	QVariant editRoleData(int row, int column, Triple pointer) const override;
-	QVariant userRoleData(int row, int column, Triple pointer) const override;
-	void setEditRoleData(int row, int column, const QVariant &value, Triple pointer) override;
+	QVariant data(int row, int column) const override;
+	void setData(int row, int column, const QVariant &value) override;
 
 private:
-	Map *currentMap = nullptr;
 	Accessor<MapEvent> accessor;
 };
 

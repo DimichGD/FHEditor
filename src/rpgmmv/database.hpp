@@ -14,24 +14,14 @@
 #include "animation.hpp"
 #include "system.hpp"
 #include "state.hpp"
+#include "accessor.hpp"
 
-#include <QString>
-#include <QStandardItemModel>
+//#include <QString>
+//#include <QStandardItemModel>
 
-#include <optional>
+//#include <optional>
 #include <map>
 
-/*template<typename T>
-concept hasIconIndex = requires(T t)
-{
-	t.iconIndex;
-};*/
-
-/*template<typename T>
-struct Storage
-{
-	std::vector<std::optional<T>> data { std::nullopt };
-};*/
 
 template<typename T>
 using Storage = std::vector<std::optional<T>>;
@@ -42,6 +32,8 @@ using Storage = std::vector<std::optional<T>>;
 	Storage<Animation>, Storage<Skill>, Storage<State>,
 	Storage<Actor>, Storage<Class>, Storage<Enemy>, Storage<Troop>
 >;*/
+
+
 
 class Database
 {
@@ -68,17 +60,26 @@ public:
 				ACTORS | CLASSES | ENEMIES | TROOPS,
 	};
 
+	//Database();
+	//~Database();
+
 	static Database *Get();
 
 	bool load(Type type);
 	bool save(Type type);
-	void saveMap(int id);
+	//void saveMap(int id);
 
 	Map *map(int id);
 	System *system();
 
 	QString switchName(int id);
 	QString variableName(int id);
+
+	template<typename T>
+	Accessor<T> accessor()
+	{
+		return Accessor<T>(&getStorage<T>());
+	}
 
 	template<typename T>
 	Storage<T> &getStorage()
@@ -94,84 +95,4 @@ private:
 		Storage<Event>, Storage<MapInfo>, Storage<TileSet>,
 		Storage<Animation>, Storage<Skill>, Storage<State>,
 		Storage<Actor>, Storage<Class>, Storage<Enemy>, Storage<Troop>> storage;
-};
-
-
-class IAccessor
-{
-public:
-	virtual ~IAccessor() = default;
-	virtual int size() = 0;
-	virtual bool hasElement(int index) = 0;
-	virtual void clearElement(int index) = 0;
-	virtual void insertToEnd(int count) = 0;
-	virtual void removeFromEnd(int count) = 0;
-};
-
-/*template <typename, typename>
-struct tuple_holds {};
-
-template <typename ...A, typename B>
-struct tuple_holds<std::tuple<A...>, B>: std::bool_constant<(std::is_same_v<A, B> || ...)> {};*/
-
-template<typename T>
-class Accessor: public IAccessor
-{
-public:
-	Accessor()
-	{
-		this->storage = &Database::Get()->getStorage<T>();
-	}
-
-	Accessor(std::vector<std::optional<T>> *storage)
-	{
-		this->storage = storage;
-	}
-
-	T *value(int id)
-	{
-		return const_cast<T *>(std::as_const(*this).value(id));
-	}
-
-	const T *value(int id) const
-	{
-		if (id < 0 || id >= std::ssize(*storage))
-			return nullptr;
-
-		if (!storage->at(id).has_value())
-			return nullptr;
-
-		return &storage->at(id).value();
-	}
-
-	int size() override
-	{
-		return storage->size();
-	}
-
-	bool hasElement(int index) override
-	{
-		return value(index) != nullptr;
-	}
-
-	void clearElement(int index) override
-	{
-		int prevId = value(index)->id;
-		*value(index) = { .id = prevId };
-	}
-
-	void insertToEnd(int count) override
-	{
-		int nextId = storage->back().value().id + 1;
-		for (int i = 0; i < count; i++)
-			storage->emplace_back( T { .id = nextId++ } );
-	}
-
-	void removeFromEnd(int count) override
-	{
-		storage->erase(storage->end() - count, storage->end());
-	}
-
-private:
-	std::vector<std::optional<T>> *storage;
 };

@@ -90,7 +90,7 @@ void MapView::load(TileMap *tileMap)
 
 	scene->setSceneRect(0, 0, tileMap->width() * tileSize, tileMap->height() * tileSize);
 
-	for (auto &eventOptional: *tileMap->events())
+	/*for (auto &eventOptional: *tileMap->events())
 	{
 		if (!eventOptional.has_value())
 			continue;
@@ -101,7 +101,7 @@ void MapView::load(TileMap *tileMap)
 		item->setOpacity(EventGraphicsItem::drawFullItem ? 1.0f : 0.5f);
 		scene->addItem(item);
 		eventItemMap[event.id] = item;
-	}
+	}*/
 
 
 	setEnabled(true);
@@ -333,7 +333,7 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MapView::startAsyncLoad()
 {
-	for (auto &eventOptional: *tileMap->events())
+	/*for (auto &eventOptional: *tileMap->events())
 	{
 		if (!eventOptional.has_value())
 			continue;
@@ -342,12 +342,12 @@ void MapView::startAsyncLoad()
 		Image *image = &event.pages[0].image;
 		if (!image->characterName.isEmpty())
 			Images::Get()->loadImage("characters/" + image->characterName);
-	}
+	}*/
 }
 
 void MapView::completeAsyncLoad()
 {
-	for (auto it: eventItemMap)
+	/*for (auto it: eventItemMap)
 	{
 		MapEvent &event = tileMap->events()->at(it.first).value();
 		Image *image = &event.pages[0].image;
@@ -392,6 +392,6 @@ void MapView::completeAsyncLoad()
 
 	}
 
-	scene->invalidate();
+	scene->invalidate();*/
 }
 

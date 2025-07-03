@@ -20,13 +20,12 @@ public:
 
 private slots:
 	void eventRowSelected(int row);
-	void contextMenuRequested(const QPoint &pos);
-	void applyButtonClicked();
+	//void contextMenuRequested(const QPoint &pos);
 
 private:
 	Ui::CommonEventsTab *ui = nullptr;
 	QMenu *contextMenu = nullptr;
-	Event *currentEvent = nullptr;
+	//Event *currentEvent = nullptr;
 	CommonEventsModel *model = nullptr;
 	DataMapper *mapper = nullptr;
 };

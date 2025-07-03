@@ -16,10 +16,10 @@ signals:
 
 protected slots:
 	void changeId(int id);
-	void buttonClicked(bool);
+	void buttonClicked();
 
 private:
-	SimpleChooserDialog::Source source;
+	SimpleChooserDialog::Source source = SimpleChooserDialog::EMPTY;
 	int id = 0;
 };
 

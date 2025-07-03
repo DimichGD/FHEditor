@@ -1,5 +1,5 @@
 #include "simple_chooser_dialog.hpp"
-#include "base_table.hpp"
+//#include "base_table.hpp"
 #include "database.hpp"
 #include "ui_simple_chooser_dialog.h"
 
@@ -18,13 +18,19 @@ QStandardItem *newItem(QString name, int id)
 template<typename T>
 void readModel(QStandardItemModel *model)
 {
-	for (auto &item: Database::Get()->getStorage<T>())
+	/*for (auto &item: Database::Get()->getStorage<T>())
 	{
 		if (!item)
 			model->appendRow(newItem("", 0));
 
 		else
 			model->appendRow(newItem(item->name, item->id));
+	}*/
+	Accessor<T> accessor(&Database::Get()->getStorage<T>());
+	for (int i = 1; i < accessor.size(); i++)
+	{
+		T *item = accessor.value(i);
+		model->appendRow(newItem(item->name, item->id));
 	}
 }
 
@@ -47,8 +53,8 @@ SimpleChooserDialog::SimpleChooserDialog(Source source, int targetId, QWidget *p
 	if (source == ANIMATION)
 	{
 		model->appendRow(newItem("Normal Attack", -1));
+		model->appendRow(newItem("None", 0));
 		readModel<Animation>(model);
-		model->setData(model->index(1, 0), "None", Qt::DisplayRole);
 		++targetId;
 	}
 
@@ -88,17 +94,14 @@ SimpleChooserDialog::SimpleChooserDialog(Source source, int targetId, QWidget *p
 	else
 		return;
 
-	if (source == ANIMATION)
-		filterModel = new QSortFilterProxyModel(this);
-	else
-		filterModel = new ProxyModel(this);
+	filterModel = new QSortFilterProxyModel(this);
 
 	filterModel->setSourceModel(model);
 	filterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
 
-	ui->listView->setModel(filterModel);
-	ui->listView->setCurrentIndex(filterModel->mapFromSource(model->index(targetId, 0)));
-	ui->listView->scrollTo(filterModel->mapFromSource(model->index(targetId, 0)));
+	ui->listView->setModel(filterModel); // FIXME: find id instead of subtract 1
+	ui->listView->setCurrentIndex(filterModel->index(targetId - 1, 0));
+	ui->listView->scrollTo(filterModel->index(targetId - 1, 0));
 
 	connect(ui->filterEdit, &QLineEdit::textChanged,
 			filterModel, &QSortFilterProxyModel::setFilterFixedString);

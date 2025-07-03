@@ -1,31 +1,28 @@
 #include "map_info_model.hpp"
+#include "database.hpp"
 
+MapInfoModel::MapInfoModel(QObject *parent)
+	: BaseModel2(&accessor, parent), accessor(Database::Get()->accessor<MapInfo>()) {}
 
 MapInfo *MapInfoModel::mapInfo(int row)
 {
-	// TODO: check for valid id
-	return accessor.value(row);
+	return accessor.value(row + 1);
 }
 
-QVariant MapInfoModel::displayRoleData(int row, int column, Triple pointer) const
+QVariant MapInfoModel::data(int row, int column) const
 {
-	const MapInfo *info = accessor.value(row);
-	if (!info)
+	const MapInfo *mapInfo = accessor.value(row);
+	if (!mapInfo) // map info can be null
 		return QVariant();
 
-	if (column == 0) return info->id;
-	if (column == 1) return info->name;
+	if (column == MapInfo::ID) return mapInfo->id;
+	if (column == MapInfo::NAME) return mapInfo->name;
 
 	return QVariant();
 }
 
-QVariant MapInfoModel::editRoleData(int row, int column, Triple pointer) const
+void MapInfoModel::setData(int row, int column, const QVariant &value)
 {
-
-}
-
-void MapInfoModel::setEditRoleData(int row, int column, const QVariant &value, Triple pointer)
-{
-
+	qDebug() << "MapInfoModel::setData";
 }
 

@@ -1,18 +1,17 @@
 #pragma once
 #include "base_model.hpp"
+#include "map_info.hpp"
 
-class MapInfoModel: public BaseModel
+class MapInfoModel: public BaseModel2
 {
-	Q_OBJECT
 public:
-	explicit MapInfoModel(QObject *parent = nullptr): BaseModel(&accessor, 2, parent) {}
+	MapInfoModel(QObject *parent = nullptr);
 	MapInfo *mapInfo(int row);
 
 protected:
-	QVariant displayRoleData(int row, int column, Triple pointer) const override;
-	QVariant editRoleData(int row, int column, Triple pointer) const override;
-	void setEditRoleData(int row, int column, const QVariant &value, Triple pointer) override;
+	QVariant data(int row, int column) const override;
+	void setData(int row, int column, const QVariant &value) override;
 
 private:
-	Accessor<MapInfo> accessor;
+	Accessor<MapInfo> accessor;	
 };

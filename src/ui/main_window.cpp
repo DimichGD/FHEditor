@@ -45,10 +45,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 		const QString &tabObjectName = ui->tabWidget->currentWidget()->objectName();
 		if (tabObjectName == "mapTab")
-			Database::Get()->saveMap(ui->mapTab->mapId());
+			Database::Get()->save(Database::MAP);
+			//Database::Get()->saveMap(ui->mapTab->mapId());
 
 		else if (tabObjectName == "mapEventsTab")
-			Database::Get()->saveMap(ui->mapTab->mapId());
+			Database::Get()->save(Database::MAP);
+			//Database::Get()->saveMap(ui->mapTab->mapId());
 
 		else if (tabObjectName == "itemsTab")
 			Database::Get()->save(Database::ITEMS);

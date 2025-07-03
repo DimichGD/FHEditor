@@ -13,7 +13,8 @@ class MapEventPage: public QWidget
 	Q_OBJECT
 
 public:
-	explicit MapEventPage(MapEventPagesModel *model, int index, Page *page, QWidget *parent = nullptr);
+	MapEventPage(QWidget *parent);
+	MapEventPage(MapEventPagesModel *model, int index, QWidget *parent);
 	~MapEventPage();
 
 	void connectCheckBoxToWidget(QCheckBox *checkBox, QWidget *widget);
@@ -22,5 +23,7 @@ public:
 private:
 	DataMapper *mapper = nullptr;
 	Ui::MapEventPage *ui = nullptr;
+	MapEventPagesModel *model = nullptr;
+	//Page *page = nullptr;
 };
 

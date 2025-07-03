@@ -6,6 +6,13 @@
 
 struct Armor
 {
+	enum Type
+	{
+		ID, ATYPE_ID, DESC, ETYPE_ID, ICON_INDEX, NAME, NOTE,
+		/* PARAMS */
+		PRICE, COUNT,
+	};
+
 	int id;
 	int atypeId = 0;
 	QString description {};

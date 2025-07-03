@@ -7,7 +7,7 @@ ChangeMaximumDialog::ChangeMaximumDialog(QAbstractItemModel *model, QWidget *par
 	QDialog(parent), ui(new Ui::ChangeMaximumDialog)
 {
 	ui->setupUi(this);
-	ui->spinBox->setValue(model->rowCount() - 1); // TODO: do something with -1 thing
+	ui->spinBox->setValue(model->rowCount());
 	setMaximumSize(size());
 
 	if (parent)
@@ -17,7 +17,7 @@ ChangeMaximumDialog::ChangeMaximumDialog(QAbstractItemModel *model, QWidget *par
 		move(pos);
 	}
 
-	connect(this, &QDialog::accepted, [model, this]()
+	/*connect(this, &QDialog::accepted, [model, this]()
 	{
 		int count = ui->spinBox->value() + 1;
 		int rowCount = model->rowCount();
@@ -27,7 +27,7 @@ ChangeMaximumDialog::ChangeMaximumDialog(QAbstractItemModel *model, QWidget *par
 
 		else if (count > rowCount)
 			model->insertRows(rowCount, count - rowCount);
-	});
+	});*/
 }
 
 ChangeMaximumDialog::~ChangeMaximumDialog()

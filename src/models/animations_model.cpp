@@ -1,29 +1,26 @@
 #include "animations_model.hpp"
+#include "database.hpp"
 
-QVariant AnimationsModel::displayRoleData(int row, int column, Triple pointer) const
+AnimationsModel::AnimationsModel(QObject *parent)
+	: BaseModel2(&accessor, parent), accessor(Database::Get()->accessor<Animation>()) {}
+
+Animation *AnimationsModel::animation(int row)
 {
-	const Animation *anim = accessor.value(row);
-	if (!anim)
-		return QVariant();
+	return accessor.value(row + 1);
+}
 
-	if (column == 0) return anim->id;
-	if (column == 1) return anim->name;
+QVariant AnimationsModel::data(int id, int column) const
+{
+	const Animation *anim = accessor.value(id);
+
+	if (column == Animation::ID) return anim->id;
+	if (column == Animation::NAME) return anim->name;
 
 	return QVariant();
 }
 
-QVariant AnimationsModel::editRoleData(int row, int column, Triple pointer) const
+void AnimationsModel::setData(int id, int column, const QVariant &value)
 {
-	//
-}
-
-QVariant AnimationsModel::userRoleData(int row, int column, Triple pointer) const
-{
-	//
-}
-
-void AnimationsModel::setEditRoleData(int row, int column, const QVariant &value, Triple pointer)
-{
-	//
+	qDebug() << "AnimationsModel::setData";
 }
 

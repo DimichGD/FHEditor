@@ -24,66 +24,76 @@ void SelectorButton::changeId(int id)
 
 		else
 		{
-			Animation *value = Accessor<Animation>().value(id);
+			Animation *value = Database::Get()->accessor<Animation>().value(id);
 			setText(value ? value->name : "?");
 		}
 	}
 	else if (source == SimpleChooserDialog::STATE)
 	{
-		State *value = Accessor<State>().value(id);
+		State *value = Database::Get()->accessor<State>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::SKILL)
 	{
-		Skill *value = Accessor<Skill>().value(id);
+		Skill *value = Database::Get()->accessor<Skill>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::SWITCH)
 	{
-		QString value = Database::Get()->system()->switches.at(id);
+		//QString value = Database::Get()->system()->switches.at(id);
+		QString value = Database::Get()->switchName(id);
+		value = fontMetrics().elidedText(value, Qt::ElideRight, width() - 8);
 		setText(value); // TODO: '?' if id >= switches.size()
 	}
 	else if (source == SimpleChooserDialog::VARIABLE)
 	{
-		QString value = Database::Get()->system()->variables.at(id);
+		//QString value = Database::Get()->system()->variables.at(id);
+		QString value = Database::Get()->variableName(id);
+		value = fontMetrics().elidedText(value, Qt::ElideRight, width() - 8);
 		setText(value); // TODO: '?' if id >= variables.size()
 	}
 	else if (source == SimpleChooserDialog::ITEM)
 	{
-		Item *value = Accessor<Item>().value(id);
+		Item *value = Database::Get()->accessor<Item>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::COMMON_EVENT)
 	{
-		Event *value = Accessor<Event>().value(id);
+		Event *value = Database::Get()->accessor<Event>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::ACTOR)
 	{
-		Actor *value = Accessor<Actor>().value(id);
+		Actor *value = Database::Get()->accessor<Actor>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::CLASS)
 	{
-		Class *value = Accessor<Class>().value(id);
+		Class *value = Database::Get()->accessor<Class>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::WEAPON)
 	{
-		Weapon *value = Accessor<Weapon>().value(id);
+		Weapon *value = Database::Get()->accessor<Weapon>().value(id);
 		setText(value ? value->name : "?");
 	}
 	else if (source == SimpleChooserDialog::ARMOR)
 	{
-		Armor *value = Accessor<Armor>().value(id);
+		Armor *value = Database::Get()->accessor<Armor>().value(id);
 		setText(value ? value->name : "?");
 	}
 	//} catch (std::exception &e) // TODO: remove this
 	//{ qDebug() << "idChanged(" << id << ") exception with source" << source; }
 }
 
-void SelectorButton::buttonClicked(bool)
+void SelectorButton::buttonClicked()
 {
+	if (source == SimpleChooserDialog::EMPTY)
+	{
+		qDebug() << "SelectorButton source is not set";
+		return;
+	}
+
 	static QStringList titleMap = {
 		"Animations",
 		"States",

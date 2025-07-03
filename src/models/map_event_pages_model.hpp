@@ -7,9 +7,11 @@ class MapEventPagesModel: public QAbstractTableModel
 	Q_OBJECT
 
 public:
-	explicit MapEventPagesModel(std::vector<Page> *pages, QObject *parent):
-		QAbstractTableModel(parent) { this->pages = pages; }
+	explicit MapEventPagesModel(QObject *parent):
+		QAbstractTableModel(parent) {}
 
+	Page *page(int index) { return &pages->at(index); }
+	void setPages(std::vector<Page> *pages);
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	QVariant data(const QModelIndex &index, int role) const override;

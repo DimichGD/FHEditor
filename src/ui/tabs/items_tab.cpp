@@ -11,11 +11,6 @@
 #include "menu.hpp"
 #include "ui_items_tab.h"
 
-//#include <QMenu>
-//#include <QDataWidgetMapper>
-//#include <QListWidgetItem>
-//#include <QItemSelectionModel>
-
 ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 {
 	ui->setupUi(this);
@@ -67,8 +62,18 @@ ItemsTab::ItemsTab(QWidget *parent): QWidget(parent), ui(new Ui::ItemsTab)
 	mapper->add(ui->itemTPGainSpinBox, Item::TP_GAIN);
 
 	ui->itemEffectsList->setModel(effectsModel);
-	ui->itemsTable->setModel2(model, Images::Get()->iconSet());
+	ui->itemsTable->setModel2(model, Item::NAME);
 	ui->itemAnimationButton->setSource(SimpleChooserDialog::ANIMATION);
+
+	for (int i = 0; i < Item::COUNT; i++)
+		ui->itemsTable->setColumnHidden(i, true);
+
+	ui->itemsTable->setColumnHidden(Item::ID, false);
+	ui->itemsTable->setColumnHidden(Item::ICON_INDEX, false);
+	ui->itemsTable->setColumnHidden(Item::NAME, false);
+	ui->itemsTable->resizeColumnToContents(Item::ID);
+	ui->itemsTable->resizeColumnToContents(Item::ICON_INDEX);
+	ui->itemsTable->setItemDelegateForColumn(Item::ICON_INDEX, new IconDelegate(Images::Get()->iconSet(), this));
 }
 
 ItemsTab::~ItemsTab()
@@ -99,7 +104,6 @@ void ItemsTab::init()
 
 void ItemsTab::itemRowSelected(int row)
 {
-	//currentItem = model->item(row);
 	if (!model->item(row))
 	{
 		effectsModel->setItemIndex(-1);
@@ -135,25 +139,25 @@ void ItemsTab::contextMenuRequested(const QPoint &pos)
 	ui->actionEffectDelete->setEnabled(enabled);
 
 	//bool flag = enabled && index.data(ItemEffectsModel::CODE).toInt() == Effect::COMMON_EVENT;
-	ui->actionEffectGoTo->setEnabled(false);
+	bool flag = enabled && effectsModel->effectCode(index.row()) == Effect::COMMON_EVENT;
+	ui->actionEffectGoTo->setEnabled(flag);
 
 	itemEffectsListMenu->exec(ui->itemEffectsList->viewport()->mapToGlobal(pos));
 }
 
 void ItemsTab::actionEffectNewTriggered(bool)
 {
-	model->addEffect(ui->itemsTable->selectedRow());
+	effectsModel->addEffect();
 	ui->itemEffectsList->selectRow(effectsModel->rowCount() - 1);
 }
 
 void ItemsTab::actionEffectEditTriggered(bool)
 {
 	int effectIndex = ui->itemEffectsList->currentIndex().row();
-	int itemIndex = ui->itemsTable->selectedRow(); // TODO: Change name to selectedId or something
-	ItemEffectDialog dialog(model->item(itemIndex)->effects.at(effectIndex), this);
+	ItemEffectDialog dialog(*effectsModel->effect(effectIndex), this); // FIXME: why value instead of pointer?
 	if (dialog.exec())
 	{
-		model->setEffect(ui->itemsTable->selectedRow(), effectIndex, dialog.value());
+		effectsModel->setEffect(effectIndex, dialog.value());
 		ui->itemEffectsList->selectRow(effectIndex);
 	}
 }
@@ -161,13 +165,13 @@ void ItemsTab::actionEffectEditTriggered(bool)
 void ItemsTab::actionEffectDeleteTriggered(bool)
 {
 	int effectIndex = ui->itemEffectsList->currentIndex().row();
-	model->removeEffect(ui->itemsTable->selectedRow(), effectIndex);
+	effectsModel->removeEffect(effectIndex);
 }
 
 void ItemsTab::actionEffectGotToTriggered(bool)
 {
-	QModelIndex index = ui->itemEffectsList->currentIndex();
-	//emit selectCommonEvent(index.data(ItemEffectsModel::DATA).toInt());
+	int effectIndex = ui->itemEffectsList->currentIndex().row();
+	emit selectCommonEvent(effectsModel->effectCode(effectIndex));
 }
 
 
@@ -185,19 +189,20 @@ void ItemsTab::enableGroupBoxes(bool enabled)
 
 void ItemsTab::itemNewClicked()
 {
-	model->insertRows(model->rowCount(), 1);
+	model->changeCount(model->rowCount() + 1);
 	ui->itemsTable->selectRow(ui->itemsTable->rowCount() - 1);
 }
 
 void ItemsTab::itemResizeClicked()
 {
 	ChangeMaximumDialog dialog(model, ui->itemResizeButton);
-	dialog.exec();
+	if (dialog.exec())
+		model->changeCount(dialog.value());
 }
 
 void ItemsTab::itemClearClicked()
 {
-	model->clearElement(ui->itemsTable->selectedRow());
-	//effectsModel->setEffects(nullptr); // Should auto clear itself?
+	model->clearRow(ui->itemsTable->selectedRow());
+	effectsModel->setItemIndex(-1);
 }
 

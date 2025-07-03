@@ -12,6 +12,7 @@ void EventContentListModel::load(std::list<Command> *list)
 	endResetModel();
 }
 
+
 int EventContentListModel::rowCount(const QModelIndex &parent) const
 {
 	Q_UNUSED(parent)
@@ -50,7 +51,7 @@ void EventContentListModel::removeCommands(int row, int count)
 	QAbstractListModel::endRemoveRows();
 }
 
-void EventContentListModel::insertCommands(int row, std::list<Command> &&otherList)
+void EventContentListModel::insertCommands(int row, std::list<Command> otherList)
 {
 	if (!commandList)
 		return;

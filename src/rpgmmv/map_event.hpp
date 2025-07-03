@@ -66,6 +66,11 @@ struct Page
 
 struct MapEvent
 {
+	enum Type
+	{
+		ID, NAME, NOTE, POS_X, POS_Y, COUNT
+	};
+
 	int id;
 	QString name {};
 	QString note {};

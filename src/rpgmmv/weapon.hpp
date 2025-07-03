@@ -6,6 +6,13 @@
 
 struct Weapon
 {
+	enum Type
+	{
+		ID, ANIMATION_ID, DESC, ETYPE_ID, ICON_INDEX, NAME, NOTE,
+		/* PARAMS */
+		PRICE, WTYPE_ID, COUNT,
+	};
+
 	int id;
 	int animationId = 0;
 	QString description {};

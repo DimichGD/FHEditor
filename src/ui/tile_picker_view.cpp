@@ -20,12 +20,12 @@ TilePickerView::TilePickerView(QWidget *parent): QGraphicsView(parent)
 	cursorItem->setPen(whitePen);
 }
 
-void TilePickerView::setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap pixmap)
+/*void TilePickerView::setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QPixmap pixmap)
 {
 	this->setIndex = setIndex;
 	this->tileSize = tileSize;
 
-	backgroundPixmap = pixmap;
+	pixmap = pixmap;
 	if (!pixmap)
 		return;
 
@@ -37,12 +37,13 @@ void TilePickerView::setBackgroundPixmap(TileSet::Set setIndex, int tileSize, QP
 		scene->setSceneRect(0, 0, pixmap.width(), pixmap.height());
 
 	scene->update();
-}
+}*/
 
 void TilePickerView::setBackgroundPixmap(QPixmap pixmap, int tileSize, bool split)
 {
+	this->split = split;
 	this->tileSize = tileSize;
-	this->backgroundPixmap = pixmap;
+	this->pixmap = pixmap;
 
 	if (pixmap.isNull())
 		return;
@@ -52,6 +53,8 @@ void TilePickerView::setBackgroundPixmap(QPixmap pixmap, int tileSize, bool spli
 
 	else
 		scene->setSceneRect(0, 0, pixmap.width(), pixmap.height());
+
+	scene->update();
 }
 
 QGraphicsRectItem *TilePickerView::cursor()
@@ -60,7 +63,7 @@ QGraphicsRectItem *TilePickerView::cursor()
 }
 
 
-void TilePickerView::selectPoint(const QPoint &point)
+/*void TilePickerView::selectPoint(const QPoint &point)
 {
 	QPoint transformedPoint = mapToScene(point).toPoint();
 
@@ -75,14 +78,13 @@ void TilePickerView::selectPoint(const QPoint &point)
 	tilesSelectionRect.setWidth(1);
 	tilesSelectionRect.setHeight(1);
 
-	QRect rect( x * tileSize, y * tileSize, tileSize, tileSize );
+	QRect rect(x * tileSize, y * tileSize, tileSize, tileSize);
 	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
-	cursorSetIndex = setIndex;
 	cursorItem->show();
 	scene->update();
 
-	emit tileSelected(setIndex, tilesSelectionRect.left(), tilesSelectionRect.top());
-}
+	emit tileSelected(tilesSelectionRect.left(), tilesSelectionRect.top());
+}*/
 
 void TilePickerView::selectRect(const QPoint &first, const QPoint &second)
 {
@@ -92,12 +94,6 @@ void TilePickerView::selectRect(const QPoint &first, const QPoint &second)
 	int maxHeight = scene->sceneRect().height() - 1;
 	transformedFirst.ry() = std::min(transformedFirst.y(), maxHeight);
 	transformedSecond.ry() = std::min(transformedSecond.y(), maxHeight);
-
-	/*if (transformedFirst.y() >= scene->sceneRect().height())
-		transformedFirst.setY(scene->sceneRect().height() - 1);
-
-	if (transformedSecond.y() >= scene->sceneRect().height())
-		transformedSecond.setY(scene->sceneRect().height() - 1);*/
 
 	int x1 = transformedFirst.x() / tileSize;
 	int y1 = transformedFirst.y() / tileSize;
@@ -109,17 +105,18 @@ void TilePickerView::selectRect(const QPoint &first, const QPoint &second)
 
 	QRect rect(QPoint(x1, y1) * tileSize, QPoint(x2 + 1, y2 + 1) * tileSize - QPoint(1, 1));
 	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
-	cursorSetIndex = setIndex;
 	cursorItem->show();
 
 	tilesSelectionRect = QRect(QPoint(x1, y1), QPoint(x2, y2));
-	if (tilesSelectionRect != lastTilesSelectionRect)
+	scene->update();
+	emit selected(tilesSelectionRect);
+	/*if (tilesSelectionRect != lastTilesSelectionRect)
 	{
 		scene->update();
 		lastTilesSelectionRect = tilesSelectionRect;
 
-		emit multipleTilesSelected(setIndex, tilesSelectionRect);
-	}
+		emit selected(tilesSelectionRect);
+	}*/
 }
 
 
@@ -130,7 +127,7 @@ void TilePickerView::clearSelection()
 	scene->update();
 }
 
-void TilePickerView::selectTile(int tileId)
+/*void TilePickerView::selectTile(int tileId)
 {
 	tileId &= 0xFF;
 	int x = tileId % 8;
@@ -144,37 +141,45 @@ void TilePickerView::selectTile(int tileId)
 	scene->update();
 
 	emit tileSelected(setIndex, x, y);
+}*/
+
+void TilePickerView::selectTile(int x, int y)
+{
+	QRect rect(x * tileSize, y * tileSize, tileSize, tileSize);
+	cursorItem->setRect(rect.adjusted(2, 2, -2, -2).toRectF());
+	centerOn(cursorItem);
+	scene->update();
+	emit selected(QRect(x, y, 1, 1));
 }
 
 void TilePickerView::drawBackground(QPainter *painter, const QRectF &rect)
 {
 	QGraphicsView::drawBackground(painter, rect);
+	drawGrid(painter, rect);
 
-	if (!backgroundPixmap)
+	if (pixmap.isNull())
 		return;
 
-	if (setIndex == TileSet::A5)
+	if (!split)
 	{
-		painter->drawPixmap(rect, backgroundPixmap, rect);
+		painter->drawPixmap(rect, pixmap, rect);
 		return;
 	}
 
-	float dx = 384; // FIXME: remove hardcoded variables
-	float dy = 768;
-	QRectF rect1(0, 0, 384, 768);
-	QRectF rect2(0, 768, 384, 768);
+	float dx = pixmap.width() / 2;
+	float dy = pixmap.height();
+	QRectF rect1(0, 0,  dx, dy);
+	QRectF rect2(0, dy, dx, dy);
 	QRectF intersection1 = rect.intersected(rect1);
 	QRectF intersection2 = rect.intersected(rect2);
 
-	painter->drawPixmap(intersection1, backgroundPixmap, intersection1);
-	painter->drawPixmap(intersection2, backgroundPixmap, intersection2.adjusted(dx, -dy, dx, -dy));
-
-	return;
+	painter->drawPixmap(intersection1, pixmap, intersection1);
+	painter->drawPixmap(intersection2, pixmap, intersection2.adjusted(dx, -dy, dx, -dy));
 }
 
 void TilePickerView::mousePressEvent(QMouseEvent *event)
 {
-	if (!backgroundPixmap)
+	if (!pixmap)
 	{
 		event->ignore();
 		return;
@@ -183,7 +188,8 @@ void TilePickerView::mousePressEvent(QMouseEvent *event)
 	if (event->button() == Qt::LeftButton)
 	{
 		dragStart = event->position().toPoint();
-		selectPoint(event->position().toPoint());
+		selectRect(dragStart, dragStart);
+		//selectPoint(dragStart);
 
 		currentDragOp = SELECT;
 		event->accept();
@@ -200,7 +206,7 @@ void TilePickerView::mousePressEvent(QMouseEvent *event)
 
 void TilePickerView::mouseMoveEvent(QMouseEvent *event)
 {
-	if (!backgroundPixmap)
+	if (!pixmap)
 	{
 		event->ignore();
 		return;
@@ -230,7 +236,7 @@ void TilePickerView::mouseMoveEvent(QMouseEvent *event)
 
 void TilePickerView::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (!backgroundPixmap)
+	if (pixmap.isNull())
 	{
 		event->ignore();
 		return;
@@ -242,12 +248,31 @@ void TilePickerView::mouseReleaseEvent(QMouseEvent *event)
 
 void TilePickerView::resizeEvent(QResizeEvent *event)
 {
-	if (!backgroundPixmap.isNull())
+	if (!pixmap.isNull())
 	{
-		float scaleFactor = static_cast<float>(viewport()->width()) / 384; // FIXME: remove hardcoded variables
+		int tileSetWidth = tileSize * 8;
+		float scaleFactor = static_cast<float>(viewport()->width()) / tileSetWidth;
 		setTransform(QTransform::fromScale(scaleFactor, scaleFactor));
 	}
 
 	QGraphicsView::resizeEvent(event);
+}
+
+void TilePickerView::drawGrid(QPainter *painter, const QRectF &rect)
+{
+	painter->setPen(QColor::fromRgb(220, 220, 220));
+	int gridSize = tileSize / 2;
+	QRect r = rect.toRect();
+
+	int xmin = r.left() - r.left() % gridSize - gridSize;
+	int ymin = r.top() - r.top() % gridSize - gridSize;
+	int xmax = r.right() - r.right() % gridSize + gridSize;
+	int ymax = r.bottom() - r.bottom() % gridSize + gridSize;
+
+	for (int x = xmin; x <= xmax; x += gridSize)
+		painter->drawLine(x, r.top(), x, r.bottom());
+
+	for (int y = ymin; y <= ymax; y+= gridSize)
+		painter->drawLine(r.left(), y, r.right(), y);
 }
 

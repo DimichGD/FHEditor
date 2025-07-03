@@ -80,8 +80,7 @@ SOURCES += \
     src/ui/icon_picker_view.cpp \
     src/ui/main_window.cpp \
     src/ui/map_view.cpp \
-    src/ui/tile_picker_view.cpp \
-    src/ui/widgets/tile_picker_widget.cpp
+    src/ui/tile_picker_view.cpp
 
 HEADERS += \
     src/accessor.hpp \
@@ -175,8 +174,7 @@ HEADERS += \
     src/ui/main_window.hpp \
     src/ui/map_view.hpp \
     src/ui/settings.hpp \
-    src/ui/tile_picker_view.hpp \
-    src/ui/widgets/tile_picker_widget.hpp
+    src/ui/tile_picker_view.hpp
 
 FORMS += \
     src/ui/dialogs/change_maximum_dialog.ui \
@@ -199,8 +197,7 @@ FORMS += \
     src/ui/tabs/map_tab.ui \
     src/ui/tabs/types_tab.ui \
     src/ui/tabs/weapons_tab.ui \
-    src/ui/widgets/icon_widget.ui \
-    src/ui/widgets/tile_picker_widget.ui
+    src/ui/widgets/icon_widget.ui
 
 TRANSLATIONS +=
 

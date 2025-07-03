@@ -29,7 +29,7 @@ TileSet::Set tilesetIndexFromId(int id)
 	else if (id >= 4352 && id < 5888) return TileSet::A3;
 	else if (id >= 5888 && id < 8192) return TileSet::A4;
 
-	qDebug() << "Unknown layer int id" << id;
+	qDebug() << "Unknown layer id" << id;
 	return TileSet::B;
 }
 
@@ -55,10 +55,6 @@ int tileIdOffset(TileSet::Set index)
 }
 
 
-QString makeMapName(int id)
-{
-
-}
 
 TileMap::TileMap()
 {
@@ -81,18 +77,18 @@ void TileMap::loadTileSet(int id)
 		if (name.isEmpty())
 			continue;
 
-		/*QPixmap *pixmap = Images::Get()->tileSet(name);
-		if (!pixmap)
-			continue;*/
+		QPixmap pixmap = Images::Get()->tileSet(name);
+		if (pixmap.isNull())
+			continue;
 
-		tileSets[i] = nullptr;
+		tileSets[i] = pixmap;
 		if (i >= TileSet::A1 && i < TileSet::A5)
 			autoTilesFlag = true;
 
 		mask.set(i);
 	}
 
-	tileSets[TileSet::R] = new QPixmap(":/color-grid.png");
+	tileSets[TileSet::R] = QPixmap(":/color-grid.png");
 }
 
 bool TileMap::loadTileMap(int id)
@@ -197,7 +193,7 @@ void TileMap::clear()
 	autoTilesFlag = false;
 
 	for (int i = 0; i < TileSet::COUNT; i++)
-		tileSets[i] = nullptr;
+		tileSets[i] = QPixmap();
 }
 
 void TileMap::setEventsModel(MapEventsModel *model)

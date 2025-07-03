@@ -22,7 +22,7 @@ void TilePickerTool::mousePress(QPoint pos)
 		if (tileId == 0)
 			continue;
 
-		emit pickTile(tileId, buttonGroupIndex(tileId));
+		emit pickTile((tileId & 0xFF) % 8, (tileId & 0xFF) / 8, buttonGroupIndex(tileId));
 		lastLayer = i;
 		break;
 	}

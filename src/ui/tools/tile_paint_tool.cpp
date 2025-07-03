@@ -4,6 +4,9 @@
 
 void TilePaintTool::mousePress(QPoint pos)
 {
+	if (currentMultipleTileInfoList.empty())
+		return;
+
 	if (currentMultipleTileSize.width() * currentMultipleTileSize.height() == 1)
 	{
 		tileMap->putTile(pos.x(), pos.y(), currentLayer, currentMultipleTileInfoList[0].id);
@@ -85,14 +88,8 @@ void TilePaintTool::mouseRelease()
 	isPainting = false;
 }
 
-void TilePaintTool::setCurrentTileSingle(TileSet::Set setIndex, int x, int y)
+/*void TilePaintTool::setCurrentTileSingle(TileSet::Set setIndex, int x, int y)
 {
-	//if (tile)
-
-	/*currentTileInfo = tileMap->tileItemInfo(x, y, setIndex);
-	cursor->setRect(0, 0, tileSize, tileSize);
-	if (setIndex >= TileSet::B && setIndex <= TileSet::E && x == 0 && y == 0)
-		currentTileInfo.pixmap = nullptr;*/
 	QRect rect(x, y, 1, 1);
 
 	QList<TileItemInfo> tileInfos;
@@ -106,7 +103,7 @@ void TilePaintTool::setCurrentTileSingle(TileSet::Set setIndex, int x, int y)
 	currentMultipleTileInfoList = tileInfos;
 
 	cursor->setRect(2, 2, rect.size().width() * tileSize - 3, rect.size().height() * tileSize - 3);
-}
+}*/
 
 void TilePaintTool::setCurrentTileMultiple(TileSet::Set setIndex, const QRect &rect)
 {

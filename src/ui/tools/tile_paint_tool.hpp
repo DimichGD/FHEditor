@@ -19,7 +19,7 @@ public:
 	//void mouseDoubleClick(const QPoint &) override {}
 
 	void setCurrentLayer(int layer) { currentLayer = layer; }
-	void setCurrentTileSingle(TileSet::Set setIndex, int x, int y);
+	//void setCurrentTileSingle(TileSet::Set setIndex, int x, int y);
 	void setCurrentTileMultiple(TileSet::Set setIndex, const QRect &rect);
 
 private:

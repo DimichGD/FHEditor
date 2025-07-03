@@ -17,7 +17,7 @@ public:
 	//void mouseDoubleClick(const QPoint &) override {}
 
 signals:
-	void pickTile(int tileId, int buttonIndex); // TODO: better naming
+	void pickTile(int x, int y, int buttonIndex); // TODO: better naming
 
 private:
 	int buttonGroupIndex(int tileId);

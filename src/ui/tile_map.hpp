@@ -8,14 +8,13 @@
 
 struct TileItemInfo
 {
-	QPixmap *pixmap = nullptr;
+	QPixmap pixmap {};
 	QRect rect {};
-	int id = -1;
+	int id = 0;
 };
 
 int tileIdOffset(TileSet::Set index);
 TileSet::Set tilesetIndexFromId(int id);
-QString makeMapName(int id);
 
 class TileMap
 {
@@ -27,7 +26,7 @@ public:
 	bool hasAutoTiles() const { return autoTilesFlag; }
 	bool hasTileSet(TileSet::Set setIndex) { return mask[setIndex]; }
 
-	QPixmap *pixmap(int index) { return tileSets[index]; }
+	QPixmap pixmap(int index) { return tileSets[index]; }
 	int tileId(int x, int y, int z);
 	TileItemInfo tileItemInfo(int tileId);
 	TileItemInfo tileItemInfo(int x, int y, TileSet::Set setIndex);
@@ -52,7 +51,7 @@ private:
 	int tileSize = 48;
 	std::bitset<TileSet::COUNT> mask;
 	QList<std::span<int>> tileLayers;
-	QList<QPixmap *> tileSets;
+	QList<QPixmap> tileSets;
 
 	//MapEventsModel *model = nullptr;
 };

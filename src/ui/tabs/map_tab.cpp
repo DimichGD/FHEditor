@@ -30,12 +30,12 @@ MapTab::MapTab(QWidget *parent): BaseTab(parent), ui(new Ui::MapTab)
 	ui->modeButtonGroup->setId(ui->pickerModeButton, 2);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_1, 2);
 	ui->paintLayerButtonGroup->setId(ui->layerButton_2, 3);
-	/*ui->tilePickerButtonGroup->setId(ui->tilePickerButton_A, 0);
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButton_A, 0);
 	ui->tilePickerButtonGroup->setId(ui->tilePickerButton_B, 1);
 	ui->tilePickerButtonGroup->setId(ui->tilePickerButton_C, 2);
 	ui->tilePickerButtonGroup->setId(ui->tilePickerButton_D, 3);
 	ui->tilePickerButtonGroup->setId(ui->tilePickerButton_E, 4);
-	ui->tilePickerButtonGroup->setId(ui->tilePickerButton_R, 5);*/
+	ui->tilePickerButtonGroup->setId(ui->tilePickerButton_R, 5);
 
 	expandIcon = QIcon(":/icons8-expand-48.png");
 	collapseIcon = QIcon(":/icons8-collapse-arrow-48.png");
@@ -77,10 +77,10 @@ MapTab::MapTab(QWidget *parent): BaseTab(parent), ui(new Ui::MapTab)
 
 
 	// TODO: remember last selection
-	/*connect(ui->tilePickerButtonGroup, &QButtonGroup::idClicked, [this](int id)
+	connect(ui->tilePickerButtonGroup, &QButtonGroup::idClicked, [this](int id)
 	{
 		TileSet::Set setIndex = TileSet::Set(TileSet::A5 + id);
-		ui->tilePickerView->setBackgroundPixmap(setIndex, 48, tileMap.pixmap(setIndex));
+		ui->tilePickerView->setBackgroundPixmap(tileMap.pixmap(setIndex), 48, id != 0);
 
 		if (id == 0)
 		{
@@ -96,7 +96,7 @@ MapTab::MapTab(QWidget *parent): BaseTab(parent), ui(new Ui::MapTab)
 			ui->layerButton_1->setEnabled(true);
 			ui->layerButton_2->setEnabled(true);
 		}
-	});*/
+	});
 
 	//mapViewTools[0] = tilePaintTool = new TilePaintTool(ui->mapView->currentScene(), this);
 	mapViewTools[0] = tilePaintTool = ui->mapView->makeTool<TilePaintTool>();
@@ -104,14 +104,17 @@ MapTab::MapTab(QWidget *parent): BaseTab(parent), ui(new Ui::MapTab)
 	mapViewTools[2] = tilePickerTool = ui->mapView->makeTool<TilePickerTool>();
 
 	//connect(ui->tilePickerView, &TilePickerView::tileSelected, tilePaintTool, &TilePaintTool::setCurrentTileSingle);
-	//connect(ui->tilePickerView, &TilePickerView::multipleTilesSelected, tilePaintTool, &TilePaintTool::setCurrentTileMultiple);
+	connect(ui->tilePickerView, &TilePickerView::selected, this, [this](const QRect &rect)
+	{
+		tilePaintTool->setCurrentTileMultiple(TileSet::Set(ui->tilePickerButtonGroup->checkedId() + 4), rect);
+	});
 
-	/*connect(tilePickerTool, &TilePickerTool::pickTile,
-			[this](int tileId, int buttonIndex)
+	connect(tilePickerTool, &TilePickerTool::pickTile,
+			[this](int x, int y, int buttonIndex)
 	{
 		ui->tilePickerButtonGroup->button(buttonIndex)->click();
-		ui->tilePickerView->selectTile(tileId);
-	});*/
+		ui->tilePickerView->selectTile(x, y);
+	});
 
 	connect(ui->paintLayerButtonGroup, &QButtonGroup::idClicked, tilePaintTool, &TilePaintTool::setCurrentLayer);
 
@@ -173,8 +176,9 @@ void MapTab::loadMap(int id)
 	}
 
 	tileMap.loadTileMap(id);
-	for (auto tool: mapViewTools)
-		tool->setTileMap(&tileMap);
+	tilePaintTool->setTileMap(&tileMap);
+	mapEventTool->setTileMap(&tileMap);
+	tilePickerTool->setTileMap(&tileMap);
 
 	for (int layer = 0; layer < 6; layer++) // 6 - region
 	{
@@ -201,25 +205,16 @@ void MapTab::loadMap(int id)
 	for (int i = 0; i < 5; i++)
 	{
 		TileSet::Set setIndex = TileSet::Set(TileSet::A5 + i);
-		//ui->tilePickerButtonGroup->button(i)->setEnabled(tileMap.hasTileSet(setIndex));
+		ui->tilePickerButtonGroup->button(i)->setEnabled(tileMap.hasTileSet(setIndex));
 	}
 
-	Map *map = Database::Get()->map(id);
-	ui->tilePickerWidget->setTileSet(map->tilesetId);
+	//Map *map = Database::Get()->map(id);
+	//ui->tilePickerWidget->setTileSet(map->tilesetId);
 
 	ui->mapView->load(&tileMap);
+	ui->tilePickerButtonGroup->button(0)->click();
 
-	// Set first existing tileset for tile picker
-	/*for (int i = 0; i < 5; i++)
-	{
-		if (ui->tilePickerButtonGroup->button(i)->isEnabled())
-		{
-			ui->tilePickerButtonGroup->button(i)->click();
-			break;
-		}
-	}*/
-
-	//ui->tilePickerView->selectPoint(QPoint(0, 0));
+	ui->tilePickerView->selectTile(0, 0);
 	ui->mapToolBar->setEnabled(true);
 }
 

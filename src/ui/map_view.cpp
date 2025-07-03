@@ -188,10 +188,10 @@ void MapView::drawBackground(QPainter *painter, const QRectF &rect)
 					continue;
 
 				TileItemInfo info = tileMap->tileItemInfo(tileId);
-				if (info.pixmap)
+				if (!info.pixmap.isNull())
 				{
 					QRect dstRect(x * tileSize, y * tileSize, tileSize, tileSize);
-					painter->drawPixmap(dstRect, *info.pixmap, info.rect);
+					painter->drawPixmap(dstRect, info.pixmap, info.rect);
 				}
 				else
 				{
